@@ -22,7 +22,7 @@ class main():
         else:
             print("Running classifier and Regression tests\n")
             classifier = classification.class_classification()
-            classifier.get_classifier()
+            classifier.run_classifier()
 
             regressor = regression.class_regression()
             regressor.get_regressor()
