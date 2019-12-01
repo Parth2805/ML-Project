@@ -180,6 +180,7 @@ def train_model(path):
 
     VBP = VanillaBackprop(net, loss_fn)
     activation_maximization(VBP)
+    fgst(net, testing_data, torch_test_data, loss_fn)
 
 
 def fwd_pass(X, y, optimizer, loss_fn, net, train=False):
