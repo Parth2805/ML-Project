@@ -3,6 +3,8 @@ import sys
 import cifar10 as cifar10
 from pip._vendor.distlib.compat import raw_input
 
+from src import classification
+
 
 class main():
 
@@ -14,12 +16,13 @@ class main():
             cifar10.Cifar10(sys.argv[1], user_response)
         else:
             print("Running classifier and Regression tests\n")
-            # classifier = classification.class_classification()
-            # classifier.run_classifier()
+
+            classifier = classification.class_classification()
+            classifier.run_classifier()
             #
             # regressor = regression.class_regression()
             # regressor.get_regressor()
-            cifar10.Cifar10(sys.argv[1], user_response)
+            # cifar10.Cifar10(sys.argv[1], user_response)
 
 
 start1 = main()
