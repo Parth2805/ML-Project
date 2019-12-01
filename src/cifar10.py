@@ -1,13 +1,9 @@
 import os
 import pickle
 
-import matplotlib.pyplot as plt
 import numpy as np
-import plot
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-import torchvision
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
 

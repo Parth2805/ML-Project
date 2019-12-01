@@ -1,11 +1,6 @@
 from pip._vendor.distlib.compat import raw_input
 import sys
-import os
-import torch
-import torch.nn as nn
-import torchvision
-import torch.nn.functional as F
-import cifar10
+import cifar10 as cifar10
 from cifar10 import CNN
 
 
