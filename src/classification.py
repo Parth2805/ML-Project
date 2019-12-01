@@ -23,18 +23,17 @@ from scipy.io import arff
 class class_classification:
     '''Contains all the classifiers'''
 
-    def grid_search_cv(self, classifier, param_grid, X_train, y_train, X_test, y_test):
-        model = model_select.GridSearchCV(classifier, param_grid, cv=5, verbose=10).fit(X_train, y_train)
+    def grid_search_cv(self, classifier, param_grid, X_train, y_train, X_test, y_test,cv=5):
+        model = model_select.GridSearchCV(classifier, param_grid, verbose=10,cv=cv).fit(X_train, y_train)
 
-        model.best_estimator_.score(X_test, y_test)
         '''valida
         lear
         confs'''
 
-    def random_search_cv(self, classifier, param_grid, X_train, y_train, X_test, y_test):
-        model = model_select.GridSearchCV(classifier, param_grid, cv=5, verbose=10).fit(X_train, y_train)
+    def random_search_cv(self, classifier, param_grid, X_train, y_train, X_test, y_test,cv=5):
+        model = model_select.GridSearchCV(classifier, param_grid, cv=cv, verbose=10).fit(X_train, y_train)
 
-        model.best_estimator_.score(X_test, y_test)
+        # print(model.best_estimator_.score(X_test, y_test))
 
     def run_classifier(self):
         print('Running classifiers for the following datasets: \n')
@@ -116,8 +115,8 @@ class class_classification:
 
         param = dict(kernel=['rbf', 'linear'],
                      degree=[1, 2, 3],
-                     C=reciprocal(0.01, 2),
-                     gamma=reciprocal(0.01, 2))
+                     C=Stats.reciprocal(0.01, 2),
+                     gamma=Stats.reciprocal(0.01, 2))
 
         # model = sklearn.model_selection.RandomizedSearchCV(estimator=svm, param_distributions=param, verbose=10,
         #                                                    cv=5).fit(X_train, y_train)
