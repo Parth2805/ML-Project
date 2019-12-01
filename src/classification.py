@@ -26,15 +26,12 @@ class class_classification:
     def grid_search_cv(self, classifier, param_grid, X_train, y_train, X_test, y_test):
         model = model_select.GridSearchCV(classifier, param_grid, cv=5, verbose=10).fit(X_train, y_train)
 
-        model.best_estimator_.score(X_test, y_test)
-        '''valida
-        lear
-        confs'''
+        # model.best_estimator_.score(X_test, y_test)
 
     def random_search_cv(self, classifier, param_grid, X_train, y_train, X_test, y_test):
         model = model_select.GridSearchCV(classifier, param_grid, cv=5, verbose=10).fit(X_train, y_train)
 
-        model.best_estimator_.score(X_test, y_test)
+        # model.best_estimator_.score(X_test, y_test)
 
     def run_classifier(self):
         print('Running classifiers for the following datasets: \n')
