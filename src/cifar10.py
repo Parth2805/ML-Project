@@ -2,6 +2,7 @@ import os
 import pickle
 
 import numpy as np
+import plot
 import torch
 import torch.nn as nn
 from sklearn import preprocessing
@@ -9,7 +10,7 @@ from sklearn.model_selection import train_test_split
 
 N_CHANNELS = 3
 SIZE = 32
-MODEL_NAME = "RAJANCIFAR10.t7"
+MODEL_NAME = "CIFAR10.t7"
 EPOCHS = 10
 TOLERANCE = 1e-4
 device = torch.device('cpu')
@@ -127,7 +128,8 @@ def train_model(path):
     torch_test_data = torch.tensor(testing_data, dtype=torch.float32)
     torch_test_labels = torch.tensor(testing_labels, dtype=torch.int64)
     batch_size = 128
-    train(net, torch_train_data, torch_train_labels, validation_data, validation_labels, batch_size, optimizer, loss_fn)
+    train(net, torch_train_data, torch_train_labels, torch_val_data, torch_val_labels, batch_size, optimizer, loss_fn)
+    test_accuracy(torch_test_data, torch_test_labels, net)
 
 
 def fwd_pass(X, y, optimizer, loss_fn, net, train=False):
@@ -144,6 +146,12 @@ def fwd_pass(X, y, optimizer, loss_fn, net, train=False):
     return acc, loss
 
 
+def test_accuracy(torch_test_data, torch_test_labels, net):
+    net.eval()
+    o = net(torch_test_data)
+    print((o.argmax(axis=1) == torch_test_labels.argmax(axis=1)).sum() * 1.0 / torch_test_labels.shape[0])
+
+
 def test(X, y, optimizer, loss_fn, net, batch_size=500):
     avg_val_acc = 0
     avg_val_loss = 0
@@ -152,7 +160,8 @@ def test(X, y, optimizer, loss_fn, net, batch_size=500):
     for i in range(0, X.shape[0], batch_size):
         val_X, val_y = X[i:i + batch_size], y[i:i + batch_size]
         with torch.no_grad():
-            val_acc, val_loss = fwd_pass(val_X, val_y, optimizer, loss_fn, net)
+            val_acc, val_loss = fwd_pass(val_X.view(batch_size, N_CHANNELS, SIZE, SIZE).to(device), val_y.to(device),
+                                         optimizer, loss_fn, net)
             avg_val_acc += val_acc / avg_by
             avg_val_loss += val_loss / avg_by
             print("val_acc {0} and val_loss {1}".format(val_acc, val_loss))
@@ -193,13 +202,22 @@ def train(net, torch_train_data, torch_train_labels, torch_val_data, torch_val_l
             print("Iteration: {0} | Loss: {1} | Training accuracy: {2}".format(epoch, train_loss, train_acc * 100))
 
     print("Finished Training ...")
-    # plot.plot(training_acc, training_loss, validation_acc, validation_loss)
+    plot.plot_training_val_graph(training_acc, training_loss, validation_acc, validation_loss)
+
+
+def plot_image(index, test=False):
+    if (test):
+        plt.imshow(testing_data[index].transpose(1, 2, 0))
+        plt.title(labels[testing_labels[index].argmax()]);
+    else:
+        plt.imshow(training_data[index].transpose(1, 2, 0))
+        plt.title(labels[training_labels[index].argmax()]);
 
 
 class Cifar10:
     def __init__(self, path, load_pretrained_model):
         self.path = path
-        if load_pretrained_model is "Y":
+        if load_pretrained_model is "1":
             print("load")
             loaded_model = torch.load("../Pretrained Models/" + MODEL_NAME, map_location=device)
             print(loaded_model['net'])
