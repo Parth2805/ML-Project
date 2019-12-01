@@ -1,6 +1,7 @@
 import os
 import pickle
 
+import matplotlib.pyplot as plt
 import numpy as np
 import plot
 import torch
@@ -14,7 +15,8 @@ MODEL_NAME = "CIFAR10.t7"
 EPOCHS = 10
 TOLERANCE = 1e-4
 device = torch.device('cpu')
-DEMO_PATH = "../Results For Demo"
+DEMO_PATH = "../Results For Demo/"
+labels = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
 
 
 class CNN(nn.Module):
@@ -82,6 +84,51 @@ class CNN(nn.Module):
         return x
 
 
+class VanillaBackprop():
+    def __init__(self, model, loss_fn):
+        self.model = model
+        self.gradients = None
+        # Put model in evaluation mode
+        self.model.eval()
+        self.loss_fn = loss_fn
+
+    def generate_gradient_first_layer(self, input_image, target_class):
+        for i in range(10):
+            model_output = self.model(input_image)  # for grad, add to(device)
+            self.model.zero_grad()
+            label_as_var = torch.from_numpy(np.asarray([target_class], dtype=np.int64))
+            loss = self.loss_fn(model_output, label_as_var)
+            loss.backward()
+            input_image.data += 0.2 * input_image.grad.data
+        return input_image
+
+
+class FGST():
+    def __init__(self, model, loss_fn, alpha):
+        self.model = model
+        self.model.eval()
+        self.alpha = alpha
+        self.loss_fn = loss_fn
+
+    def adversarial_noise(self, image, label):
+        image.grad = None
+        model_output = self.model(image.to(device))
+        label_as_var = torch.from_numpy(np.asarray([label], dtype=np.int64))
+        loss = self.loss_fn(model_output, label_as_var)
+        loss.backward()
+        return torch.sign(image.grad.data)
+
+    def generate_gradient_on_target_class(self, index, target_class, torch_test_data):
+        random_image = torch_test_data[index].reshape(1, 3, 32, 32)
+        random_tensor = torch.tensor(random_image, dtype=torch.float32, requires_grad=True)
+        perturbations = 0.0
+        for i in range(5):
+            perturbations += self.adversarial_noise(random_tensor, target_class).numpy()
+            perturbations_tensor = torch.tensor(perturbations)
+            random_tensor.data = random_tensor.data - perturbations_tensor * self.alpha
+        return random_tensor, perturbations_tensor;
+
+
 def unpickle(file):
     with open(file, 'rb') as file:
         dictionary = pickle.load(file, encoding='bytes')
@@ -130,6 +177,9 @@ def train_model(path):
     batch_size = 128
     train(net, torch_train_data, torch_train_labels, torch_val_data, torch_val_labels, batch_size, optimizer, loss_fn)
     test_accuracy(torch_test_data, torch_test_labels, net)
+
+    VBP = VanillaBackprop(net, loss_fn)
+    activation_maximization(VBP)
 
 
 def fwd_pass(X, y, optimizer, loss_fn, net, train=False):
@@ -205,21 +255,100 @@ def train(net, torch_train_data, torch_train_labels, torch_val_data, torch_val_l
     plot.plot_training_val_graph(training_acc, training_loss, validation_acc, validation_loss)
 
 
-def plot_image(index, test=False):
-    if (test):
-        plt.imshow(testing_data[index].transpose(1, 2, 0))
-        plt.title(labels[testing_labels[index].argmax()]);
-    else:
-        plt.imshow(training_data[index].transpose(1, 2, 0))
-        plt.title(labels[training_labels[index].argmax()]);
+def activation_maximization(VBP):
+    random_image = np.ones(32 * 32 * 3).reshape(3, 32, 32)
+    random_tensor_image = random_image.reshape(1, 3, 32, 32)
+    f, axarr = plt.subplots(1, 11, figsize=(32, 32));
+    axarr[0].imshow(random_image.transpose(1, 2, 0));
+    axarr[0].set_xticks([]);
+    axarr[0].set_yticks([]);
+    axarr[0].set_title("random image");
+    j = 0;
+    for i in range(10):
+        random_tensor = torch.tensor(random_tensor_image, dtype=torch.float32, requires_grad=True)
+        input_image_gradients = VBP.generate_gradient_first_layer(random_tensor, i)
+        input_image_gradients_numpy = input_image_gradients.data.cpu().numpy()[0]
+        gray_vanilla = convert_to_gray_scale(input_image_gradients_numpy)
+        axarr[i + 1].imshow(np.repeat(gray_vanilla, 3, axis=0).transpose(1, 2, 0));
+        axarr[i + 1].set_xticks([]);
+        axarr[i + 1].set_yticks([]);
+        axarr[i + 1].set_title("activating \nimage \nfor class\n {0}".format(labels[j]));
+        j = j + 1
+    plt.show(block=True)
+    f.savefig(DEMO_PATH + "activation_maximization.jpg")
+
+
+def fgst(net, testing_data, torch_test_data, loss_fn):
+    # testing to add perturbations to one image acc to target class
+    index = 100
+    target_class = 5
+    fgst1 = FGST(net, loss_fn, alpha=0.5)
+    perturbated_result, pertubation_tensor = fgst1.generate_gradient_on_target_class(index, target_class,
+                                                                                     torch_test_data)
+    model_perturbated_pred = torch.softmax(net(perturbated_result.to(device)), dim=1)
+    model_actual_pred = torch.softmax(net(torch_test_data[index].view(-1, 3, 32, 32).to(device)), dim=1)
+
+    result_to_image = perturbated_result.data.cpu().numpy()[0]
+    perturbation_tensor_to_image = pertubation_tensor.data.cpu().numpy()[0]
+
+    f, axarr = plt.subplots(1, 3, figsize=(9, 9));
+
+    axarr[0].imshow(testing_data[index].transpose(1, 2, 0))
+    axarr[0].set_xticks([]);
+    axarr[0].set_yticks([]);
+    axarr[0].set_title("""Model Actual Image \nPrediction class: {0}\n accuracy: {1:.2f}% """.
+                       format(labels[model_actual_pred.argmax().item()],
+                              (model_actual_pred[0][model_actual_pred.argmax().item()] * 100).item()));
+
+    axarr[1].imshow(perturbation_tensor_to_image.transpose(1, 2, 0));
+    axarr[1].set_xticks([]);
+    axarr[1].set_yticks([]);
+    axarr[1].set_title("Perturbation Image for\n target class: {0}".format(labels[target_class]));
+
+    axarr[2].imshow(result_to_image.transpose(1, 2, 0).astype(np.uint8))
+    axarr[2].set_xticks([]);
+    axarr[2].set_yticks([]);
+    axarr[2].set_title("""Model Perturbated Image \nPrediction class: {0}\n accuracy: {1:.2f}% """.
+                       format(labels[model_perturbated_pred.argmax().item()],
+                              (model_perturbated_pred[0][model_perturbated_pred.argmax().item()] * 100).item()));
+    # plt.imsave("perturabted{0}.jpg".format(index),(perturbated_image.transpose(1,2,0)).astype(np.uint8))
+
+    f.savefig(DEMO_PATH + "/fgst.jpg");
+
+
+def convert_to_gray_scale(im_as_arr):
+    grayscale_im = np.sum(np.abs(im_as_arr), axis=0)
+    im_max = np.percentile(grayscale_im, 99)
+    im_min = np.min(grayscale_im)
+    grayscale_im = (np.clip((grayscale_im - im_min) / (im_max - im_min), 0, 1))
+    grayscale_im = np.expand_dims(grayscale_im, axis=0)
+    return grayscale_im
+
+
+# def plot_image(index, test=False):
+#     if (test):
+#         plt.imshow(testing_data[index].transpose(1, 2, 0))
+#         plt.title(labels[testing_labels[index].argmax()]);
+#     else:
+#         plt.imshow(training_data[index].transpose(1, 2, 0))
+#         plt.title(labels[training_labels[index].argmax()]);
 
 
 class Cifar10:
     def __init__(self, path, load_pretrained_model):
         self.path = path
+
         if load_pretrained_model is "1":
             print("load")
             loaded_model = torch.load("../Pretrained Models/" + MODEL_NAME, map_location=device)
             print(loaded_model['net'])
+            loss_fn = nn.CrossEntropyLoss()
+            VBP = VanillaBackprop(loaded_model['net'], loss_fn)
+            activation_maximization(VBP)
+            test_batch = unpickle(path + "/test_batch")
+            test_data = np.array(list(test_batch[b'data']))
+            testing_data = test_data.reshape(test_data.shape[0], N_CHANNELS, SIZE, SIZE)
+            torch_test_data = torch.tensor(testing_data, dtype=torch.float32)
+            fgst(loaded_model['net'], testing_data, torch_test_data, loss_fn)
         else:
             train_model(self.path)

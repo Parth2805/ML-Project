@@ -1,2 +1,5 @@
-Pretrained Models/RAJANCIFAR10.t7
+Pretrained Models/CIFAR10.t7
 Results For Demo/CIFAR10.t7
+Pretrained Models/CIFAR10CPU.t7
+Results For Demo/activation_maximization.jpg
+Results For Demo/fgst.jpg
