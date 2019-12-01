@@ -1,9 +1,5 @@
-<< << << < HEAD
 import numpy as np
-== == == =
-import arff
 import sklearn.model_selection as model_select
->> >> >> > master
 import pandas as pd
 import sklearn
 import sklearn.model_selection as model_select
