@@ -6,6 +6,7 @@ import sklearn
 import sklearn.metrics as metrics
 import sklearn.neighbors
 import sklearn.neural_network
+from scipy.stats import reciprocal
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -204,6 +205,106 @@ class class_regression:
 
     def Facebook_metrics(self):
         print('Running Regression for 5.Facebook_metrics dataset')
+
+        '''
+        ### **Preprocessing**
+        '''
+
+        file = "/content/drive/My Drive/Regression/5_Facebook/dataset_Facebook.csv"
+        df = pd.read_csv(file, sep=';')
+
+        le = sklearn.preprocessing.LabelEncoder().fit(df.iloc[:, 1])
+        df.iloc[:, 1] = le.transform(df.iloc[:, 1])
+
+        df.fillna(0, axis=0, inplace=True)
+        data = df.values
+        print(data)
+        X_train, X_test, y_train, y_test = train_test_split(data[:, 0:18], data[:, 18], test_size=0.20, random_state=0)
+
+
+        'Function for NAN'
+        list = []
+        for i in range(data.shape[0]):
+            for j in range(data.shape[1]):
+                if (np.isnan(data[i][j])):
+                    print("There is a nan at:", i, j)
+                else:
+                    list.append(data[i][j])
+        # print(len(list) / 19)
+
+        '''
+        ### **Linear Regression**
+        '''
+
+        lr = sklearn.linear_model.LinearRegression().fit(X_train, y_train)
+        # print("Validation Score:",lr.score(X_train,y_train))
+        # print("Testing Score",lr.score(X_test,y_test))
+
+        '''
+        ### **SVR**
+        '''
+
+        svm = sklearn.svm.SVR()
+        param = [{
+            "kernel": ["linear"],
+            "C": np.arange(0.01, 2)
+        }]
+
+
+        '''
+        ### **Decision Tree**
+        '''
+        dt = sklearn.tree.DecisionTreeRegressor(random_state=0)
+
+        param = {'max_depth': np.arange(1, 18, 1),
+                 'splitter': ['best', 'random'],
+                 'max_features': np.arange(1, 18, 1),
+                 'min_samples_split': np.arange(2, 20, 1)}
+
+        '''
+        ### **Random Forest**
+        '''
+        rf = sklearn.ensemble.RandomForestRegressor(n_estimators=100, random_state=0)
+
+        param = {'max_depth': np.arange(1, 20, 1),
+                 'max_features': np.array([1, 2, 5, 10, 15, 18]),
+                 'min_samples_split': np.array([2, 3, 5])}
+
+
+        '''
+        ## **Ada Boost**
+        '''
+
+        ada = sklearn.ensemble.AdaBoostRegressor(random_state=0)
+
+        param = dict(n_estimators=np.arange(50, 250, 10),
+                     loss=['linear', 'square']
+                     )
+
+
+
+        '''
+        ## **Neural Network**
+        '''
+
+        mlp = sklearn.neural_network.MLPRegressor(activation='relu', n_iter_no_change=10, momentum=0.9,
+                                                  learning_rate='adaptive', random_state=0, verbose=True,
+                                                  warm_start=True, early_stopping=True, )
+
+        param_grid = {
+            "solver": ['adam'],
+            "learning_rate_init": reciprocal(0.001, 0.1),
+            "hidden_layer_sizes": [(128, 64, 32, 16), (32, 16, 8), (64, 32, 16)]
+        }
+
+        '''
+        ## **Guassian Process**
+        '''
+        gp = sklearn.gaussian_process.GaussianProcessRegressor()
+
+        param = {'alpha': np.arange(0, 1, 0.001),
+                 'normalize_y': ['True', 'False']}
+
 
     def Bike_Sharing(self):
         print('Running Regression for 6.Bike_Sharing dataset')
