@@ -41,6 +41,110 @@ class class_regression:
     def WineQuality(self):
         print('Running Regression for 1.WineQuality dataset')
 
+        # %%
+        '''
+        ### **Preprocessing**
+        '''
+
+        # %%
+        file = "http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv"
+        df = pd.read_csv(file, sep=';')
+        data = pd.DataFrame(df)
+        data = data.values
+        file = "http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv"
+        df2 = pd.read_csv(file, sep=';')
+        data2 = pd.DataFrame(df2)
+        data2 = data2.values
+        data = np.vstack((data, data2))
+        X_train, X_test, y_train, y_test = train_test_split(data[:, 0:11], data[:, 11], test_size=0.20, random_state=0)
+
+
+
+        'Function for NAN'
+        # print(data.shape)
+        list = []
+        for i in range(data.shape[0]):
+            for j in range(data.shape[1]):
+                if (not (np.isfinite(data[i][j]))):
+                    print("There is a nan at:", i, j)
+                else:
+                    list.append(data[i][j])
+        # print(len(list) / 12)
+
+        '''
+        ### **Linear Regression**
+        '''
+        lr = sklearn.linear_model.LinearRegression().fit(X_train, y_train)
+        # print("Validation Score:",lr.score(X_train,y_train))
+        # print("Testing Score",lr.score(X_test,y_test))
+
+        '''
+        ### **SVR**
+        '''
+        svm = sklearn.svm.SVR()
+
+        param = [{"kernel": ["rbf"],
+                  "degree": [1, 2, 3],
+                  "C": np.array([1, 2, 5, 10, 20]),
+                  "gamma": np.array([0.1, 1, 5, 10])}]
+
+        '''
+        ### **Decision Tree**
+        '''
+        dt = sklearn.tree.DecisionTreeRegressor(random_state=0)
+
+        param = {'max_depth': np.arange(1, 15, 1),
+                 'splitter': ['best', 'random'],
+                 'max_features': np.arange(1, 11, 1),
+                 'min_samples_split': np.arange(2, 20, 1)}
+
+        '''
+        ### **Random Forest**
+        '''
+
+        rf = sklearn.ensemble.RandomForestRegressor(n_estimators=100, random_state=0)
+
+        param = {'max_depth': np.arange(1, 20, 1),
+                 'max_features': np.array([1, 2, 5, 11]),
+                 'min_samples_split': np.array([2, 3, 5])}
+
+        '''
+        ## **Ada Boost**
+        '''
+
+        ada = sklearn.ensemble.AdaBoostRegressor(random_state=0)
+
+        param = dict(n_estimators=np.arange(50, 250, 10),
+                     loss=['linear', 'square']
+                     )
+
+        '''
+        ## **Neural Network**
+        '''
+        mlp = sklearn.neural_network.MLPRegressor(activation='relu', n_iter_no_change=10, momentum=0.9,
+                                                  learning_rate='adaptive', random_state=0, verbose=True,
+                                                  warm_start=True, early_stopping=True, )
+
+        param_grid = {
+            "solver": ['adam'],
+            "learning_rate_init": reciprocal(0.001, 0.1),
+            "hidden_layer_sizes": [(512,), (256, 128, 64, 32), (512, 256, 128, 64, 32)]
+        }
+
+
+        '''
+        ## **Gaussian Process**
+        '''
+        gp = sklearn.gaussian_process.GaussianProcessRegressor(random_state=0)
+
+        param_grid = {
+
+            "n_restarts_optimizer": np.arange(0, 10, 1)
+        }
+
+
+
+
     def Communities_Crime(self):
         print('Running Regression for 2.Communities_Crime dataset')
 
