@@ -42,12 +42,9 @@ class class_regression:
     def WineQuality(self):
         print('Running Regression for 1.WineQuality dataset')
 
-        # %%
         '''
         ### **Preprocessing**
         '''
-
-        # %%
         file = "http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv"
         df = pd.read_csv(file, sep=';')
         data = pd.DataFrame(df)
@@ -76,8 +73,8 @@ class class_regression:
         ### **Linear Regression**
         '''
         lr = sklearn.linear_model.LinearRegression().fit(X_train, y_train)
-        # print("Validation Score:",lr.score(X_train,y_train))
-        # print("Testing Score",lr.score(X_test,y_test))
+
+
 
         '''
         ### **SVR**

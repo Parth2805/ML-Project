@@ -1,10 +1,9 @@
 import sys
 
-import cifar10 as cifar10
+# import cifar10 as cifar10
 from pip._vendor.distlib.compat import raw_input
 
-import regression
-
+# import regression
 from src import classification
 
 
