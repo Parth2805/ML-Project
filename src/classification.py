@@ -3,6 +3,7 @@ import pickle
 
 import numpy as np
 import pandas as pd
+import plot
 import scipy.stats as Stats
 import sklearn
 import sklearn.ensemble as Ensemble
@@ -32,34 +33,34 @@ class class_classification:
 
     def grid_search_cv(self, classifier, param_grid, X_train, y_train, X_test, y_test, name, cv=5):
         model = model_select.GridSearchCV(classifier, param_grid, cv=cv, verbose=10).fit(X_train, y_train)
-        print("Grid Search CV")
+        print("Grid Search CV %s".format(name))
         print("Best Estimator: ", model.best_estimator_)
         print("Average HyperParameter Search Accuracy: ", model.best_score_)
         print("Testing Accuracy: ", model.best_estimator_.score(X_test, y_test))
         print("Testing Accuracy: ", model.best_estimator_.score(X_train, y_train))
-        pickle.dump(model.best_estimator_, open(RESULTS_FOR_DEMO + "%s.sav" % name, 'wb'))
-        pickle.dump(model.best_params_, open(path + "%s.sav" % name, 'wb'))
-        # TODO: Add plotting code
+        pickle.dump(model.best_estimator_, open(RESULTS_FOR_DEMO + "%sModel.sav" % name, 'wb'))
+        pickle.dump(model.best_params_, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
+        plot.plot_learning_curve(model.best_estimator_, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=cv)
 
     def random_search_cv(self, classifier, param_grid, X_train, y_train, X_test, y_test, name, cv=5, n_iter=30):
-        model = model_select.RandomSearchCV(classifier, param_grid, cv=cv, n_iter=n_iter,
-                                            verbose=10, random_state=0).fit(X_train,
-                                                                            y_train)
-        print("Random Search CV")
+        model = model_select.RandomizedSearchCV(classifier, param_grid, cv=cv, n_iter=n_iter,
+                                                verbose=10, random_state=0).fit(X_train,
+                                                                                y_train)
+        print("Random Search %s".format(name))
         print("Best Estimator: ", model.best_estimator_)
         print("Average HyperParameter Search Accuracy: ", model.best_score_)
         print("Testing Accuracy: ", model.best_estimator_.score(X_test, y_test))
         print("Training Accuracy: ", model.best_estimator_.score(X_train, y_train))
-        pickle.dump(model.best_estimator_, open(RESULTS_FOR_DEMO + "%s.sav" % name, 'wb'))
-        pickle.dump(model.best_params_, open(path + "%s.sav" % name, 'wb'))
-        # TODO: Add plotting code
+        pickle.dump(model.best_estimator_, open(RESULTS_FOR_DEMO + "%sModel.sav" % name, 'wb'))
+        pickle.dump(model.best_params_, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
+        plot.plot_learning_curve(model.best_estimator_, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=cv)
 
     def load_pretrained_models(self, name):
         print("Loading PreTrained model: ", name)
-        model = pickle.load(PRETRAINED_MODEL + name)
+        model = pickle.load(PRETRAINED_MODEL + name + ".sav")
         print("Testing Accuracy: ", model.score(X_test, y_test))
         print("Training Accuracy: ", model.score(X_train, y_train))
-        # TODO: Add plotting code
+        plot.plot_learning_curve(model, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=cv)
 
     def run_classifier(self, userResponse):
         print('Running classifiers for the following datasets: \n')
@@ -410,28 +411,28 @@ class class_classification:
             self.random_search_cv(nn, param_grid, X_train, y_train, X_test, y_test, "DefaultCreditCardMLP", cv=3)
         else:
             # SVM
-            self.load_pretrained_models("svm_default_client_grid_model.sav")
+            self.load_pretrained_models("svm_default_client_grid_model")
 
             # DTC
-            self.load_pretrained_models("tree_default_client_grid_model.sav")
+            self.load_pretrained_models("tree_default_client_grid_model")
 
             # RFC
-            self.load_pretrained_models("random_forest_default_client_grid_model.sav")
+            self.load_pretrained_models("random_forest_default_client_grid_model")
 
             # LR
-            self.load_pretrained_models("logistic_default_client_random_model.sav")
+            self.load_pretrained_models("logistic_default_client_random_model")
 
             # Adaboost
-            self.load_pretrained_models("adaboost_default_client_grid_model.sav")
+            self.load_pretrained_models("adaboost_default_client_grid_model")
 
             # KNN
-            self.load_pretrained_models("knearest_default_client_grid_model.sav")
+            self.load_pretrained_models("knearest_default_client_grid_model")
 
             # GNB
-            self.load_pretrained_models("gaussian_default_client_grid_model.sav")
+            self.load_pretrained_models("gaussian_default_client_grid_model")
 
             # MLP
-            self.load_pretrained_models("mlp_default_client_random_model.sav")
+            self.load_pretrained_models("mlp_default_client_random_model")
 
     def Breast_Cancer_Wisconsin(self):
         print('Running classification for 3.Breast Cancer Wisconsin dataset')
@@ -1178,28 +1179,28 @@ class class_classification:
                                   "SteelFaultsMLP", cv=3)
         else:
             # SVM
-            self.load_pretrained_models("svm_faults_grid_model.sav")
+            self.load_pretrained_models("svm_faults_grid_model")
 
             # DTC
-            self.load_pretrained_models("tree_faults_grid_model.sav")
+            self.load_pretrained_models("tree_faults_grid_model")
 
             # RFC
-            self.load_pretrained_models("random_forest_faults_grid_model.sav")
+            self.load_pretrained_models("random_forest_faults_grid_model")
 
             # LR
-            self.load_pretrained_models("logistic_faults_grid_model.sav")
+            self.load_pretrained_models("logistic_faults_grid_model")
 
             # Adaboost
-            self.load_pretrained_models("adaboost_faults_grid_model.sav")
+            self.load_pretrained_models("adaboost_faults_grid_model")
 
             # KNN
-            self.load_pretrained_models("kNearest_faults_grid_model.sav")
+            self.load_pretrained_models("kNearest_faults_grid_model")
 
             # GNB
-            self.load_pretrained_models("gaussian_faults_grid_model.sav")
+            self.load_pretrained_models("gaussian_faults_grid_model")
 
             # MLP
-            self.load_pretrained_models("mlp_faults_grid_model.sav")
+            self.load_pretrained_models("mlp_faults_grid_model")
 
     def Adult(self):
         print('Running classification for 7.Adult dataset')
@@ -1574,25 +1575,25 @@ class class_classification:
                                   "SeismicBumpsMLP", cv=3)
         else:
             # SVM
-            self.load_pretrained_models("svm_bumps_grid_model.sav")
+            self.load_pretrained_models("svm_bumps_grid_model")
 
             # DTC
-            self.load_pretrained_models("tree_bumps_grid_model.sav")
+            self.load_pretrained_models("tree_bumps_grid_model")
 
             # RFC
-            self.load_pretrained_models("random_bumps_grid_model.sav")
+            self.load_pretrained_models("random_bumps_grid_model")
 
             # LR
-            self.load_pretrained_models("logistic_bumps_grid_model.sav")
+            self.load_pretrained_models("logistic_bumps_grid_model")
 
             # Adaboost
-            self.load_pretrained_models("adaboost_bumps_grid_model.sav")
+            self.load_pretrained_models("adaboost_bumps_grid_model")
 
             # KNN
-            self.load_pretrained_models("kNearest_bumps_grid_model.sav")
+            self.load_pretrained_models("kNearest_bumps_grid_model")
 
             # GNB
-            self.load_pretrained_models("gaussian_bumps_grid_model.sav")
+            self.load_pretrained_models("gaussian_bumps_grid_model")
 
             # MLP
-            self.load_pretrained_models("mlp_bumps_grid_model.sav")
+            self.load_pretrained_models("mlp_bumps_grid_model")
