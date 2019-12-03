@@ -12,8 +12,11 @@ class main():
         user_response = raw_input("Press 1 to get pre trained models and 2 to run the classification and regression \n")
 
         if user_response.__eq__('1'):
-            print("Running Preloaded models\n")
-            cifar10.Cifar10(sys.argv[1], user_response)
+        #     print("Running Preloaded models\n")
+        #     cifar10.Cifar10(sys.argv[1], user_response)
+            classifier = classification.class_classification()
+            classifier.run_classifier(user_response)
+
         else:
             print("Running classifier and Regression tests\n")
 

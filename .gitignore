@@ -5,9 +5,30 @@ Results For Demo/activation_maximization.jpg
 Results For Demo/fgst.jpg
 Pretrained Models/RAJANCIFAR10.t7
 Results For Demo/CIFAR10.t7
+
+Datasets/australian.xlsx
 Datasets/1_DiabeticRetinopathy.arff
 Datasets/student-por.csv
 Datasets/5_GermanData.xlsx
 Datasets/default of credit card clients.xls
 Datasets/Faults.xlsx
 Datasets/seismic-bumps.csv
+Datasets/yeast.data
+
+Pretrained Models/statlog_australian_adaboost_model.sav
+Pretrained Models/statlog_australian_gaussian_grid_model.sav
+Pretrained Models/statlog_australian_k_nearest_neighbours_modal.sav
+Pretrained Models/statlog_australian_logistic_regression_model.sav
+Pretrained Models/statlog_australian_neurel_network_model.sav
+Pretrained Models/statlog_australian_random_forest_model.sav
+Pretrained Models/statlog_australian_svm_model.sav
+Pretrained Models/statlog_australian_tree_model.sav
+
+Results For Demo/StatlogAustralianABC.sav
+Results For Demo/StatlogAustralianDCT.sav
+Results For Demo/StatlogAustralianKNN.sav
+Results For Demo/StatlogAustralianLRC.sav
+Results For Demo/StatlogAustralianMLP.sav
+Results For Demo/StatlogAustralianRFC.sav
+Results For Demo/StatlogAustralianSVM.sav
+Results For Demo/StatlogAustralianGNB.sav
