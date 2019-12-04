@@ -32,21 +32,20 @@ class class_classification:
     '''Contains all the classifiers'''
 
     def grid_search_cv(self, classifier, param_grid, X_train, y_train, X_test, y_test, name, cv=5):
-        model = model_select.GridSearchCV(classifier, param_grid, cv=cv, verbose=10).fit(X_train, y_train)
-        print("Grid Search CV %s".format(name))
+        model = model_select.GridSearchCV(classifier, param_grid, cv=cv, verbose=1).fit(X_train, y_train)
+        print("Grid Search CV {0}".format(name))
         print("Best Estimator: ", model.best_estimator_)
         print("Average HyperParameter Search Accuracy: ", model.best_score_)
         print("Testing Accuracy: ", model.best_estimator_.score(X_test, y_test))
-        print("Testing Accuracy: ", model.best_estimator_.score(X_train, y_train))
+        print("Training Accuracy: ", model.best_estimator_.score(X_train, y_train))
         pickle.dump(model.best_estimator_, open(RESULTS_FOR_DEMO + "%sModel.sav" % name, 'wb'))
         pickle.dump(model.best_params_, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
         plot.plot_learning_curve(model.best_estimator_, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=cv)
 
     def random_search_cv(self, classifier, param_grid, X_train, y_train, X_test, y_test, name, cv=5, n_iter=30):
-        model = model_select.RandomizedSearchCV(classifier, param_grid, cv=cv, n_iter=n_iter,
-                                                verbose=10, random_state=0).fit(X_train,
-                                                                                y_train)
-        print("Random Search %s".format(name))
+        model = model_select.RandomizedSearchCV(classifier, param_distributions=param_grid, cv=cv, n_iter=n_iter,
+                                                verbose=1, random_state=0).fit(X_train, y_train)
+        print("Random Search {0}".format(name))
         print("Best Estimator: ", model.best_estimator_)
         print("Average HyperParameter Search Accuracy: ", model.best_score_)
         print("Testing Accuracy: ", model.best_estimator_.score(X_test, y_test))
@@ -69,11 +68,11 @@ class class_classification:
         # self.Breast_Cancer_Wisconsin()
         # self.Statlog_Australian()
         # self.Statlog_German()
-        # self.Steel_Plates_Faults(userResponse)
+        self.Steel_Plates_Faults(userResponse)
         # self.Adult()
         # self.Yeast()
         # self.Thoracic_Surgery_Data()
-        self.Seismic_Bumps(userResponse)
+        # self.Seismic_Bumps(userResponse)
 
     def Diabetic_Retinopathy(self):
         print('Running classification for 1.Diabetic Retinopathy dataset')
@@ -1128,6 +1127,7 @@ class class_classification:
             self.grid_search_cv(rfc, params_grid, X_train_scaled, y_train_labels, X_test_scaled, y_test_labels,
                                 "SteelFaultsRFC", cv=3)
 
+            # LR
             params_grid = {
                 "penalty": ['l2'],
                 "C": Stats.reciprocal(0.001, 1000),
@@ -1135,7 +1135,7 @@ class class_classification:
                 "solver": ['lbfgs', 'sag', 'saga'],
                 "max_iter": [100, 200, 300, 400, 500]
             }
-            lr = Linear.LogisticRegression(random_state=0)
+            lr = Linear.LogisticRegression(multi_class='auto', random_state=0)
             self.random_search_cv(lr, params_grid, X_train_scaled, y_train_labels, X_test_scaled, y_test_labels,
                                   "DefaultCreditCardLR", cv=3)
 

@@ -4,12 +4,14 @@ import pickle
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import plot
 import scipy
 import scipy.stats as Stats
 import sklearn.ensemble as Ensemble
 import sklearn.gaussian_process as Gaussian
 import sklearn.linear_model as linear
 import sklearn.metrics as metrics
+import sklearn.model_selection as model_select
 import sklearn.neighbors as Neighbors
 import sklearn.neural_network as NN
 import sklearn.preprocessing as Preprocessing
@@ -32,25 +34,26 @@ class class_regression:
     '''Contains all the regression logic'''
 
     def grid_search_cv(self, classifier, param_grid, X_train, y_train, X_test, y_test, name, cv=5):
-        model = model_select.GridSearchCV(classifier, param_grid, cv=cv, verbose=10, scoring="r2").fit(X_train, y_train)
+        print("Grid Search CV {0}".format(name))
+        model = model_select.GridSearchCV(classifier, param_grid, cv=cv, verbose=1, scoring="r2").fit(X_train, y_train)
         print("Grid Search CV")
         print("Best Estimator: ", model.best_estimator_)
         print("Mean Squared Error: ",
               metrics.mean_squared_error(y_test, model.best_estimator_.predict(X_test)))
-        print("R2 Score: ", metrics.r2_score(y_test, svr_model.best_estimator_.predict(X_test)))
+        print("R2 Score: ", metrics.r2_score(y_test, model.best_estimator_.predict(X_test)))
         pickle.dump(model.best_estimator_, open(RESULTS_FOR_DEMO + "%sModel.sav" % name, 'wb'))
         pickle.dump(model.best_params_, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
         plot.plot_learning_curve(model.best_estimator_, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=cv)
 
     def random_search_cv(self, classifier, param_grid, X_train, y_train, X_test, y_test, name, cv=5, n_iter=30):
-        model = model_select.RandomizedSearchCV(classifier, param_grid, cv=cv, n_iter=n_iter, verbose=10,
-                                                random_state=0,
-                                                scoring="r2").fit(X_train, y_train)
+        print("Random Search {0}".format(name))
+        model = model_select.RandomizedSearchCV(classifier, param_grid, cv=cv, n_iter=n_iter, verbose=1,
+                                                random_state=0, scoring="r2").fit(X_train, y_train)
         print("Random Search CV")
         print("Best Estimator: ", model.best_estimator_)
         print("Mean Squared Error: ",
               metrics.mean_squared_error(y_test, model.best_estimator_.predict(X_test)))
-        print("R2 Score: ", metrics.r2_score(y_test, svr_model.best_estimator_.predict(X_test)))
+        print("R2 Score: ", metrics.r2_score(y_test, model.best_estimator_.predict(X_test)))
         pickle.dump(model.best_estimator_, open(RESULTS_FOR_DEMO + "%sModel.sav" % name, 'wb'))
         pickle.dump(model.best_params_, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
         plot.plot_learning_curve(model.best_estimator_, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=cv)
@@ -218,7 +221,7 @@ class class_regression:
             self.grid_search_cv(SVM.SVR(kernel='rbf'), param_grid, X_train_scaled, y_train, X_test_scaled, y_test,
                                 "ConcreteSVM")
 
-            # LR
+            LR
             lr_model = linear.LinearRegression().fit(X_train_scaled, y_train)
             print("Linear Regression Mean Squared Error: ",
                   metrics.mean_squared_error(y_test, lr_model.predict(X_test_scaled)))
@@ -258,9 +261,9 @@ class class_regression:
             self.random_search_cv(mlp, params_grid, X_train_scaled, y_train, X_test, y_test, "ConcreteMLP")
 
             # Adaboost
-            params_grid = {n_estimators: [estimator for estimator in (2 ** i for i in range(0, 8))],
-                           loss: ['linear', 'square'],
-                           learning_rate: [0.01, 0.1, 1]
+            params_grid = {"n_estimators": [estimator for estimator in (2 ** i for i in range(0, 8))],
+                           "loss": ['linear', 'square'],
+                           "learning_rate": [0.01, 0.1, 1]
                            }
             self.grid_search_cv(Ensemble.AdaBoostRegressor(random_state=0), params_grid, X_train_scaled, y_train,
                                 X_test_scaled, y_test, "ConcreteAdaboost")
@@ -270,8 +273,7 @@ class class_regression:
                 "alpha": [1e-10, 1e-9, 1e-8]
             }
             self.grid_search_cv(Gaussian.GaussianProcessRegressor(optimizer="fmin_l_bfgs_b", random_state=0),
-                                params_grid, X_train_scaled, y_train,
-                                X_test_scaled, y_test, "ConcreteDTC")
+                                params_grid, X_train_scaled, y_train, X_test_scaled, y_test, "ConcreteDTC")
         else:
             # SVM
             self.load_pretrained_models("SVR_concrete_model")
@@ -297,5 +299,5 @@ class class_regression:
     def SGEMM_GPU_kernel_performance(self):
         print('Running Regression for 9.SGEMM_GPU_kernel_performance dataset')
 
-    def Merck_Molecular_Activity_Challenge(self):
+    def Merck_Molecular_Activity_Challenge(self, userResponse):
         print('Running Regression for 10.Merck_Molecular_Activity_Challenge dataset')

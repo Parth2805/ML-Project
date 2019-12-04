@@ -13,3 +13,5 @@ Datasets/Faults.xlsx
 Datasets/seismic-bumps.csv
 Results/classification_10_class_balance.png
 Datasets/Concrete_Data.xls
+Datasets/ac2_cache.npz
+Datasets/ac4_cache.npz
