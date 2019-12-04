@@ -11,20 +11,46 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier
+import sklearn.model_selection as model_select
+
+RESULTS_FOR_DEMO = "../Results For Demo/Regression/"
+DATASETS = "../Datasets/"
+PRETRAINED_MODEL = "../Pretrained Models/"
 
 
 class class_regression:
     '''Contains all the regression logic'''
 
-    def grid_search_cv(self, classifier, param_grid, X_train, y_train, X_test, y_test, cv=5):
+    def grid_search_cv(self, classifier, param_grid, X_train, y_train, X_test, y_test, name, cv=5):
         model = model_select.GridSearchCV(classifier, param_grid, cv=cv, verbose=10).fit(X_train, y_train)
+        print("Grid Search CV")
+        print("Best Estimator: ", model.best_estimator_)
+        print("Average HyperParameter Search Accuracy: ", model.best_score_)
+        print("Testing Accuracy: ", model.best_estimator_.score(X_test, y_test))
+        print("Testing Accuracy: ", model.best_estimator_.score(X_train, y_train))
+        pickle.dump(model.best_estimator_, open(RESULTS_FOR_DEMO + "%s.sav" % name, 'wb'))
+        pickle.dump(model.best_params_, open(RESULTS_FOR_DEMO + "%s.sav" % name, 'wb'))
+        # TODO: Add plotting code
 
-        # model.best_estimator_.score(X_test, y_test)
+    def random_search_cv(self, classifier, param_grid, X_train, y_train, X_test, y_test, name, cv=5, n_iter=30):
+        model = model_select.RandomizedSearchCV(classifier, param_grid, cv=cv, n_iter=n_iter,
+                                                verbose=10, random_state=0).fit(X_train,
+                                                                                y_train)
+        print("Random Search CV")
+        print("Best Estimator: ", model.best_estimator_)
+        print("Average HyperParameter Search Accuracy: ", model.best_score_)
+        print("Testing Accuracy: ", model.best_estimator_.score(X_test, y_test))
+        print("Training Accuracy: ", model.best_estimator_.score(X_train, y_train))
+        pickle.dump(model.best_estimator_, open(RESULTS_FOR_DEMO + "%s.sav" % name, 'wb'))
+        pickle.dump(model.best_params_, open(RESULTS_FOR_DEMO + "%s.sav" % name, 'wb'))
+        # TODO: Add plotting code
 
-    def random_search_cv(self, classifier, param_grid, X_train, y_train, X_test, y_test, cv=5):
-        model = model_select.GridSearchCV(classifier, param_grid, cv=cv, verbose=10).fit(X_train, y_train)
-
-        # model.best_estimator_.score(X_test, y_test)
+    def load_pretrained_models(self, name):
+        print("Loading PreTrained model: ", name)
+        model = pickle.load(PRETRAINED_MODEL + name)
+        # print("Testing Accuracy: ", model.score(X_test, y_test))
+        # print("Training Accuracy: ", model.score(X_train, y_train))
+        # TODO: Add plotting code
 
     def get_regressor(self):
         print('Running regressors for the following datasets: \n')
@@ -86,6 +112,7 @@ class class_regression:
                   "C": np.array([1, 2, 5, 10, 20]),
                   "gamma": np.array([0.1, 1, 5, 10])}]
 
+        self.grid_search_cv(svm,param,X_train,y_train,X_test,y_test,"WineQuality_SVM")
         '''
         ### **Decision Tree**
         '''
@@ -95,7 +122,7 @@ class class_regression:
                  'splitter': ['best', 'random'],
                  'max_features': np.arange(1, 11, 1),
                  'min_samples_split': np.arange(2, 20, 1)}
-
+        self.grid_search_cv(dt, param, X_train, y_train, X_test, y_test,"WineQuality_Decision_Tree")
         '''
         ### **Random Forest**
         '''
@@ -106,6 +133,7 @@ class class_regression:
                  'max_features': np.array([1, 2, 5, 11]),
                  'min_samples_split': np.array([2, 3, 5])}
 
+        self.grid_search_cv(rf, param, X_train, y_train, X_test, y_test,"WineQuality_Random_Forest")
         '''
         ## **Ada Boost**
         '''
@@ -115,7 +143,7 @@ class class_regression:
         param = dict(n_estimators=np.arange(50, 250, 10),
                      loss=['linear', 'square']
                      )
-
+        self.grid_search_cv(ada, param, X_train, y_train, X_test, y_test,"WineQuality_Ada_Boost")
         '''
         ## **Neural Network**
         '''
@@ -123,24 +151,24 @@ class class_regression:
                                                   learning_rate='adaptive', random_state=0, verbose=True,
                                                   warm_start=True, early_stopping=True, )
 
-        param_grid = {
+        param = {
             "solver": ['adam'],
             "learning_rate_init": reciprocal(0.001, 0.1),
             "hidden_layer_sizes": [(512,), (256, 128, 64, 32), (512, 256, 128, 64, 32)]
         }
 
-
+        self.grid_search_cv(mlp, param, X_train, y_train, X_test, y_test,"WineQuality_Neural_Network")
         '''
         ## **Gaussian Process**
         '''
         gp = sklearn.gaussian_process.GaussianProcessRegressor(random_state=0)
 
-        param_grid = {
+        param = {
 
             "n_restarts_optimizer": np.arange(0, 10, 1)
         }
 
-
+        self.grid_search_cv(gp, param, X_train, y_train, X_test, y_test,"WineQuality_Gaussian_Process")
 
 
     def Communities_Crime(self):

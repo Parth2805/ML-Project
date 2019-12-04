@@ -22,7 +22,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn.preprocessing import StandardScaler
 
-RESULTS_FOR_DEMO = "../Results For Demo/"
+RESULTS_FOR_DEMO = "../Results For Demo/Classification/"
 DATASETS = "../Datasets/"
 PRETRAINED_MODEL = "../Pretrained Models/"
 
@@ -61,7 +61,7 @@ class class_classification:
         # print("Training Accuracy: ", model.score(X_train, y_train))
         # TODO: Add plotting code
 
-    def run_classifier(self, userResponse):
+    def run_classifier(self):
         print('Running classifiers for the following datasets: \n')
         self.Diabetic_Retinopathy()
         # self.Default_of_credit_card_clients(userResponse)
