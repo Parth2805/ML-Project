@@ -2,7 +2,7 @@ import itertools
 
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.model_selection import validation_curve, learning_curve
+from sklearn.model_selection import learning_curve
 
 PATH = "../Results For Demo/"
 
@@ -43,6 +43,7 @@ def plot_confusion_matrix(cm, classes,
     plt.axis('scaled')
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
+    plt.savefig(PATH + title + ".jpg")
 
 
 def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
@@ -72,30 +73,4 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
              label="Cross-validation score")
 
     plt.legend(loc="best")
-
-
-def plot_validation_curve(estimator, title, X, y, ylim, cv, param_name, param_range, n_jobs):
-    train_scores, test_scores = validation_curve(estimator, X, y, param_name=param_name, param_range=param_range, cv=cv,
-                                                 n_jobs=n_jobs, scoring="accuracy")
-    train_scores_mean = np.mean(train_scores, axis=1)
-    train_scores_std = np.std(train_scores, axis=1)
-    test_scores_mean = np.mean(test_scores, axis=1)
-    test_scores_std = np.std(test_scores, axis=1)
-
-    plt.title(title)
-    plt.xlabel(param_name)
-    plt.ylabel("Score")
-    if ylim is not None:
-        plt.ylim(*ylim)
-    lw = 2
-    plt.semilogx(param_range, train_scores_mean, label="Training score",
-                 color="darkorange", lw=lw)
-    plt.fill_between(param_range, train_scores_mean - train_scores_std,
-                     train_scores_mean + train_scores_std, alpha=0.2,
-                     color="darkorange", lw=lw)
-    plt.semilogx(param_range, test_scores_mean, label="Cross-validation score",
-                 color="navy", lw=lw)
-    plt.fill_between(param_range, test_scores_mean - test_scores_std,
-                     test_scores_mean + test_scores_std, alpha=0.2,
-                     color="navy", lw=lw)
-    plt.legend(loc="best")
+    plt.savefig(PATH + title + ".jpg")

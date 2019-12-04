@@ -3,6 +3,7 @@ import pickle
 
 import numpy as np
 import pandas as pd
+import plot
 import scipy.stats as Stats
 import sklearn
 import sklearn.ensemble as Ensemble
@@ -31,46 +32,45 @@ class class_classification:
     '''Contains all the classifiers'''
 
     def grid_search_cv(self, classifier, param_grid, X_train, y_train, X_test, y_test, name, cv=5):
-        model = model_select.GridSearchCV(classifier, param_grid, cv=cv, verbose=10).fit(X_train, y_train)
-        print("Grid Search CV")
+        model = model_select.GridSearchCV(classifier, param_grid, cv=cv, verbose=1).fit(X_train, y_train)
+        print("Grid Search CV {0}".format(name))
         print("Best Estimator: ", model.best_estimator_)
         print("Average HyperParameter Search Accuracy: ", model.best_score_)
         print("Testing Accuracy: ", model.best_estimator_.score(X_test, y_test))
         print("Training Accuracy: ", model.best_estimator_.score(X_train, y_train))
-        pickle.dump(model.best_estimator_, open(RESULTS_FOR_DEMO + "%s.sav" % name, 'wb'))
-        pickle.dump(model.best_params_, open(RESULTS_FOR_DEMO + "%s.sav" % name, 'wb'))
-        # TODO: Add plotting code
+        pickle.dump(model.best_estimator_, open(RESULTS_FOR_DEMO + "%sModel.sav" % name, 'wb'))
+        pickle.dump(model.best_params_, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
+        plot.plot_learning_curve(model.best_estimator_, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=cv)
 
     def random_search_cv(self, classifier, param_grid, X_train, y_train, X_test, y_test, name, cv=5, n_iter=30):
-        model = model_select.RandomizedSearchCV(classifier, param_grid, cv=cv, n_iter=n_iter,
-                                                verbose=10, random_state=0).fit(X_train,
-                                                                                y_train)
-        print("Random Search CV")
+        model = model_select.RandomizedSearchCV(classifier, param_distributions=param_grid, cv=cv, n_iter=n_iter,
+                                                verbose=1, random_state=0).fit(X_train, y_train)
+        print("Random Search {0}".format(name))
         print("Best Estimator: ", model.best_estimator_)
         print("Average HyperParameter Search Accuracy: ", model.best_score_)
         print("Testing Accuracy: ", model.best_estimator_.score(X_test, y_test))
         print("Training Accuracy: ", model.best_estimator_.score(X_train, y_train))
-        pickle.dump(model.best_estimator_, open(RESULTS_FOR_DEMO + "%s.sav" % name, 'wb'))
-        pickle.dump(model.best_params_, open(RESULTS_FOR_DEMO + "%s.sav" % name, 'wb'))
-        # TODO: Add plotting code
+        pickle.dump(model.best_estimator_, open(RESULTS_FOR_DEMO + "%sModel.sav" % name, 'wb'))
+        pickle.dump(model.best_params_, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
+        plot.plot_learning_curve(model.best_estimator_, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=cv)
 
-    def load_pretrained_models(self, name, X_train, y_training, X_test, y_test, cv):
+    def load_pretrained_models(self, name, X_train, y_train, X_test, y_test, cv):
         print("Loading PreTrained model: ", name)
-        model = pickle.load(PRETRAINED_MODEL + name)
+        model = pickle.load(PRETRAINED_MODEL + name + ".sav")
         print("Testing Accuracy: ", model.score(X_test, y_test))
         print("Training Accuracy: ", model.score(X_train, y_train))
-        # TODO: Add plotting code
+        plot.plot_learning_curve(model, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=cv)
 
     def run_classifier(self, userResponse):
         print('Running classifiers for the following datasets: \n')
         # self.Diabetic_Retinopathy()
         # self.Default_of_credit_card_clients(userResponse)
         # self.Breast_Cancer_Wisconsin()
-        # self.Statlog_Australian(userResponse)
+        self.Statlog_Australian(userResponse)
         # self.Statlog_German()
         # self.Steel_Plates_Faults(userResponse)
         # self.Adult()
-        self.Yeast(userResponse)
+        # self.Yeast(userResponse)
         # self.Thoracic_Surgery_Data()
         # self.Seismic_Bumps(userResponse)
 
@@ -317,29 +317,27 @@ class class_classification:
         # print(model.get_params)
 
     def Default_of_credit_card_clients(self, userResponse):
+        df = pd.read_excel(DATASETS + "default of credit card clients.xls", skiprows=1)
+        del df['ID']
+        df_train, df_test = train_test_split(df, test_size=0.2, random_state=0)
+        y_train = df_train['default payment next month']
+        X_train = df_train
+        del X_train['default payment next month']
+
+        y_test = df_test['default payment next month']
+        X_test = df_test
+        del X_test['default payment next month']
+        scaler = Preprocessing.StandardScaler().fit(X_train.iloc[:, 11:23]);
+        X_train.loc[:, 11:23] = scaler.transform(X_train.iloc[:, 11:23]);
+        X_test.loc[:, 11:23] = scaler.transform(X_test.iloc[:, 11:23]);
+
+        mean_limit_bal = np.mean(X_train['LIMIT_BAL'])
+        std_limit_bal = np.std(X_train['LIMIT_BAL'])
+        X_train['LIMIT_BAL'] = (X_train['LIMIT_BAL'] - mean_limit_bal) / std_limit_bal;
+        X_test['LIMIT_BAL'] = (X_test['LIMIT_BAL'] - mean_limit_bal) / std_limit_bal;
+
         if userResponse is "2":
             print('Running classification for 2.Default of credit card clients dataset')
-
-            df = pd.read_excel(DATASETS + "default of credit card clients.xls", skiprows=1)
-            del df['ID']
-            df_train, df_test = train_test_split(df, test_size=0.2, random_state=0)
-            y_train = df_train['default payment next month']
-            X_train = df_train
-            del X_train['default payment next month']
-
-            y_test = df_test['default payment next month']
-            X_test = df_test
-            del X_test['default payment next month']
-            scaler = Preprocessing.StandardScaler().fit(X_train.iloc[:, 11:23]);
-            X_train.loc[:, 11:23] = scaler.transform(X_train.iloc[:, 11:23]);
-            X_test.loc[:, 11:23] = scaler.transform(X_test.iloc[:, 11:23]);
-
-            mean_limit_bal = np.mean(X_train['LIMIT_BAL'])
-            std_limit_bal = np.std(X_train['LIMIT_BAL'])
-            X_train['LIMIT_BAL'] = (X_train['LIMIT_BAL'] - mean_limit_bal) / std_limit_bal;
-            X_test['LIMIT_BAL'] = (X_test['LIMIT_BAL'] - mean_limit_bal) / std_limit_bal;
-
-            print(X_train.shape, X_test.shape)
             # SVM
             param_grid = {'C': [0.001, 0.01, 0.1, 1], 'gamma': [0.01, 0.1, 1]}
             svm = sklearn.svm.SVC(kernel="rbf", random_state=0)
@@ -410,28 +408,28 @@ class class_classification:
             self.random_search_cv(nn, param_grid, X_train, y_train, X_test, y_test, "DefaultCreditCardMLP", cv=3)
         else:
             # SVM
-            self.load_pretrained_models("svm_default_client_grid_model.sav")
+            self.load_pretrained_models("svm_default_client_grid_model", X_train, y_train, X_test, y_test, 3)
 
             # DTC
-            self.load_pretrained_models("tree_default_client_grid_model.sav")
+            self.load_pretrained_models("tree_default_client_grid_model", X_train, y_train, X_test, y_test, 3)
 
             # RFC
-            self.load_pretrained_models("random_forest_default_client_grid_model.sav")
+            self.load_pretrained_models("random_forest_default_client_grid_model", X_train, y_train, X_test, y_test, 3)
 
             # LR
-            self.load_pretrained_models("logistic_default_client_random_model.sav")
+            self.load_pretrained_models("logistic_default_client_random_model", X_train, y_train, X_test, y_test, 3)
 
             # Adaboost
-            self.load_pretrained_models("adaboost_default_client_grid_model.sav")
+            self.load_pretrained_models("adaboost_default_client_grid_model", X_train, y_train, X_test, y_test, 3)
 
             # KNN
-            self.load_pretrained_models("knearest_default_client_grid_model.sav")
+            self.load_pretrained_models("knearest_default_client_grid_model", X_train, y_train, X_test, y_test, 3)
 
             # GNB
-            self.load_pretrained_models("gaussian_default_client_grid_model.sav")
+            self.load_pretrained_models("gaussian_default_client_grid_model", X_train, y_train, X_test, y_test, 3)
 
             # MLP
-            self.load_pretrained_models("mlp_default_client_random_model.sav")
+            self.load_pretrained_models("mlp_default_client_random_model", X_train, y_train, X_test, y_test, 3)
 
     def Breast_Cancer_Wisconsin(self):
         print('Running classification for 3.Breast Cancer Wisconsin dataset')
@@ -876,28 +874,33 @@ class class_classification:
 
         else:
             # ADABOOST
-            self.load_pretrained_models("statlog_australian_adaboost_model.sav")
+            self.load_pretrained_models("statlog_australian_adaboost_model.sav", X_train, y_train, X_test, y_test, 3)
 
             # DTC
-            self.load_pretrained_models("statlog_australian_tree_model.sav")
+            self.load_pretrained_models("statlog_australian_tree_model.sav", X_train, y_train, X_test, y_test, 5)
 
             # GNB
-            self.load_pretrained_models("statlog_australian_gaussian_grid_model.sav")
+            self.load_pretrained_models("statlog_australian_gaussian_grid_model.sav", X_train, y_train, X_test, y_test,
+                                        5)
 
             # KNN
-            self.load_pretrained_models("statlog_australian_k_nearest_neighbours_modal.sav")
+            self.load_pretrained_models("statlog_australian_k_nearest_neighbours_modal.sav", X_train, y_train, X_test,
+                                        y_test, 3)
 
             # LR
-            self.load_pretrained_models("statlog_australian_logistic_regression_model.sav")
+            self.load_pretrained_models("statlog_australian_logistic_regression_model.sav", X_train, y_train, X_test,
+                                        y_test, 3)
 
             # MLP
-            self.load_pretrained_models("statlog_australian_neurel_network_model.sav")
+            self.load_pretrained_models("statlog_australian_neurel_network_model.sav", X_train, y_train, X_test, y_test,
+                                        3)
 
             # RF
-            self.load_pretrained_models("statlog_australian_random_forest_model.sav")
+            self.load_pretrained_models("statlog_australian_random_forest_model.sav", X_train, y_train, X_test, y_test,
+                                        5)
 
             # SVM
-            self.load_pretrained_models("statlog_australian_svm_model.sav")
+            self.load_pretrained_models("statlog_australian_svm_model.sav", X_train, y_train, X_test, y_test, 5)
 
     def Statlog_German(self):
         print('Running classification for 5.Statlog German dataset')
@@ -1162,57 +1165,56 @@ class class_classification:
 
     def Steel_Plates_Faults(self, userResponse):
         print('Running classification for 6.Steel Plates Faults dataset')
+        df = pd.read_excel(DATASETS + "Faults.xlsx", header=0)
+        df.columns = ["X_Minimum", "X_Maximum", "Y_Minimum", "Y_Maximum", "Pixels_Areas", "X_Perimeter",
+                      "Y_Perimeter", "Sum_of_Luminosity", "Minimum_of_Luminosity", "Maximum_of_Luminosity",
+                      "Length_of_Conveyer", "TypeOfSteel_A300", "TypeOfSteel_A400", "Steel_Plate_Thickness",
+                      "Edges_Index", "Empty_Index", "Square_Index", "Outside_X_Index", "Edges_X_Index",
+                      "Edges_Y_Index", "Outside_Global_Index", "LogOfAreas", "Log_X_Index", "Log_Y_Index",
+                      "Orientation_Index", "Luminosity_Index", "SigmoidOfAreas", "Pastry", "Z_Scratch", "K_Scratch",
+                      "Stains", "Dirtiness", "Bumps", "Other_Faults"]
+        classes = ["Pastry", "Z_Scratch", "K_Scratch", "Stains", "Dirtiness", "Bumps", "Other_Faults"]
+        df['class'] = ''
+        for i in range(df.shape[0]):
+            if df.at[i, 'Pastry'] == 1:
+                df.at[i, 'class'] = 'Pastry'
+            if df.at[i, 'Z_Scratch'] == 1:
+                df.at[i, 'class'] = 'Z_Scratch'
+            if df.at[i, 'K_Scratch'] == 1:
+                df.at[i, 'class'] = 'K_Scratch'
+            if df.at[i, 'Stains'] == 1:
+                df.at[i, 'class'] = 'Stains'
+            if df.at[i, 'Dirtiness'] == 1:
+                df.at[i, 'class'] = 'Dirtiness'
+            if df.at[i, 'Bumps'] == 1:
+                df.at[i, 'class'] = 'Bumps'
+            if df.at[i, 'Other_Faults'] == 1:
+                df.at[i, 'class'] = 'Other_Faults'
+        df.drop(["Pastry", "Z_Scratch", "K_Scratch", "Stains", "Dirtiness", "Bumps", "Other_Faults"], axis=1,
+                inplace=True)
+
+        df_train, df_test = train_test_split(df, test_size=0.3, random_state=0)
+        X_train = df_train.iloc[:, :27]
+        y_train = df_train.iloc[:, 27]
+        X_test = df_test.iloc[:, :27]
+        y_test = df_test.iloc[:, 27]
+        # print(X_test.shape, y_test.shape, X_train.shape, y_train.shape)
+
+        scaler = Preprocessing.StandardScaler().fit \
+            (X_train.iloc[:, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 21, 22, 23]])
+        encoder = Preprocessing.LabelEncoder()
+
+        encoder.fit(classes)
+        y_train_labels = encoder.transform(y_train)
+        y_test_labels = encoder.transform(y_test)
+
+        X_train_scaled = X_train.copy(deep=True)
+        X_test_scaled = X_test.copy(deep=True)
+        X_train_scaled.iloc[:, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 21, 22, 23]] = scaler.transform(
+            X_train.iloc[:, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 21, 22, 23]])
+        X_test_scaled.iloc[:, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 21, 22, 23]] = scaler.transform(
+            X_test.iloc[:, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 21, 22, 23]])
         if userResponse is "2":
-            df = pd.read_excel(DATASETS + "Faults.xlsx", header=0)
-            df.columns = ["X_Minimum", "X_Maximum", "Y_Minimum", "Y_Maximum", "Pixels_Areas", "X_Perimeter",
-                          "Y_Perimeter", "Sum_of_Luminosity", "Minimum_of_Luminosity", "Maximum_of_Luminosity",
-                          "Length_of_Conveyer", "TypeOfSteel_A300", "TypeOfSteel_A400", "Steel_Plate_Thickness",
-                          "Edges_Index", "Empty_Index", "Square_Index", "Outside_X_Index", "Edges_X_Index",
-                          "Edges_Y_Index", "Outside_Global_Index", "LogOfAreas", "Log_X_Index", "Log_Y_Index",
-                          "Orientation_Index", "Luminosity_Index", "SigmoidOfAreas", "Pastry", "Z_Scratch", "K_Scratch",
-                          "Stains", "Dirtiness", "Bumps", "Other_Faults"]
-            classes = ["Pastry", "Z_Scratch", "K_Scratch", "Stains", "Dirtiness", "Bumps", "Other_Faults"]
-            df['class'] = ''
-            for i in range(df.shape[0]):
-                if df.at[i, 'Pastry'] == 1:
-                    df.at[i, 'class'] = 'Pastry'
-                if df.at[i, 'Z_Scratch'] == 1:
-                    df.at[i, 'class'] = 'Z_Scratch'
-                if df.at[i, 'K_Scratch'] == 1:
-                    df.at[i, 'class'] = 'K_Scratch'
-                if df.at[i, 'Stains'] == 1:
-                    df.at[i, 'class'] = 'Stains'
-                if df.at[i, 'Dirtiness'] == 1:
-                    df.at[i, 'class'] = 'Dirtiness'
-                if df.at[i, 'Bumps'] == 1:
-                    df.at[i, 'class'] = 'Bumps'
-                if df.at[i, 'Other_Faults'] == 1:
-                    df.at[i, 'class'] = 'Other_Faults'
-            df.drop(["Pastry", "Z_Scratch", "K_Scratch", "Stains", "Dirtiness", "Bumps", "Other_Faults"], axis=1,
-                    inplace=True)
-
-            df_train, df_test = train_test_split(df, test_size=0.3, random_state=0)
-            X_train = df_train.iloc[:, :27]
-            y_train = df_train.iloc[:, 27]
-            X_test = df_test.iloc[:, :27]
-            y_test = df_test.iloc[:, 27]
-            # print(X_test.shape, y_test.shape, X_train.shape, y_train.shape)
-
-            scaler = Preprocessing.StandardScaler().fit \
-                (X_train.iloc[:, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 21, 22, 23]])
-            encoder = Preprocessing.LabelEncoder()
-
-            encoder.fit(classes)
-            y_train_labels = encoder.transform(y_train)
-            y_test_labels = encoder.transform(y_test)
-
-            X_train_scaled = X_train.copy(deep=True)
-            X_test_scaled = X_test.copy(deep=True)
-            X_train_scaled.iloc[:, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 21, 22, 23]] = scaler.transform(
-                X_train.iloc[:, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 21, 22, 23]])
-            X_test_scaled.iloc[:, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 21, 22, 23]] = scaler.transform(
-                X_test.iloc[:, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 21, 22, 23]])
-
             # SVM
             params_grid = {'gamma': [1e-3, 1e-4],
                            'C': [1, 10, 100, 1000]}
@@ -1239,6 +1241,7 @@ class class_classification:
             self.grid_search_cv(rfc, params_grid, X_train_scaled, y_train_labels, X_test_scaled, y_test_labels,
                                 "SteelFaultsRFC", cv=3)
 
+            # LR
             params_grid = {
                 "penalty": ['l2'],
                 "C": Stats.reciprocal(0.001, 1000),
@@ -1246,7 +1249,7 @@ class class_classification:
                 "solver": ['lbfgs', 'sag', 'saga'],
                 "max_iter": [100, 200, 300, 400, 500]
             }
-            lr = Linear.LogisticRegression(random_state=0)
+            lr = Linear.LogisticRegression(multi_class='auto', random_state=0)
             self.random_search_cv(lr, params_grid, X_train_scaled, y_train_labels, X_test_scaled, y_test_labels,
                                   "DefaultCreditCardLR", cv=3)
 
@@ -1290,28 +1293,36 @@ class class_classification:
                                   "SteelFaultsMLP", cv=3)
         else:
             # SVM
-            self.load_pretrained_models("svm_faults_grid_model.sav")
+            self.load_pretrained_models("svm_faults_grid_model", X_train_scaled, y_train_labels, X_test_scaled,
+                                        y_test_labels, 3)
 
             # DTC
-            self.load_pretrained_models("tree_faults_grid_model.sav")
+            self.load_pretrained_models("tree_faults_grid_model", X_train_scaled, y_train_labels, X_test_scaled,
+                                        y_test_labels, 3)
 
             # RFC
-            self.load_pretrained_models("random_forest_faults_grid_model.sav")
+            self.load_pretrained_models("random_forest_faults_grid_model", X_train_scaled, y_train_labels,
+                                        X_test_scaled,
+                                        y_test_labels, 3)
 
             # LR
-            self.load_pretrained_models("logistic_faults_grid_model.sav")
+            self.load_pretrained_models("logistic_faults_grid_model", X_train_scaled, y_train_labels, X_test_scaled,
+                                        y_test_labels, 3)
 
             # Adaboost
-            self.load_pretrained_models("adaboost_faults_grid_model.sav")
+            self.load_pretrained_models("adaboost_faults_grid_model", X_train_scaled, y_train_labels, X_test_scaled,
+                                        y_test_labels, 3)
 
             # KNN
-            self.load_pretrained_models("kNearest_faults_grid_model.sav")
+            self.load_pretrained_models("kNearest_faults_grid_model", X_train_scaled, y_train_labels, X_test_scaled,
+                                        y_test_labels, 3)
 
             # GNB
-            self.load_pretrained_models("gaussian_faults_grid_model.sav")
+            self.load_pretrained_models("gaussian_faults_grid_model", X_train_scaled, y_train, X_test_scaled, y_test, 3)
 
             # MLP
-            self.load_pretrained_models("mlp_faults_grid_model.sav")
+            self.load_pretrained_models("mlp_faults_grid_model", X_train_scaled, y_train_labels, X_test_scaled,
+                                        y_test_labels, 3)
 
     def Adult(self):
         print('Running classification for 7.Adult dataset')
@@ -1538,6 +1549,35 @@ class class_classification:
                 "var_smoothing": [1e-07, 1e-08, 1e-09]
             }
             self.grid_search_cv(GaussianNB(), param_grid, X_train, y_train, X_test, y_test, "YeastGNN", 5)
+        else:
+            # ADABOOST
+            self.load_pretrained_models("yeast_adaboost_model.sav", X_train, y_train, X_test, y_test, 3)
+
+            # DTC
+            self.load_pretrained_models("yeast_gaussian_grid_model.sav", X_train, y_train, X_test, y_test, 5)
+
+            # KNN
+            self.load_pretrained_models("yeast_k_nearest_neighbours_modal.sav", X_train, y_train, X_test, y_test,
+                                        5)
+
+            # LR
+            self.load_pretrained_models("yeast_logistic_regression_model.sav", X_train, y_train, X_test,
+                                        y_test, 3)
+
+            # NN
+            self.load_pretrained_models("yeast_neurel_network_model.sav", X_train, y_train, X_test,
+                                        y_test, 3)
+
+            # RF
+            self.load_pretrained_models("yeast_random_forest_model.sav", X_train, y_train, X_test, y_test,
+                                        3)
+
+            # SVM
+            self.load_pretrained_models("yeast_svm_model.sav", X_train, y_train, X_test, y_test,
+                                        5)
+
+            # DCT
+            self.load_pretrained_models("yeast_tree_model.sav", X_train, y_train, X_test, y_test, 5)
 
     def Thoracic_Surgery_Data(self):
         print('Running classification for 9.Thoracic Surgery Data dataset')
@@ -1646,50 +1686,49 @@ class class_classification:
 
     def Seismic_Bumps(self, userResponse):
         print('Running classification for 10.Seismic Bumps dataset')
+        df = pd.read_csv(DATASETS + "seismic-bumps.csv", header=None);
+        df.columns = ["seismic", "seismoacoustic", "shift", "genergy", "gpuls", "gdenergy", "gdpuls", "ghazard",
+                      "nbumps", "nbumps2", "nbumps3", "nbumps4", "nbumps5", "nbumps6", "nbumps7", "nbumps89",
+                      "energy", "maxenergy", "class"]
+
+        df.drop(["nbumps6", "nbumps7", "nbumps89"], axis=1, inplace=True)
+
+        encoder = Preprocessing.LabelEncoder()
+
+        encoder.fit(df['seismic'])
+        df['seismic'] = encoder.transform(df['seismic'])
+
+        encoder.fit(df['seismoacoustic'])
+        df['seismoacoustic'] = encoder.transform(df['seismoacoustic'])
+
+        encoder.fit(df['shift'])
+        df['shift'] = encoder.transform(df['shift'])
+
+        encoder.fit(df['ghazard'])
+        df['ghazard'] = encoder.transform(df['ghazard'])
+
+        df_train, df_test = train_test_split(df, test_size=0.3, random_state=0)
+        X_train, y_train = df_train.iloc[:, :-1], df_train.iloc[:, -1]
+        X_test, y_test = df_test.iloc[:, :-1], df_test.iloc[:, -1]
+        scaler = Preprocessing.StandardScaler().fit(X_train.iloc[:, [3, 4, 5, 6, 13, 14]])
+        X_train_scaled = X_train.copy(deep=True)
+        X_test_scaled = X_test.copy(deep=True)
+        X_train_scaled.iloc[:, [3, 4, 5, 6, 13, 14]] = scaler.transform(X_train.iloc[:, [3, 4, 5, 6, 13, 14]])
+        X_test_scaled.iloc[:, [3, 4, 5, 6, 13, 14]] = scaler.transform(X_test.iloc[:, [3, 4, 5, 6, 13, 14]])
+
+        smote = SMOTETomek(ratio='auto', random_state=0)
+        X_smote, y_smote = smote.fit_sample(X_train_scaled, y_train)
+        y_smote = pd.DataFrame(data=y_smote, dtype=np.int64)
+        y_smote.columns = ['class']
+        X_smote = pd.DataFrame(data=X_smote)
+        X_smote.columns = ["seismic", "seismoacoustic", "shift", "genergy", "gpuls", "gdenergy", "gdpuls",
+                           "ghazard", "nbumps", "nbumps2", "nbumps3", "nbumps4", "nbumps5", "energy", "maxenergy"]
+        df_train_smote = pd.concat([X_smote, y_smote], axis=1)
+        df_train_smote_shuffle = df_train_smote.sample(frac=1, axis=0, random_state=0).reset_index(drop=True)
+        X_smote_train, y_smote_train = df_train_smote_shuffle.iloc[:, :-1], df_train_smote_shuffle.iloc[:, -1]
+
         if userResponse is "2":
-            df = pd.read_csv(DATASETS + "seismic-bumps.csv", header=None);
-            df.columns = ["seismic", "seismoacoustic", "shift", "genergy", "gpuls", "gdenergy", "gdpuls", "ghazard",
-                          "nbumps", "nbumps2", "nbumps3", "nbumps4", "nbumps5", "nbumps6", "nbumps7", "nbumps89",
-                          "energy", "maxenergy", "class"]
-
-            df.drop(["nbumps6", "nbumps7", "nbumps89"], axis=1, inplace=True)
-
-            encoder = Preprocessing.LabelEncoder()
-
-            encoder.fit(df['seismic'])
-            df['seismic'] = encoder.transform(df['seismic'])
-
-            encoder.fit(df['seismoacoustic'])
-            df['seismoacoustic'] = encoder.transform(df['seismoacoustic'])
-
-            encoder.fit(df['shift'])
-            df['shift'] = encoder.transform(df['shift'])
-
-            encoder.fit(df['ghazard'])
-            df['ghazard'] = encoder.transform(df['ghazard'])
-
-            df_train, df_test = train_test_split(df, test_size=0.3, random_state=0)
-            X_train, y_train = df_train.iloc[:, :-1], df_train.iloc[:, -1]
-            X_test, y_test = df_test.iloc[:, :-1], df_test.iloc[:, -1]
-            scaler = Preprocessing.StandardScaler().fit(X_train.iloc[:, [3, 4, 5, 6, 13, 14]])
-            X_train_scaled = X_train.copy(deep=True)
-            X_test_scaled = X_test.copy(deep=True)
-            X_train_scaled.iloc[:, [3, 4, 5, 6, 13, 14]] = scaler.transform(X_train.iloc[:, [3, 4, 5, 6, 13, 14]])
-            X_test_scaled.iloc[:, [3, 4, 5, 6, 13, 14]] = scaler.transform(X_test.iloc[:, [3, 4, 5, 6, 13, 14]])
-
-            smote = SMOTETomek(ratio='auto', random_state=0)
-            X_smote, y_smote = smote.fit_sample(X_train_scaled, y_train)
-            y_smote = pd.DataFrame(data=y_smote, dtype=np.int64)
-            y_smote.columns = ['class']
-            X_smote = pd.DataFrame(data=X_smote)
-            X_smote.columns = ["seismic", "seismoacoustic", "shift", "genergy", "gpuls", "gdenergy", "gdpuls",
-                               "ghazard", "nbumps", "nbumps2", "nbumps3", "nbumps4", "nbumps5", "energy", "maxenergy"]
-            df_train_smote = pd.concat([X_smote, y_smote], axis=1)
-            df_train_smote_shuffle = df_train_smote.sample(frac=1, axis=0, random_state=0).reset_index(drop=True)
-            X_smote_train, y_smote_train = df_train_smote_shuffle.iloc[:, :-1], df_train_smote_shuffle.iloc[:, -1]
-
             df_train_smote_shuffle['class'].value_counts().plot(kind='bar', title='Count (class)');
-
             # SVM
             params_grid = {
                 'gamma': [1e-2, 1e-1, 1, 10, 100],
@@ -1767,25 +1806,30 @@ class class_classification:
                                   "SeismicBumpsMLP", cv=3)
         else:
             # SVM
-            self.load_pretrained_models("svm_bumps_grid_model.sav")
+            self.load_pretrained_models("svm_bumps_grid_model", X_smote_train, y_smote_train, X_test_scaled, y_test, 3)
 
             # DTC
-            self.load_pretrained_models("tree_bumps_grid_model.sav")
+            self.load_pretrained_models("tree_bumps_grid_model", X_smote_train, y_smote_train, X_test_scaled, y_test, 3)
 
             # RFC
-            self.load_pretrained_models("random_bumps_grid_model.sav")
+            self.load_pretrained_models("random_bumps_grid_model", X_smote_train, y_smote_train, X_test_scaled, y_test,
+                                        3)
 
             # LR
-            self.load_pretrained_models("logistic_bumps_grid_model.sav")
+            self.load_pretrained_models("logistic_bumps_grid_model", X_smote_train, y_smote_train, X_test_scaled,
+                                        y_test, 3)
 
             # Adaboost
-            self.load_pretrained_models("adaboost_bumps_grid_model.sav")
+            self.load_pretrained_models("adaboost_bumps_grid_model", X_smote_train, y_smote_train, X_test_scaled,
+                                        y_test, 3)
 
             # KNN
-            self.load_pretrained_models("kNearest_bumps_grid_model.sav")
+            self.load_pretrained_models("kNearest_bumps_grid_model", X_smote_train, y_smote_train, X_test_scaled,
+                                        y_test, 3)
 
             # GNB
-            self.load_pretrained_models("gaussian_bumps_grid_model.sav")
+            self.load_pretrained_models("gaussian_bumps_grid_model", X_smote_train, y_smote_train, X_test_scaled,
+                                        y_test, 3)
 
             # MLP
-            self.load_pretrained_models("mlp_bumps_grid_model.sav")
+            self.load_pretrained_models("mlp_bumps_grid_model", X_smote_train, y_smote_train, X_test_scaled, y_test, 3)
