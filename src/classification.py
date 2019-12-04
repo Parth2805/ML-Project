@@ -1,4 +1,3 @@
-import itertools
 import pickle
 
 import numpy as np
@@ -8,17 +7,14 @@ import scipy.stats as Stats
 import sklearn
 import sklearn.ensemble as Ensemble
 import sklearn.linear_model  as Linear
-import sklearn.metrics as metrics
 import sklearn.model_selection as model_select
 import sklearn.neighbors as Neighbors
 import sklearn.neural_network as NN
 import sklearn.preprocessing as Preprocessing
 import sklearn.svm
 import sklearn.tree as Tree
-from imblearn.combine import SMOTETomek
-from imblearn.over_sampling import SMOTE
+#from imblearn.combine import SMOTETomek
 from scipy.io import arff
-from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn.preprocessing import StandardScaler
@@ -431,7 +427,7 @@ class class_classification:
             # MLP
             self.load_pretrained_models("mlp_default_client_random_model", X_train, y_train, X_test, y_test, 3)
 
-    def Breast_Cancer_Wisconsin(self):
+    def Breast_Cancer_Wisconsin(self, userResponse):
         print('Running classification for 3.Breast Cancer Wisconsin dataset')
 
         ''' DATASET WBC'''
@@ -462,93 +458,123 @@ class class_classification:
         X_train = scaler.transform(X_train)
         X_test = scaler.transform(X_test)
 
-        ''' KNN CLASSIFICATION'''
+        if userResponse is "2":
+            ''' KNN CLASSIFICATION'''
 
-        print('Running KNN Classifier\n')
-        param_grid = {
-            "n_neighbors": np.arange(5, 50, 5),
-            "weights": ['uniform', 'distance'],
-            "leaf_size": np.arange(5, 100, 10)
-        }
+            print('Running KNN Classifier\n')
+            param_grid = {
+                "n_neighbors": np.arange(5, 50, 5),
+                "weights": ['uniform', 'distance'],
+                "leaf_size": np.arange(5, 100, 10)
+            }
 
-        self.grid_search_cv(self, sklearn.neighbors.KNeighborsClassifier(), param_grid, 5, X_train, y_train)
+            self.grid_search_cv(self, sklearn.neighbors.KNeighborsClassifier(), param_grid, X_train, y_train, X_test,
+                                y_test, "kNN_WBC_model", 5)
 
-        ''' Decision Tree CLASSIFICATION'''
+            ''' Decision Tree CLASSIFICATION'''
 
-        print('Running Decision Tree Classifier\n')
-        param_grid = {'max_depth': np.arange(5, 50),
-                      'max_leaf_nodes': np.arange(5, 50, 5),
-                      'criterion': ['gini', 'entropy']
-                      }
+            print('Running Decision Tree Classifier\n')
+            param_grid = {'max_depth': np.arange(5, 50),
+                          'max_leaf_nodes': np.arange(5, 50, 5),
+                          'criterion': ['gini', 'entropy']
+                          }
 
-        self.grid_search_cv(self, Tree.DecisionTreeClassifier(random_state=0), param_grid, 5, X_train, y_train)
+            self.grid_search_cv(self, Tree.DecisionTreeClassifier(random_state=0), param_grid, X_train, y_train, X_test,
+                                y_test, "DecisionTree_WBC_model", 5)
 
-        ''' SVM CLASSIFICATION'''
+            ''' SVM CLASSIFICATION'''
 
-        print('Running SVM Classifier\n')
-        param_grid = {
-            'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
-            'C': np.logspace(0, 3, 4),
-            'gamma': np.logspace(-2, 1, 4)
-        }
+            print('Running SVM Classifier\n')
+            param_grid = {
+                'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
+                'C': np.logspace(0, 3, 4),
+                'gamma': np.logspace(-2, 1, 4)
+            }
 
-        self.random_search_cv(self, sklearn.svm.SVC(random_state=0), param_grid, 3, X_train, y_train)
+            self.random_search_cv(self, sklearn.svm.SVC(random_state=0), param_grid, X_train, y_train, X_test, y_test,
+                                  "Svm_WBC_model", 5)
 
-        '''RANDOM FOREST CLASSIFIER'''
+            '''RANDOM FOREST CLASSIFIER'''
 
-        print('Running Random Forest Classifier\n')
-        param_grid = {'n_estimators': np.arange(5, 20, 5),
-                      'max_depth': np.arange(5, 50),
-                      'max_leaf_nodes': np.arange(5, 50, 5),
-                      'criterion': ['gini', 'entropy']
-                      }
+            print('Running Random Forest Classifier\n')
+            param_grid = {'n_estimators': np.arange(5, 20, 5),
+                          'max_depth': np.arange(5, 50),
+                          'max_leaf_nodes': np.arange(5, 50, 5),
+                          'criterion': ['gini', 'entropy']
+                          }
 
-        self.random_search_cv(self, sklearn.ensemble.RandomForestClassifier(random_state=0), param_grid, 5, X_train,
-                              y_train)
+            self.random_search_cv(self, sklearn.ensemble.RandomForestClassifier(random_state=0), param_grid, X_train,
+                                  y_train, X_test, y_test, "RandomForest_WBC_model", 5)
 
-        '''ADABOOST CLASSIFIER'''
+            '''ADABOOST CLASSIFIER'''
 
-        print('Running Adaboost Classifier\n')
-        param_grid = {'n_estimators': np.arange(25, 75, 5),
-                      'learning_rate': np.arange(0.1, 1.1, 0.1),
-                      'algorithm': ['SAMME', 'SAMME.R']
-                      }
+            print('Running Adaboost Classifier\n')
+            param_grid = {'n_estimators': np.arange(25, 75, 5),
+                          'learning_rate': np.arange(0.1, 1.1, 0.1),
+                          'algorithm': ['SAMME', 'SAMME.R']
+                          }
 
-        self.random_search_cv(self, sklearn.ensemble.AdaBoostClassifier(random_state=0), param_grid, 5, X_train,
-                              y_train)
+            self.random_search_cv(self, sklearn.ensemble.AdaBoostClassifier(random_state=0), param_grid, X_train,
+                                  y_train, X_test, y_test, "Adaboost_WBC_model", 5)
 
-        '''LOGISTIC REGRESSION CLASSIFIER'''
+            '''LOGISTIC REGRESSION CLASSIFIER'''
 
-        print('Running Logistic Regression Classifier\n')
-        param_grid = {
-            'C': np.logspace(0, 3, 4),
-            'fit_intercept': [True, False],
-            'max_iter': [50, 100, 150],
-            'solver': ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga']
-        }
-        self.random_search_cv(self, sklearn.linear_model.LogisticRegression(random_state=0), param_grid, 5, X_train,
-                              y_train)
+            print('Running Logistic Regression Classifier\n')
+            param_grid = {
+                'C': np.logspace(0, 3, 4),
+                'fit_intercept': [True, False],
+                'max_iter': [50, 100, 150],
+                'solver': ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga']
+            }
+            self.random_search_cv(self, sklearn.linear_model.LogisticRegression(random_state=0), param_grid, X_train,
+                                  y_train, X_test, y_test, "Logistic_WBC_model", 5)
 
-        '''GAUSSIAN NAIVE BAYES CLASSIFIER'''
+            '''GAUSSIAN NAIVE BAYES CLASSIFIER'''
 
-        print('Running Gaussian Naive Bayes Classifier\n')
-        param_grid = {
-            "var_smoothing": [1e-05, 1e-07, 1e-09, 1e-11]}
-        self.grid_search_cv(self, GaussianNB(), param_grid, 5, X_train, y_train)
+            print('Running Gaussian Naive Bayes Classifier\n')
+            param_grid = {
+                "var_smoothing": [1e-05, 1e-07, 1e-09, 1e-11]}
+            self.grid_search_cv(self, GaussianNB(), param_grid, X_train, y_train, X_test, y_test, "Gaussian_WBC_model",
+                                5)
 
-        '''Neural Network Classifier'''
+            '''Neural Network Classifier'''
 
-        mlp = sklearn.neural_network.MLPClassifier(activation='relu', tol=1e-4, n_iter_no_change=10, momentum=0.9,
-                                                   learning_rate='adaptive', random_state=0, verbose=True,
-                                                   warm_start=True, early_stopping=True)
+            mlp = sklearn.neural_network.MLPClassifier(activation='relu', tol=1e-4, n_iter_no_change=10, momentum=0.9,
+                                                       learning_rate='adaptive', random_state=0, verbose=True,
+                                                       warm_start=True, early_stopping=True)
 
-        param_grid = {
-            "solver": ['adam', 'sgd'],
-            "learning_rate_init": np.arange(0.1, 1.1, 0.1),
-            "hidden_layer_sizes": [(512,), (256, 128, 64, 32, 2), (512, 256, 128, 64, 32, 2)]
-        }
+            param_grid = {
+                "solver": ['adam'],
+                "learning_rate_init": np.arange(0.1, 1.1, 0.1),
+                "hidden_layer_sizes": [(512,), (256, 128, 64, 32, 2), (512, 256, 128, 64, 32, 2)]
+            }
 
-        self.random_search_cv(self, mlp, param_grid, 5, X_train, y_train)
+            self.random_search_cv(self, mlp, param_grid, X_train, y_train, X_test, y_test, "Mlp_WBC_model", 5)
+        else:
+            # SVM
+            self.load_pretrained_models("Svm_WBC_model", X_train, y_train, X_test, y_test, 5)
+
+            # DTC
+            self.load_pretrained_models("DecisionTree_WBC_model", X_train, y_train, X_test, y_test, 5)
+
+            # RFC
+            self.load_pretrained_models("RandomForest_WBC_model", X_train, y_train, X_test, y_test, 5)
+
+            # LR
+            self.load_pretrained_models("Logistic_WBC_model", X_train, y_train, X_test, y_test, 5)
+
+            # Adaboost
+            self.load_pretrained_models("Adaboost_WBC_model", X_train, y_train, X_test, y_test, 5)
+
+            # KNN
+            self.load_pretrained_models("kNN_WBC_model", X_train, y_train, X_test, y_test, 5)
+
+            # GNB
+            self.load_pretrained_models("Gaussian_WBC_model", X_train, y_train, X_test, y_test, 5)
+
+            # MLP
+            self.load_pretrained_models("Mlp_WBC_model", X_train, y_train, X_test, y_test, 5)
+
         '''DATASET WDBC'''
         df = pd.read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/wdbc.data",
                          delimiter=",", header=None,
@@ -570,93 +596,123 @@ class class_classification:
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=0)
 
-        ''' KNN CLASSIFICATION'''
+        if userResponse is "2":
 
-        print('Running KNN Classifier\n')
-        param_grid = {
-            "n_neighbors": np.arange(5, 50, 5),
-            "weights": ['uniform', 'distance'],
-            "leaf_size": np.arange(5, 100, 10)
-        }
+            ''' KNN CLASSIFICATION'''
 
-        self.grid_search_cv(self, sklearn.neighbors.KNeighborsClassifier(), param_grid, 5, X_train, y_train)
+            print('Running KNN Classifier\n')
+            param_grid = {
+                "n_neighbors": np.arange(5, 50, 5),
+                "weights": ['uniform', 'distance'],
+                "leaf_size": np.arange(5, 100, 10)
+            }
 
-        ''' Decision Tree CLASSIFICATION'''
+            self.grid_search_cv(self, sklearn.neighbors.KNeighborsClassifier(), param_grid, X_train, y_train, X_test,
+                                y_test, "knearest_WDBC_model")
 
-        print('Running Decision Tree Classifier\n')
-        param_grid = {'max_depth': np.arange(5, 50),
-                      'max_leaf_nodes': np.arange(5, 50, 5),
-                      'criterion': ['gini', 'entropy']
-                      }
+            ''' Decision Tree CLASSIFICATION'''
 
-        self.grid_search_cv(self, Tree.DecisionTreeClassifier(random_state=0), param_grid, 5, X_train, y_train)
+            print('Running Decision Tree Classifier\n')
+            param_grid = {'max_depth': np.arange(5, 50),
+                          'max_leaf_nodes': np.arange(5, 50, 5),
+                          'criterion': ['gini', 'entropy']
+                          }
 
-        ''' SVM CLASSIFICATION'''
+            self.grid_search_cv(self, Tree.DecisionTreeClassifier(random_state=0), param_grid, X_train, y_train, X_test,
+                                y_test, "tree_WDBC_model")
 
-        print('Running SVM Classifier\n')
-        param_grid = {
-            'kernel': ['rbf', 'linear'],
-            'C': np.logspace(0, 3, 4),
-            'gamma': np.logspace(-2, 1, 4)
-        }
+            ''' SVM CLASSIFICATION'''
 
-        self.random_search_cv(self, sklearn.svm.SVC(random_state=0), param_grid, 3, X_train, y_train)
+            print('Running SVM Classifier\n')
+            param_grid = {
+                'kernel': ['rbf', 'linear'],
+                'C': np.logspace(0, 3, 4),
+                'gamma': np.logspace(-2, 1, 4)
+            }
 
-        '''RANDOM FOREST CLASSIFIER'''
+            self.random_search_cv(self, sklearn.svm.SVC(random_state=0), param_grid, X_train, y_train, X_test, y_test,
+                                  "svm_WDBC_model")
 
-        print('Running Random Forest Classifier\n')
-        param_grid = {'n_estimators': np.arange(5, 20, 5),
-                      'max_depth': np.arange(5, 50, 3),
-                      'max_leaf_nodes': np.arange(5, 50, 5),
-                      'criterion': ['gini', 'entropy']
-                      }
+            '''RANDOM FOREST CLASSIFIER'''
 
-        self.random_search_cv(self, sklearn.ensemble.RandomForestClassifier(random_state=0), param_grid, 5, X_train,
-                              y_train)
+            print('Running Random Forest Classifier\n')
+            param_grid = {'n_estimators': np.arange(5, 20, 5),
+                          'max_depth': np.arange(5, 50, 3),
+                          'max_leaf_nodes': np.arange(5, 50, 5),
+                          'criterion': ['gini', 'entropy']
+                          }
 
-        '''ADABOOST CLASSIFIER'''
+            self.random_search_cv(self, sklearn.ensemble.RandomForestClassifier(random_state=0), param_grid, X_train,
+                                  y_train, X_test, y_test, "random_forest_WDBC_model")
 
-        print('Running Adaboost Classifier\n')
-        param_grid = {'n_estimators': np.arange(25, 75, 5),
-                      'learning_rate': np.arange(0.1, 1.1, 0.1),
-                      'algorithm': ['SAMME', 'SAMME.R']
-                      }
+            '''ADABOOST CLASSIFIER'''
 
-        self.random_search_cv(self, sklearn.ensemble.AdaBoostClassifier(random_state=0), param_grid, 5, X_train,
-                              y_train)
+            print('Running Adaboost Classifier\n')
+            param_grid = {'n_estimators': np.arange(25, 75, 5),
+                          'learning_rate': np.arange(0.1, 1.1, 0.1),
+                          'algorithm': ['SAMME', 'SAMME.R']
+                          }
 
-        '''LOGISTIC REGRESSION CLASSIFIER'''
+            self.random_search_cv(self, sklearn.ensemble.AdaBoostClassifier(random_state=0), param_grid, X_train,
+                                  y_train, X_test, y_test, "adaboost_WDBC_model")
 
-        print('Running Logistic Regression Classifier\n')
-        param_grid = {
-            'C': np.logspace(0, 3, 4),
-            'fit_intercept': [True, False],
-            'max_iter': [50, 100, 150],
-            'solver': ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga']
-        }
-        self.random_search_cv(self, sklearn.linear_model.LogisticRegression(random_state=0), param_grid, 5, X_train,
-                              y_train)
+            '''LOGISTIC REGRESSION CLASSIFIER'''
 
-        '''GAUSSIAN NAIVE BAYES CLASSIFIER'''
+            print('Running Logistic Regression Classifier\n')
+            param_grid = {
+                'C': np.logspace(0, 3, 4),
+                'fit_intercept': [True, False],
+                'max_iter': [50, 100, 150],
+                'solver': ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga']
+            }
+            self.random_search_cv(self, sklearn.linear_model.LogisticRegression(random_state=0), param_grid, X_train,
+                                  y_train, X_test, y_test, "logistic_WDBC_model")
 
-        print('Running Gaussian Naive Bayes Classifier\n')
-        param_grid = {
-            "var_smoothing": [1e-05, 1e-07, 1e-09, 1e-11]}
-        self.grid_search_cv(self, GaussianNB(), param_grid, 5, X_train, y_train)
+            '''GAUSSIAN NAIVE BAYES CLASSIFIER'''
 
-        '''Neural Network Classifier'''
+            print('Running Gaussian Naive Bayes Classifier\n')
+            param_grid = {
+                "var_smoothing": [1e-05, 1e-07, 1e-09, 1e-11]}
+            self.grid_search_cv(self, GaussianNB(), param_grid, X_train, y_train, X_test, y_test, "gaussian_WDBC_model")
 
-        mlp = sklearn.neural_network.MLPClassifier(activation='relu', tol=1e-4, n_iter_no_change=10, momentum=0.9,
-                                                   learning_rate='adaptive', random_state=0, verbose=True,
-                                                   warm_start=True, early_stopping=True)
+            '''Neural Network Classifier'''
 
-        param_grid = {
-            "solver": ['adam', 'sgd'],
-            "learning_rate_init": np.arange(0.1, 1.1, 0.1),
-            "hidden_layer_sizes": [(512,), (256, 128, 64, 32, 2), (512, 256, 128, 64, 32, 2)]
-        }
+            mlp = sklearn.neural_network.MLPClassifier(activation='relu', tol=1e-4, n_iter_no_change=10, momentum=0.9,
+                                                       learning_rate='adaptive', random_state=0, verbose=True,
+                                                       warm_start=True, early_stopping=True)
 
-        self.random_search_cv(self, mlp, param_grid, 5, X_train, y_train)
+            param_grid = {
+                "solver": ['adam'],
+                "learning_rate_init": np.arange(0.1, 1.1, 0.1),
+                "hidden_layer_sizes": [(512,), (256, 128, 64, 32, 2), (512, 256, 128, 64, 32, 2)]
+            }
+
+            self.random_search_cv(self, mlp, param_grid, X_train, y_train, X_test, y_test, "mlp_WDBC_model")
+        else:
+            # SVM
+            self.load_pretrained_models("svm_WDBC_model", X_train, y_train, X_test, y_test, 5)
+
+            # DTC
+            self.load_pretrained_models("tree_WDBC_model", X_train, y_train, X_test, y_test, 5)
+
+            # RFC
+            self.load_pretrained_models("random_forest_WDBC_model", X_train, y_train, X_test, y_test, 5)
+
+            # LR
+            self.load_pretrained_models("logistic_WDBC_model", X_train, y_train, X_test, y_test, 5)
+
+            # Adaboost
+            self.load_pretrained_models("adaboost_WDBC_model", X_train, y_train, X_test, y_test, 5)
+
+            # KNN
+            self.load_pretrained_models("knearest_WDBC_model", X_train, y_train, X_test, y_test, 5)
+
+            # GNB
+            self.load_pretrained_models("gaussian_WDBC_model", X_train, y_train, X_test, y_test, 5)
+
+            # MLP
+            self.load_pretrained_models("mlp_WDBC_model", X_train, y_train, X_test, y_test, 5)
+
         '''DATASET WPBC'''
 
         df = pd.read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/wpbc.data",
@@ -693,94 +749,123 @@ class class_classification:
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=0)
 
-        ''' KNN CLASSIFICATION'''
+        if userResponse is "2":
 
-        print('Running KNN Classifier\n')
-        param_grid = {
-            "n_neighbors": np.arange(5, 50, 5),
-            "weights": ['uniform', 'distance'],
-            "leaf_size": np.arange(5, 100, 10)
-        }
+            ''' KNN CLASSIFICATION'''
 
-        self.grid_search_cv(self, sklearn.neighbors.KNeighborsClassifier(), param_grid, 5, X_train, y_train)
+            print('Running KNN Classifier\n')
+            param_grid = {
+                "n_neighbors": np.arange(5, 50, 5),
+                "weights": ['uniform', 'distance'],
+                "leaf_size": np.arange(5, 100, 10)
+            }
 
-        ''' Decision Tree CLASSIFICATION'''
+            self.grid_search_cv(self, sklearn.neighbors.KNeighborsClassifier(), param_grid, X_train, y_train, X_test,
+                                y_test, "knearest_WPBC_model")
 
-        print('Running Decision Tree Classifier\n')
-        param_grid = {
-            'max_depth': np.arange(5, 50),
-            'max_leaf_nodes': np.arange(5, 50, 5),
-            'criterion': ['gini', 'entropy']
-        }
+            ''' Decision Tree CLASSIFICATION'''
 
-        self.grid_search_cv(self, Tree.DecisionTreeClassifier(random_state=0), param_grid, 5, X_train, y_train)
+            print('Running Decision Tree Classifier\n')
+            param_grid = {
+                'max_depth': np.arange(5, 50),
+                'max_leaf_nodes': np.arange(5, 50, 5),
+                'criterion': ['gini', 'entropy']
+            }
 
-        ''' SVM CLASSIFICATION'''
+            self.grid_search_cv(self, Tree.DecisionTreeClassifier(random_state=0), param_grid, X_train, y_train, X_test,
+                                y_test, "tree_WPBC_model")
 
-        print('Running SVM Classifier\n')
-        param_grid = {
-            'kernel': ['rbf', 'linear'],
-            'C': np.logspace(0, 3, 4),
-            'gamma': np.logspace(-2, 1, 4)
-        }
+            ''' SVM CLASSIFICATION'''
 
-        self.random_search_cv(self, sklearn.svm.SVC(random_state=0), param_grid, 3, X_train, y_train)
+            print('Running SVM Classifier\n')
+            param_grid = {
+                'kernel': ['rbf', 'linear'],
+                'C': np.logspace(0, 3, 4),
+                'gamma': np.logspace(-2, 1, 4)
+            }
 
-        '''RANDOM FOREST CLASSIFIER'''
+            self.random_search_cv(self, sklearn.svm.SVC(random_state=0), param_grid, X_train, y_train, X_test, y_test,
+                                  "svm_WPBC_model")
 
-        print('Running Random Forest Classifier\n')
-        param_grid = {'n_estimators': np.arange(5, 20, 5),
-                      'max_depth': np.arange(5, 50),
-                      'max_leaf_nodes': np.arange(5, 50, 5),
-                      'criterion': ['gini', 'entropy']
-                      }
+            '''RANDOM FOREST CLASSIFIER'''
 
-        self.random_search_cv(self, sklearn.ensemble.RandomForestClassifier(random_state=0), param_grid, 5, X_train,
-                              y_train)
+            print('Running Random Forest Classifier\n')
+            param_grid = {'n_estimators': np.arange(5, 20, 5),
+                          'max_depth': np.arange(5, 50),
+                          'max_leaf_nodes': np.arange(5, 50, 5),
+                          'criterion': ['gini', 'entropy']
+                          }
 
-        '''ADABOOST CLASSIFIER'''
+            self.random_search_cv(self, sklearn.ensemble.RandomForestClassifier(random_state=0), param_grid, X_train,
+                                  y_train, X_test, y_test, "random_forest_WPBC_model")
 
-        print('Running Adaboost Classifier\n')
-        param_grid = {'n_estimators': np.arange(25, 75, 5),
-                      'learning_rate': np.arange(0.1, 1.1, 0.1),
-                      'algorithm': ['SAMME', 'SAMME.R']
-                      }
+            '''ADABOOST CLASSIFIER'''
 
-        self.random_search_cv(self, sklearn.ensemble.AdaBoostClassifier(random_state=0), param_grid, 5, X_train,
-                              y_train)
+            print('Running Adaboost Classifier\n')
+            param_grid = {'n_estimators': np.arange(25, 75, 5),
+                          'learning_rate': np.arange(0.1, 1.1, 0.1),
+                          'algorithm': ['SAMME', 'SAMME.R']
+                          }
 
-        '''LOGISTIC REGRESSION CLASSIFIER'''
+            self.random_search_cv(self, sklearn.ensemble.AdaBoostClassifier(random_state=0), param_grid, X_train,
+                                  y_train, X_test, y_test, "adaboost_WPBC_model")
 
-        print('Running Logistic Regression Classifier\n')
-        param_grid = {
-            'C': np.logspace(0, 3, 4),
-            'fit_intercept': [True, False],
-            'max_iter': [50, 100, 150],
-            'solver': ['lbfgs', 'liblinear', 'sag', 'saga']
-        }
-        self.random_search_cv(self, sklearn.linear_model.LogisticRegression(random_state=0), param_grid, 5, X_train,
-                              y_train)
+            '''LOGISTIC REGRESSION CLASSIFIER'''
 
-        '''GAUSSIAN NAIVE BAYES CLASSIFIER'''
+            print('Running Logistic Regression Classifier\n')
+            param_grid = {
+                'C': np.logspace(0, 3, 4),
+                'fit_intercept': [True, False],
+                'max_iter': [50, 100, 150],
+                'solver': ['lbfgs', 'liblinear', 'sag', 'saga']
+            }
+            self.random_search_cv(self, sklearn.linear_model.LogisticRegression(random_state=0), param_grid, X_train,
+                                  y_train, X_test, y_test, "logistic_WPBC_model")
 
-        print('Running Gaussian Naive Bayes Classifier\n')
-        param_grid = {
-            "var_smoothing": [1e-05, 1e-07, 1e-09, 1e-11]}
-        self.grid_search_cv(self, GaussianNB(), param_grid, 5, X_train, y_train)
+            '''GAUSSIAN NAIVE BAYES CLASSIFIER'''
 
-        '''Neural Network Classifier'''
+            print('Running Gaussian Naive Bayes Classifier\n')
+            param_grid = {
+                "var_smoothing": [1e-05, 1e-07, 1e-09, 1e-11]}
+            self.grid_search_cv(self, GaussianNB(), param_grid, X_train, y_train, X_test, y_test, "gaussian_WPBC_model")
 
-        mlp = sklearn.neural_network.MLPClassifier(activation='relu', tol=1e-4, n_iter_no_change=10, momentum=0.9,
-                                                   learning_rate='adaptive', random_state=0, verbose=True,
-                                                   warm_start=True, early_stopping=True)
+            '''Neural Network Classifier'''
 
-        param_grid = {
-            "solver": ['adam', 'sgd'],
-            "learning_rate_init": np.arange(0.1, 1.1, 0.1),
-            "hidden_layer_sizes": [(512,), (256, 128, 64, 32, 2), (512, 256, 128, 64, 32, 2)]
-        }
+            mlp = sklearn.neural_network.MLPClassifier(activation='relu', tol=1e-4, n_iter_no_change=10, momentum=0.9,
+                                                       learning_rate='adaptive', random_state=0, verbose=True,
+                                                       warm_start=True, early_stopping=True)
 
-        self.random_search_cv(self, mlp, param_grid, 5, X_train, y_train)
+            param_grid = {
+                "solver": ['adam'],
+                "learning_rate_init": np.arange(0.1, 1.1, 0.1),
+                "hidden_layer_sizes": [(512,), (256, 128, 64, 32, 2), (512, 256, 128, 64, 32, 2)]
+            }
+
+            self.random_search_cv(self, mlp, param_grid, X_train, y_train, X_test, y_test, "mlp_WPBC_model")
+        else:
+            # SVM
+            self.load_pretrained_models("svm_WPBC_model", X_train, y_train, X_test, y_test)
+
+            # DTC
+            self.load_pretrained_models("tree_WPBC_model", X_train, y_train, X_test, y_test)
+
+            # RFC
+            self.load_pretrained_models("random_forest_WPBC_model", X_train, y_train, X_test, y_test)
+
+            # LR
+            self.load_pretrained_models("logistic_WPBC_model", X_train, y_train, X_test, y_test)
+
+            # Adaboost
+            self.load_pretrained_models("adaboost_WPBC_model", X_train, y_train, X_test, y_test)
+
+            # KNN
+            self.load_pretrained_models("knearest_WPBC_model", X_train, y_train, X_test, y_test)
+
+            # GNB
+            self.load_pretrained_models("gaussian_WPBC_model", X_train, y_train, X_test, y_test)
+
+            # MLP
+            self.load_pretrained_models("mlp_WPBC_model", X_train, y_train, X_test, y_test)
 
     def Statlog_Australian(self):
         print('Running classification for 4.Statlog Australian dataset')
@@ -998,7 +1083,7 @@ class class_classification:
                                                    warm_start=True, early_stopping=True)
 
         param_grid = {
-            "solver": ['adam', 'sgd'],
+            "solver": ['adam'],
             "learning_rate_init": Stats.reciprocal(0.001, 0.1),
             "hidden_layer_sizes": [(512,), (256, 128, 64, 32), (512, 256, 128, 64, 32)]
         }
@@ -1207,7 +1292,7 @@ class class_classification:
             self.load_pretrained_models("mlp_faults_grid_model", X_train_scaled, y_train_labels, X_test_scaled,
                                         y_test_labels, 3)
 
-    def Adult(self):
+    def Adult(self, userResponse):
         print('Running classification for 7.Adult dataset')
 
         labelencoder_data = sklearn.preprocessing.LabelEncoder()
@@ -1261,98 +1346,127 @@ class class_classification:
         y_test = labelencoder_data.fit_transform(y_test)
         y_test = pd.DataFrame(y_test)
 
-        ''' KNN CLASSIFICATION'''
+        if userResponse is "2":
+            ''' KNN CLASSIFICATION'''
 
-        print('Running KNN Classifier\n')
-        param_grid = {
-            "n_neighbors": np.arange(5, 40),
-            "weights": ['uniform', 'distance']
-        }
+            print('Running KNN Classifier\n')
+            param_grid = {
+                "n_neighbors": np.arange(5, 40),
+                "weights": ['uniform', 'distance']
+            }
 
-        self.grid_search_cv(self, sklearn.neighbors.KNeighborsClassifier(), param_grid, 5, X_train, y_train)
+            self.grid_search_cv(self, sklearn.neighbors.KNeighborsClassifier(), param_grid, X_train, y_train, X_test,
+                                y_test, "knearest_Adult_model", cv=3)
 
-        ''' Decision Tree CLASSIFICATION'''
+            ''' Decision Tree CLASSIFICATION'''
 
-        print('Running Decision Tree Classifier\n')
-        param_grid = {
-            'max_depth': np.arange(5, 50, 5),
-            'max_leaf_nodes': np.arange(5, 50, 5),
-            'criterion': ['gini', 'entropy']
-        }
+            print('Running Decision Tree Classifier\n')
+            param_grid = {
+                'max_depth': np.arange(5, 50, 5),
+                'max_leaf_nodes': np.arange(5, 50, 5),
+                'criterion': ['gini', 'entropy']
+            }
 
-        self.grid_search_cv(self, Tree.DecisionTreeClassifier(random_state=0), param_grid, X_train, y_train)
+            self.grid_search_cv(self, Tree.DecisionTreeClassifier(random_state=0), param_grid, X_train, y_train, X_test,
+                                y_test, "tree_Adult_model", cv=3)
 
-        ''' SVM CLASSIFICATION'''
+            ''' SVM CLASSIFICATION'''
 
-        print('Running SVM Classifier\n')
-        param_grid = {
-            'kernel': ['rbf', 'linear'],
-            'C': np.logspace(0, 3, 2),
-            'gamma': np.logspace(-2, 1, 2)
-        }
+            print('Running SVM Classifier\n')
+            param_grid = {
+                'kernel': ['rbf', 'linear'],
+                'C': np.logspace(0, 3, 2),
+                'gamma': np.logspace(-2, 1, 2)
+            }
 
-        self.random_search_cv(self, sklearn.svm.SVC(random_state=0), param_grid, 2, X_train, y_train)
+            self.random_search_cv(self, sklearn.svm.SVC(random_state=0), param_grid, X_train, y_train, X_test, y_test,
+                                  "svm_Adult_model", cv=3)
 
-        '''RANDOM FOREST CLASSIFIER'''
+            '''RANDOM FOREST CLASSIFIER'''
 
-        print('Running Random Forest Classifier\n')
-        param_grid = {'n_estimators': np.arange(5, 20, 5),
-                      'max_depth': np.arange(5, 50),
-                      'max_leaf_nodes': np.arange(5, 50, 5),
-                      'criterion': ['gini', 'entropy']
-                      }
+            print('Running Random Forest Classifier\n')
+            param_grid = {'n_estimators': np.arange(5, 20, 5),
+                          'max_depth': np.arange(5, 50),
+                          'max_leaf_nodes': np.arange(5, 50, 5),
+                          'criterion': ['gini', 'entropy']
+                          }
 
-        self.random_search_cv(self, sklearn.ensemble.RandomForestClassifier(random_state=0), param_grid, 3, X_train,
-                              y_train)
+            self.random_search_cv(self, sklearn.ensemble.RandomForestClassifier(random_state=0), param_grid, X_train,
+                                  y_train, X_test, y_test, "random_forest_Adult_model", cv=3)
 
-        '''ADABOOST CLASSIFIER'''
+            '''ADABOOST CLASSIFIER'''
 
-        print('Running Adaboost Classifier\n')
-        param_grid = {'n_estimators': np.arange(25, 75, 5),
-                      'learning_rate': np.arange(0.1, 1.1, 0.1),
-                      'algorithm': ['SAMME', 'SAMME.R']
-                      }
+            print('Running Adaboost Classifier\n')
+            param_grid = {'n_estimators': np.arange(25, 75, 5),
+                          'learning_rate': np.arange(0.1, 1.1, 0.1),
+                          'algorithm': ['SAMME', 'SAMME.R']
+                          }
 
-        self.random_search_cv(self, sklearn.ensemble.AdaBoostClassifier(random_state=0), param_grid, 5, X_train,
-                              y_train)
+            self.random_search_cv(self, sklearn.ensemble.AdaBoostClassifier(random_state=0), param_grid, X_train,
+                                  y_train, X_test, y_test, "adaboost_Adult_model", cv=3)
 
-        '''LOGISTIC REGRESSION CLASSIFIER'''
+            '''LOGISTIC REGRESSION CLASSIFIER'''
 
-        print('Running Logistic Regression Classifier\n')
-        param_grid = {
-            'C': np.logspace(0, 3, 4),
-            'fit_intercept': [True, False],
-            'max_iter': [50, 100, 150],
-            'solver': ['lbfgs', 'liblinear', 'sag', 'saga']
-        }
-        self.random_search_cv(self, sklearn.linear_model.LogisticRegression(random_state=0), param_grid, 3, X_train,
-                              y_train)
+            print('Running Logistic Regression Classifier\n')
+            param_grid = {
+                'C': np.logspace(0, 3, 4),
+                'fit_intercept': [True, False],
+                'max_iter': [50, 100, 150],
+                'solver': ['lbfgs', 'liblinear', 'sag', 'saga']
+            }
+            self.random_search_cv(self, sklearn.linear_model.LogisticRegression(random_state=0), param_grid, X_train,
+                                  y_train, X_test, y_test, "logistic_Adult_model", cv=3)
 
-        '''GAUSSIAN NAIVE BAYES CLASSIFIER'''
+            '''GAUSSIAN NAIVE BAYES CLASSIFIER'''
 
-        print('Running Gaussian Naive Bayes Classifier\n')
-        param_grid = {
-            "var_smoothing": [1e-05, 1e-07, 1e-09, 1e-11]}
-        self.grid_search_cv(self, GaussianNB(), param_grid, 5, X_train, y_train)
+            print('Running Gaussian Naive Bayes Classifier\n')
+            param_grid = {
+                "var_smoothing": [1e-05, 1e-07, 1e-09, 1e-11]}
+            self.grid_search_cv(self, GaussianNB(), param_grid, X_train, y_train, X_test, y_test,
+                                "gaussian_Adult_model", cv=3)
 
-        '''Neural Network Classifier'''
+            '''Neural Network Classifier'''
 
-        mlp = sklearn.neural_network.MLPClassifier(activation='relu', tol=1e-4, n_iter_no_change=10, momentum=0.9,
-                                                   learning_rate='adaptive', random_state=0, verbose=True,
-                                                   warm_start=True, early_stopping=True)
+            mlp = sklearn.neural_network.MLPClassifier(activation='relu', tol=1e-4, n_iter_no_change=10, momentum=0.9,
+                                                       learning_rate='adaptive', random_state=0, verbose=True,
+                                                       warm_start=True, early_stopping=True)
 
-        param_grid = {
-            "solver": ['adam', 'sgd'],
-            "learning_rate_init": np.arange(0.1, 1.1, 0.1),
-            "hidden_layer_sizes": [(128,), (128, 64, 32, 2), (512, 256, 128, 64, 32, 2)]
-        }
+            param_grid = {
+                "solver": ['adam'],
+                "learning_rate_init": np.arange(0.1, 1.1, 0.1),
+                "hidden_layer_sizes": [(128,), (128, 64, 32, 2), (512, 256, 128, 64, 32, 2)]
+            }
 
-        self.random_search_cv(self, mlp, param_grid, 5, X_train, y_train)
+            self.random_search_cv(self, mlp, param_grid, X_train, y_train, X_test, y_test, "mlp_Adult_model", cv=3)
+        else:
+            # SVM
+            self.load_pretrained_models("svm_Adult_model", X_train, y_train, X_test, y_test, 3)
+
+            # DTC
+            self.load_pretrained_models("tree_Adult_model", X_train, y_train, X_test, y_test, 3)
+
+            # RFC
+            self.load_pretrained_models("random_forest_Adult_model", X_train, y_train, X_test, y_test, 3)
+
+            # LR
+            self.load_pretrained_models("logistic_Adult_model", X_train, y_train, X_test, y_test, 3)
+
+            # Adaboost
+            self.load_pretrained_models("adaboost_Adult_model", X_train, y_train, X_test, y_test, 3)
+
+            # KNN
+            self.load_pretrained_models("knearest_Adult_model", X_train, y_train, X_test, y_test, 3)
+
+            # GNB
+            self.load_pretrained_models("gaussian_Adult_model", X_train, y_train, X_test, y_test, 3)
+
+            # MLP
+            self.load_pretrained_models("mlp_Adult_model", X_train, y_train, X_test, y_test, 3)
 
     def Yeast(self):
         print('Running classification for 8.Yeast dataset')
 
-    def Thoracic_Surgery_Data(self):
+    def Thoracic_Surgery_Data(self, userResponse):
         print('Running classification for 9.Thoracic Surgery Data dataset')
         df = pd.read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/00277/ThoraricSurgery.arff",
                          delimiter=",", header=None, skiprows=21)
@@ -1367,95 +1481,127 @@ class class_classification:
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=0)
 
-        ''' KNN CLASSIFICATION'''
+        if userResponse is "2":
 
-        print('Running KNN Classifier\n')
-        param_grid = {
-            "n_neighbors": np.arange(5, 50),
-            "weights": ['uniform', 'distance'],
-            "leaf_size": np.arange(5, 100, 5)
-        }
+            ''' KNN CLASSIFICATION'''
 
-        self.grid_search_cv(self, sklearn.neighbors.KNeighborsClassifier(), param_grid, 3, X_train, y_train)
+            print('Running KNN Classifier\n')
+            param_grid = {
+                "n_neighbors": np.arange(5, 50),
+                "weights": ['uniform', 'distance'],
+                "leaf_size": np.arange(5, 100, 5)
+            }
 
-        ''' Decision Tree CLASSIFICATION'''
+            self.grid_search_cv(self, sklearn.neighbors.KNeighborsClassifier(), param_grid, X_train, y_train, X_test,
+                                y_test, "knearest_Thoracic_Surgery_Data_model", cv=3)
 
-        print('Running Decision Tree Classifier\n')
-        param_grid = {
-            'max_depth': np.arange(5, 50, 5),
-            'max_leaf_nodes': np.arange(5, 50, 3),
-            'criterion': ['gini', 'entropy']
-        }
+            ''' Decision Tree CLASSIFICATION'''
 
-        self.grid_search_cv(self, Tree.DecisionTreeClassifier(random_state=0), param_grid, 3, X_train, y_train)
+            print('Running Decision Tree Classifier\n')
+            param_grid = {
+                'max_depth': np.arange(5, 50, 5),
+                'max_leaf_nodes': np.arange(5, 50, 3),
+                'criterion': ['gini', 'entropy']
+            }
 
-        ''' SVM CLASSIFICATION'''
+            self.grid_search_cv(self, Tree.DecisionTreeClassifier(random_state=0), param_grid, X_train, y_train, X_test,
+                                y_test, "tree_Thoracic_Surgery_Data_model", cv=3)
 
-        print('Running SVM Classifier\n')
-        param_grid = {
-            'kernel': ['linear', 'rbf', 'sigmoid'],
-            'degree': [2, 3, 4],
-            'C': np.logspace(0, 3, 4),
-            'gamma': np.logspace(-2, 1, 4)
-        }
+            ''' SVM CLASSIFICATION'''
 
-        self.random_search_cv(self, sklearn.svm.SVC(random_state=0), param_grid, 3, X_train, y_train)
+            print('Running SVM Classifier\n')
+            param_grid = {
+                'kernel': ['linear', 'rbf', 'sigmoid'],
+                'degree': [2, 3, 4],
+                'C': np.logspace(0, 3, 4),
+                'gamma': np.logspace(-2, 1, 4)
+            }
 
-        '''RANDOM FOREST CLASSIFIER'''
+            self.random_search_cv(self, sklearn.svm.SVC(random_state=0), param_grid, X_train, y_train, X_test, y_test,
+                                  "svm_Thoracic_Surgery_Data_model", cv=3)
 
-        print('Running Random Forest Classifier\n')
-        param_grid = {'n_estimators': np.arange(5, 20, 3),
-                      'max_depth': np.arange(5, 50, 3),
-                      'max_leaf_nodes': np.arange(5, 50, 5),
-                      'criterion': ['gini', 'entropy']
-                      }
+            '''RANDOM FOREST CLASSIFIER'''
 
-        self.grid_search_cv(self, sklearn.ensemble.RandomForestClassifier(random_state=0), param_grid, 3, X_train,
-                            y_train)
+            print('Running Random Forest Classifier\n')
+            param_grid = {'n_estimators': np.arange(5, 20, 3),
+                          'max_depth': np.arange(5, 50, 3),
+                          'max_leaf_nodes': np.arange(5, 50, 5),
+                          'criterion': ['gini', 'entropy']
+                          }
 
-        '''ADABOOST CLASSIFIER'''
+            self.grid_search_cv(self, sklearn.ensemble.RandomForestClassifier(random_state=0), param_grid, X_train,
+                                y_train, X_test, y_test, "random_forest_Thoracic_Surgery_Data_model", cv=3)
 
-        print('Running Adaboost Classifier\n')
-        param_grid = {'n_estimators': np.arange(25, 75, 5),
-                      'learning_rate': np.arange(0.1, 1.1, 0.1),
-                      'algorithm': ['SAMME', 'SAMME.R']
-                      }
+            '''ADABOOST CLASSIFIER'''
 
-        self.random_search_cv(self, sklearn.ensemble.AdaBoostClassifier(random_state=0), param_grid, 3, X_train,
-                              y_train)
+            print('Running Adaboost Classifier\n')
+            param_grid = {'n_estimators': np.arange(25, 75, 5),
+                          'learning_rate': np.arange(0.1, 1.1, 0.1),
+                          'algorithm': ['SAMME', 'SAMME.R']
+                          }
 
-        '''LOGISTIC REGRESSION CLASSIFIER'''
+            self.random_search_cv(self, sklearn.ensemble.AdaBoostClassifier(random_state=0), param_grid, X_train,
+                                  y_train, X_test, y_test, "adaboost_Thoracic_Surgery_Data_model", cv=3)
 
-        print('Running Logistic Regression Classifier\n')
-        param_grid = {
-            'C': np.logspace(0, 3, 4),
-            'fit_intercept': [True, False],
-            'max_iter': [50, 100, 150],
-            'solver': ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga']
-        }
-        self.random_search_cv(self, sklearn.linear_model.LogisticRegression(random_state=0), param_grid, 3, X_train,
-                              y_train)
+            '''LOGISTIC REGRESSION CLASSIFIER'''
 
-        '''GAUSSIAN NAIVE BAYES CLASSIFIER'''
+            print('Running Logistic Regression Classifier\n')
+            param_grid = {
+                'C': np.logspace(0, 3, 4),
+                'fit_intercept': [True, False],
+                'max_iter': [50, 100, 150],
+                'solver': ['lbfgs', 'liblinear', 'sag', 'saga']
+            }
+            self.random_search_cv(self, sklearn.linear_model.LogisticRegression(random_state=0), param_grid, X_train,
+                                  y_train, X_test, y_test, "logistic_Thoracic_Surgery_Data_model", cv=3)
 
-        print('Running Gaussian Naive Bayes Classifier\n')
-        param_grid = {
-            "var_smoothing": [1e-05, 1e-07, 1e-09, 1e-11]}
-        self.grid_search_cv(self, GaussianNB(), param_grid, 3, X_train, y_train)
+            '''GAUSSIAN NAIVE BAYES CLASSIFIER'''
 
-        '''Neural Network Classifier'''
+            print('Running Gaussian Naive Bayes Classifier\n')
+            param_grid = {
+                "var_smoothing": [1e-05, 1e-07, 1e-09, 1e-11]}
+            self.grid_search_cv(self, GaussianNB(), param_grid, X_train, y_train, X_test, y_test,
+                                "gaussian_Thoracic_Surgery_Data_model", cv=3)
 
-        mlp = sklearn.neural_network.MLPClassifier(activation='relu', tol=1e-4, n_iter_no_change=10, momentum=0.9,
-                                                   learning_rate='adaptive', random_state=0, verbose=True,
-                                                   warm_start=True, early_stopping=True)
+            '''Neural Network Classifier'''
 
-        param_grid = {
-            "solver": ['adam', 'sgd'],
-            "learning_rate_init": np.arange(0.1, 1.1, 0.1),
-            "hidden_layer_sizes": [(512,), (256, 128, 64, 32, 2), (512, 256, 128, 64, 32, 2)]
-        }
+            mlp = sklearn.neural_network.MLPClassifier(activation='relu', tol=1e-4, n_iter_no_change=10, momentum=0.9,
+                                                       learning_rate='adaptive', random_state=0, verbose=True,
+                                                       warm_start=True, early_stopping=True)
 
-        self.random_search_cv(self, mlp, param_grid, 5, X_train, y_train)
+            param_grid = {
+                "solver": ['adam'],
+                "learning_rate_init": np.arange(0.1, 1.1, 0.1),
+                "hidden_layer_sizes": [(512,), (256, 128, 64, 32, 2), (512, 256, 128, 64, 32, 2)]
+            }
+
+            self.random_search_cv(self, mlp, param_grid, X_train, y_train, X_test, y_test,
+                                  "mlp_Thoracic_Surgery_Data_model", cv=3)
+        else:
+            # SVM
+            self.load_pretrained_models("svm_Thoracic_Surgery_Data_model", X_train, y_train, X_test, y_test, 3)
+
+            # DTC
+            self.load_pretrained_models("tree_Thoracic_Surgery_Data_model", X_train, y_train, X_test, y_test, 3)
+
+            # RFC
+            self.load_pretrained_models("random_forest_Thoracic_Surgery_Data_model", X_train, y_train, X_test, y_test,
+                                        3)
+
+            # LR
+            self.load_pretrained_models("logistic_Thoracic_Surgery_Data_model", X_train, y_train, X_test, y_test, 3)
+
+            # Adaboost
+            self.load_pretrained_models("adaboost_Thoracic_Surgery_Data_model", X_train, y_train, X_test, y_test, 3)
+
+            # KNN
+            self.load_pretrained_models("knearest_Thoracic_Surgery_Data_model", X_train, y_train, X_test, y_test, 3)
+
+            # GNB
+            self.load_pretrained_models("gaussian_Thoracic_Surgery_Data_model", X_train, y_train, X_test, y_test, 3)
+
+            # MLP
+            self.load_pretrained_models("mlp_Thoracic_Surgery_Data_model", X_train, y_train, X_test, y_test, 3)
 
     def Seismic_Bumps(self, userResponse):
         print('Running classification for 10.Seismic Bumps dataset')

@@ -1,29 +1,20 @@
-import itertools
 import pickle
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import plot
-import scipy
 import scipy.stats as Stats
 import sklearn.ensemble as Ensemble
 import sklearn.gaussian_process as Gaussian
 import sklearn.linear_model as linear
 import sklearn.metrics as metrics
 import sklearn.model_selection as model_select
-import sklearn.neighbors as Neighbors
 import sklearn.neural_network as NN
 import sklearn.preprocessing as Preprocessing
 import sklearn.svm as SVM
 import sklearn.tree as Tree
-from sklearn.metrics import confusion_matrix, classification_report
-from sklearn.metrics import confusion_matrix, classification_report
+from sklearn.model_selection import RandomizedSearchCV
 from sklearn.model_selection import train_test_split
-from sklearn.model_selection import validation_curve, GridSearchCV, RandomizedSearchCV, learning_curve
-from sklearn.multiclass import OneVsRestClassifier, OneVsOneClassifier
-from sklearn.utils import class_weight
-from sklearn.utils import resample
 
 RESULTS_FOR_DEMO = "../Results For Demo/"
 DATASETS = "../Datasets/"
@@ -92,14 +83,14 @@ class class_regression:
         print('Running regressors for the following datasets: \n')
         # self.WineQuality()
         # self.Communities_Crime()
-        self.QSAR_aquatic_toxicity()
+        self.QSAR_aquatic_toxicity(userResponse)
         # self.Parkinson_Speech()
         # self.Facebook_metrics()
         # self.Bike_Sharing()
-        self.Student_Performance()
+        #self.Student_Performance(userResponse)
         # self.Concrete_Compressive_Strength(userResponse)
         # self.SGEMM_GPU_kernel_performance()
-        #self.Merck_Molecular_Activity_Challenge(userResponse)
+        # self.Merck_Molecular_Activity_Challenge(userResponse)
 
     def WineQuality(self):
         print('Running Regression for 1.WineQuality dataset')
@@ -107,7 +98,7 @@ class class_regression:
     def Communities_Crime(self):
         print('Running Regression for 2.Communities_Crime dataset')
 
-    def QSAR_aquatic_toxicity(self):
+    def QSAR_aquatic_toxicity(self, userResponse):
         print('Running Regression for 3.QSAR_aquatic_toxicity dataset')
         file = "http://archive.ics.uci.edu/ml/machine-learning-databases/00505/qsar_aquatic_toxicity.csv"
         df = pd.read_csv(file, sep=';', header=None)
@@ -125,67 +116,91 @@ class class_regression:
         print("Linear Regression Mean Squared Error: ",
               metrics.mean_squared_error(y_test, lr_model.predict(X_test)))
         print("Linear Regression R2 Score: ", metrics.r2_score(y_test, lr_model.predict(X_test)))
-        filename = "QSAR_aquatic_toxicity.sav"
+        filename = "LinearRegression_QSARAquaticToxicity_model.sav"
         pickle.dump(lr_model, open(RESULTS_FOR_DEMO + filename, 'wb'))
-        filename1 = "QSAR_aquatic_toxicity.sav"
+        filename1 = "LinearRegression_QSARAquaticToxicity_model.sav"
         pickle.dump(lr_model.get_params, open(RESULTS_FOR_DEMO + filename1, 'wb'))
 
-        '''SVR'''
+        if userResponse is "2":
+            '''SVR'''
 
-        param_grid = {"kernel": ['linear', 'rbf'],
-                      "C": np.logspace(0, 3, 4),
-                      "gamma": np.logspace(-2, 1, 4)}
+            param_grid = {"kernel": ['linear', 'rbf'],
+                          "C": np.logspace(0, 3, 4),
+                          "gamma": np.logspace(-2, 1, 4)}
 
-        self.random_search_cv(SVM.SVR(), param_grid, X_train, y_train, X_test, y_test,
-                                "QSAR_aquatic_toxicity_SVR")
+            self.random_search_cv(SVM.SVR(), param_grid, X_train, y_train, X_test, y_test,
+                                  "SVR_QSARAquaticToxicity_model")
 
-        '''DECISION TREE REGRESSOR'''
+            '''DECISION TREE REGRESSOR'''
 
-        param_grid = {'max_depth': np.arange(1, 20, 2),
-                      'splitter': ['best', 'random']}
+            param_grid = {'max_depth': np.arange(1, 20, 2),
+                          'splitter': ['best', 'random']}
 
-        self.grid_search_cv(Tree.DecisionTreeRegressor(random_state=0), param_grid, X_train, y_train,
-                                X_test, y_test, "QSAR_aquatic_toxicity_DTR")
+            self.grid_search_cv(Tree.DecisionTreeRegressor(random_state=0), param_grid, X_train, y_train,
+                                X_test, y_test, "DecisionTree_QSARAquaticToxicity_model")
 
-        '''RANDOM FOREST REGRESSOR'''
+            '''RANDOM FOREST REGRESSOR'''
 
-        param_grid = {'max_depth': np.arange(1, 20, 1),
-                      'min_samples_split': np.array([2, 3, 5])}
+            param_grid = {'max_depth': np.arange(1, 20, 1),
+                          'min_samples_split': np.array([2, 3, 5])}
 
-        self.grid_search_cv(Ensemble.RandomForestRegressor(random_state=0), param_grid, X_train, y_train,
-                                X_test, y_test, "QSAR_aquatic_toxicity_RFR")
+            self.grid_search_cv(Ensemble.RandomForestRegressor(random_state=0), param_grid, X_train, y_train,
+                                X_test, y_test, "RandomForest_QSARAquaticToxicity_model")
 
-        '''ADABOOST REGRESSOR'''
+            '''ADABOOST REGRESSOR'''
 
-        param_grid = {
-            'n_estimators': np.arange(50, 250, 10),
-            'loss': ['linear', 'square']
-        }
+            param_grid = {
+                'n_estimators': np.arange(50, 250, 10),
+                'loss': ['linear', 'square']
+            }
 
-        self.grid_search_cv(Ensemble.AdaBoostRegressor(random_state=0), param_grid, X_train, y_train,
-                            X_test, y_test, "QSAR_aquatic_toxicity_Adaboost")
+            self.grid_search_cv(Ensemble.AdaBoostRegressor(random_state=0), param_grid, X_train, y_train,
+                                X_test, y_test, "AdaBoost_QSARAquaticToxicity_model")
 
-        '''GAUSSIAN PROCESS REGRESSOR'''
+            '''GAUSSIAN PROCESS REGRESSOR'''
 
-        param_grid = {
-            "alpha": [1e-10, 1e-9, 1e-8, 1e-5]
-        }
+            param_grid = {
+                "alpha": [1e-10, 1e-9, 1e-8, 1e-5]
+            }
 
-        self.grid_search_cv(Gaussian.GaussianProcessRegressor(optimizer="fmin_l_bfgs_b", random_state=0),
-                            param_grid, X_train, y_train, X_test, y_test, "QSAR_aquatic_toxicity_GPR")
+            self.grid_search_cv(Gaussian.GaussianProcessRegressor(optimizer="fmin_l_bfgs_b", random_state=0),
+                                param_grid, X_train, y_train, X_test, y_test, "GaussianNaive_QSARAquaticToxicity_model")
 
-        '''NEURAL NETWORK REGRESSOR'''
+            '''NEURAL NETWORK REGRESSOR'''
 
-        param_grid = {
-            "solver": ['adam', 'sgd'],
-            "learning_rate_init": np.arange(0.001, 0.1),
-            "hidden_layer_sizes": [(512,), (256, 128, 64, 32), (512, 256, 128, 64, 32)]
-        }
+            param_grid = {
+                "solver": ['adam'],
+                "learning_rate_init": np.arange(0.001, 0.1),
+                "hidden_layer_sizes": [(512,), (256, 128, 64, 32), (512, 256, 128, 64, 32)]
+            }
 
-        mlp = NN.MLPRegressor(activation='relu',tol=1e-4,n_iter_no_change=10, momentum=0.9, learning_rate='adaptive', random_state=0,
-                              verbose=True, warm_start=True, early_stopping=True)
+            mlp = NN.MLPRegressor(activation='relu', tol=1e-4, n_iter_no_change=10, momentum=0.9,
+                                  learning_rate='adaptive', random_state=0,
+                                  verbose=True, warm_start=True, early_stopping=True)
 
-        self.random_search_cv(mlp, param_grid, X_train, y_train, X_test, y_test, "QSAR_aquatic_toxicity_NN")
+            self.random_search_cv(mlp, param_grid, X_train, y_train, X_test, y_test, "NeuralNetwork_QSARAquaticToxicity_model")
+        else:
+            # SVM
+            self.load_pretrained_models("SVR_QSARAquaticToxicity_model", X_train, y_train, X_test, y_test, 5)
+
+            # DTC
+            self.load_pretrained_models("DecisionTree_QSARAquaticToxicity_model", X_train, y_train, X_test, y_test, 5)
+
+            # RFC
+            self.load_pretrained_models("RandomForest_QSARAquaticToxicity_model", X_train, y_train, X_test, y_test, 5)
+
+            # LR
+            self.load_pretrained_models("LinearRegression_QSARAquaticToxicity_model", X_train, y_train, X_test, y_test,
+                                        5)
+
+            # Adaboost
+            self.load_pretrained_models("AdaBoost_QSARAquaticToxicity_model", X_train, y_train, X_test, y_test, 5)
+
+            # GNB
+            self.load_pretrained_models("GaussianNaive_QSARAquaticToxicity_model", X_train, y_train, X_test, y_test, 5)
+
+            # MLP
+            self.load_pretrained_models("NeuralNetwork_QSARAquaticToxicity_model", X_train, y_train, X_test, y_test, 5)
 
     def Parkinson_Speech(self):
         print('Running Regression for 4.Parkinson_Speech dataset')
@@ -196,7 +211,7 @@ class class_regression:
     def Bike_Sharing(self):
         print('Running Regression for 6.Bike_Sharing dataset')
 
-    def Student_Performance(self):
+    def Student_Performance(self, userResponse):
         print('Running Regression for 7.Student_Performance dataset')
 
         df = pd.read_csv("../Datasets/student-por.csv", sep=';')
@@ -210,76 +225,97 @@ class class_regression:
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=0)
 
-        '''LINEAR REGRESSION'''
+        if userResponse is "2":
 
-        lr_model = linear.LinearRegression().fit(X_train, y_train)
-        print("Linear Regression Mean Squared Error: ",
-              metrics.mean_squared_error(y_test, lr_model.predict(X_test)))
-        print("Linear Regression R2 Score: ", metrics.r2_score(y_test, lr_model.predict(X_test)))
-        filename = "Student_Performance.sav"
-        pickle.dump(lr_model, open(RESULTS_FOR_DEMO + filename, 'wb'))
-        filename1 = "Student_Performance.sav"
-        pickle.dump(lr_model.get_params, open(RESULTS_FOR_DEMO + filename1, 'wb'))
+            '''LINEAR REGRESSION'''
 
-        '''SVR'''
+            lr_model = linear.LinearRegression().fit(X_train, y_train)
+            print("Linear Regression Mean Squared Error: ",
+                  metrics.mean_squared_error(y_test, lr_model.predict(X_test)))
+            print("Linear Regression R2 Score: ", metrics.r2_score(y_test, lr_model.predict(X_test)))
+            filename = "LinearRegression_Student_Performance_model.sav"
+            pickle.dump(lr_model, open(RESULTS_FOR_DEMO + filename, 'wb'))
+            filename1 = "LinearRegression_Student_Performance_model.sav"
+            pickle.dump(lr_model.get_params, open(RESULTS_FOR_DEMO + filename1, 'wb'))
 
-        param_grid = {"kernel": ['linear', 'rbf'],
-                      "C": np.logspace(0, 3, 4),
-                      "gamma": np.logspace(-2, 1, 4)}
+            '''SVR'''
 
-        self.random_search_cv(SVM.SVR(), param_grid, X_train, y_train, X_test, y_test,
-                                "Student_Performance_SVR")
+            param_grid = {"kernel": ['linear', 'rbf'],
+                          "C": np.logspace(0, 3, 4),
+                          "gamma": np.logspace(-2, 1, 4)}
 
+            self.random_search_cv(SVM.SVR(), param_grid, X_train, y_train, X_test, y_test,
+                                  "SVR_Student_Performance_model")
 
-        '''DECISION TREE REGRESSOR'''
+            '''DECISION TREE REGRESSOR'''
 
-        param_grid = {'max_depth': np.arange(1, 20, 2),
-                      'splitter': ['best', 'random']}
+            param_grid = {'max_depth': np.arange(1, 20, 2),
+                          'splitter': ['best', 'random']}
 
-        self.grid_search_cv(Tree.DecisionTreeRegressor(random_state=0), param_grid, X_train, y_train,
-                                X_test, y_test, "Student_Performance_DTR")
+            self.grid_search_cv(Tree.DecisionTreeRegressor(random_state=0), param_grid, X_train, y_train,
+                                X_test, y_test, "DecisionTree_Student_Performance_model")
 
+            '''RANDOM FOREST REGRESSOR'''
 
-        '''RANDOM FOREST REGRESSOR'''
+            param_grid = {'max_depth': np.arange(1, 20, 1),
+                          'min_samples_split': np.array([2, 3, 5])}
 
-        param_grid = {'max_depth': np.arange(1, 20, 1),
-                      'min_samples_split': np.array([2, 3, 5])}
+            self.grid_search_cv(Ensemble.RandomForestRegressor(random_state=0), param_grid, X_train, y_train,
+                                X_test, y_test, "RandomForest_Student_Performance_model")
 
-        self.grid_search_cv(Ensemble.RandomForestRegressor(random_state=0), param_grid, X_train, y_train,
-                            X_test, y_test, "Student_Performance_RFR")
+            '''ADABOOST REGRESSOR'''
 
-        '''ADABOOST REGRESSOR'''
+            param_grid = {
+                'n_estimators': np.arange(50, 250, 10),
+                'loss': ['linear', 'square']
+            }
 
-        param_grid = {
-            'n_estimators': np.arange(50, 250, 10),
-            'loss': ['linear', 'square']
-        }
+            self.grid_search_cv(Ensemble.AdaBoostRegressor(random_state=0), param_grid, X_train, y_train,
+                                X_test, y_test, "AdaBoost_Student_Performance_model")
 
-        self.grid_search_cv(Ensemble.AdaBoostRegressor(random_state=0), param_grid, X_train, y_train,
-                            X_test, y_test, "Student_Performance_Adaboost")
+            '''GAUSSIAN PROCESS REGRESSOR'''
 
-        '''GAUSSIAN PROCESS REGRESSOR'''
+            param_grid = {
+                "alpha": [1e-10, 1e-9, 1e-8, 1e-5]
+            }
 
-        param_grid = {
-            "alpha": [1e-10, 1e-9, 1e-8, 1e-5]
-        }
+            self.grid_search_cv(Gaussian.GaussianProcessRegressor(optimizer="fmin_l_bfgs_b", random_state=0),
+                                param_grid, X_train, y_train, X_test, y_test, "GaussianNaive_Student_Performance_model")
 
-        self.grid_search_cv(Gaussian.GaussianProcessRegressor(optimizer="fmin_l_bfgs_b", random_state=0),
-                            param_grid, X_train, y_train, X_test, y_test, "Student_Performance_GPR")
+            '''NEURAL NETWORK REGRESSOR'''
 
+            param_grid = {
+                "solver": ['adam'],
+                "learning_rate_init": np.arange(0.001, 0.1),
+                "hidden_layer_sizes": [(512,), (256, 128, 64, 32), (512, 256, 128, 64, 32)]
+            }
+            mlp = NN.MLPRegressor(activation='relu', tol=1e-4, n_iter_no_change=10, momentum=0.9,
+                                  learning_rate='adaptive', random_state=0,
+                                  verbose=True, warm_start=True, early_stopping=True)
 
-        '''NEURAL NETWORK REGRESSOR'''
+            self.random_search_cv(mlp, param_grid, X_train, y_train, X_test, y_test, "NeuralNetwork_Student_Performance_model")
+        else:
+            # SVM
+            self.load_pretrained_models("SVR_Student_Performance_model", X_train, y_train, X_test, y_test, 5)
 
-        param_grid = {
-            "solver": ['adam', 'sgd'],
-            "learning_rate_init": np.arange(0.001, 0.1),
-            "hidden_layer_sizes": [(512,), (256, 128, 64, 32), (512, 256, 128, 64, 32)]
-        }
-        mlp = NN.MLPRegressor(activation='relu',tol=1e-4,n_iter_no_change=10, momentum=0.9, learning_rate='adaptive', random_state=0,
-                              verbose=True, warm_start=True, early_stopping=True)
+            # DTC
+            self.load_pretrained_models("DecisionTree_Student_Performance_model", X_train, y_train, X_test, y_test, 5)
 
-        self.random_search_cv(mlp, param_grid, X_train, y_train, X_test, y_test, "Student_Performance_NN")
+            # RFC
+            self.load_pretrained_models("RandomForest_Student_Performance_model", X_train, y_train, X_test, y_test, 5)
 
+            # LR
+            self.load_pretrained_models("LinearRegression_Student_Performance_model", X_train, y_train, X_test, y_test,
+                                        5)
+
+            # Adaboost
+            self.load_pretrained_models("AdaBoost_Student_Performance_model", X_train, y_train, X_test, y_test, 5)
+
+            # GNB
+            self.load_pretrained_models("GaussianNaive_Student_Performance_model", X_train, y_train, X_test, y_test, 5)
+
+            # MLP
+            self.load_pretrained_models("NeuralNetwork_Student_Performance_model", X_train, y_train, X_test, y_test, 5)
 
     def Concrete_Compressive_Strength(self, userResponse):
         print('Running Regression for 8.Concrete_Compressive_Strength dataset')
