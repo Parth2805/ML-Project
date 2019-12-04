@@ -51,3 +51,8 @@ Results For Demo/YeastSVM.sav
 Results For Demo/YeastRF.sav
 Results For Demo/YeastNN.sav
 
+Results/classification_10_class_balance.png
+Datasets/Concrete_Data.xls
+Datasets/ac2_cache.npz
+Datasets/ac4_cache.npz
+Results For Demo/merckResults.txt
