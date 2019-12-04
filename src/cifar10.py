@@ -344,8 +344,12 @@ class Cifar10:
             loaded_model = torch.load("../Pretrained Models/" + MODEL_NAME, map_location=device)
             print(loaded_model['net'])
             loss_fn = nn.CrossEntropyLoss()
+
+            print("Activation Maximization")
             VBP = VanillaBackprop(loaded_model['net'], loss_fn)
             activation_maximization(VBP)
+
+            print("FGST")
             test_batch = unpickle(path + "/test_batch")
             test_data = np.array(list(test_batch[b'data']))
             testing_data = test_data.reshape(test_data.shape[0], N_CHANNELS, SIZE, SIZE)
