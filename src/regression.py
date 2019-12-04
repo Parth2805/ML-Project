@@ -60,13 +60,13 @@ class class_regression:
 
     def load_pretrained_models(self, name, X_train, y_train, X_test, y_test, cv):
         print("Loading PreTrained model: ", name)
-        model = pickle.load(PRETRAINED_MODEL + name + ".sav")
+        model = pickle.load(open(PRETRAINED_MODEL + name + ".sav", 'rb'))
         print("Mean Squared Error: ",
               metrics.mean_squared_error(y_test, model.predict(X_test)))
         print("R2 Score: ", metrics.r2_score(y_test, model.predict(X_test)))
         plot.plot_learning_curve(model, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=cv)
 
-    def merck_model(self, act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, name):
+    def merck_model(self, act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, name, pretrained=False):
         print(name)
         act2_predict = act2.predict(X_test_act2)
         act4_predict = act4.predict(X_test_act4)
@@ -79,11 +79,13 @@ class class_regression:
         pearson_act2 = Stats.pearsonr(act2_predict, y_test_act2)
         pearson_act4 = Stats.pearsonr(act4_predict, y_test_act4)
         print("PearsonR: act2 {0}: & act4: {1} ".format(pearson_act2, pearson_act4))
-
-        pickle.dump(act2, open(RESULTS_FOR_DEMO + name + "BestModelACT2.sav", 'wb'))
-        pickle.dump(act2.get_params, open(RESULTS_FOR_DEMO + name + "BestParamsACT2.sav", 'wb'))
-        pickle.dump(act4, open(RESULTS_FOR_DEMO + name + "BestModelACT4.sav", 'wb'))
-        pickle.dump(svr_act4.get_params, open(RESULTS_FOR_DEMO + name + "BestParamsACT2.sav", 'wb'))
+        if pretrained:
+            print("Pretrained Model")
+        else:
+            pickle.dump(act2, open(RESULTS_FOR_DEMO + name + "BestModelACT2.sav", 'wb'))
+            pickle.dump(act2.get_params, open(RESULTS_FOR_DEMO + name + "BestParamsACT2.sav", 'wb'))
+            pickle.dump(act4, open(RESULTS_FOR_DEMO + name + "BestModelACT4.sav", 'wb'))
+            pickle.dump(act4.get_params, open(RESULTS_FOR_DEMO + name + "BestParamsACT4.sav", 'wb'))
 
     def get_regressor(self, userResponse):
         print('Running regressors for the following datasets: \n')
@@ -368,49 +370,50 @@ class class_regression:
                                                                                                         y_train_act4)
             self.merck_model(gau_act2, gau_act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "GPR")
 
-            # MLP
-            param_grid = {
-                "activation": ['relu', 'tanh'],
-                "learning_rate_init": Stats.reciprocal(0.001, 0.1),
-                "hidden_layer_sizes": [(512, 256, 128, 64, 32), (128, 64, 32, 16), (64, 32, 16)]
-            }
-
-            mlp_act2 = NN.MLPRegressor(solver='adam', n_iter_no_change=10, momentum=0.9, learning_rate='adaptive',
-                                       random_state=0, verbose=True, warm_start=True, early_stopping=True)
-            nn_act2 = model_select.RandomizedSearchCV(mlp_act2, param_grid, cv=5, scoring='r2', verbose=5,
-                                                      error_score='np.nan').fit(X_train_act2, y_train_act2)
-            print("act2 done")
-            mlp_act4 = NN.MLPRegressor(solver='adam', n_iter_no_change=10, momentum=0.9, learning_rate='adaptive',
-                                       random_state=0, verbose=True, warm_start=True, early_stopping=True)
-            nn_act4 = RandomizedSearchCV(mlp_act4, param_grid, cv=5, scoring='r2', verbose=5, error_score='np.nan').fit(
-                X_train_act4, y_train_act4)
-            self.merck_model(nn_act2.best_estimator_, nn_act4.best_estimator_, X_test_act2, y_test_act2, X_test_act4,
-                             y_test_act4, "MLP")
+            # # MLP
+            # param_grid = {
+            #     "activation": ['relu', 'tanh'],
+            #     "learning_rate_init": Stats.reciprocal(0.001, 0.1),
+            #     "hidden_layer_sizes": [(512, 256, 128, 64, 32), (128, 64, 32, 16), (64, 32, 16)]
+            # }
+            #
+            # mlp_act2 = NN.MLPRegressor(solver='adam', n_iter_no_change=10, momentum=0.9, learning_rate='adaptive',
+            #                            random_state=0, verbose=True, warm_start=True, early_stopping=True)
+            # nn_act2 = model_select.RandomizedSearchCV(mlp_act2, param_grid, cv=5, scoring='r2', verbose=5,
+            #                                           error_score='np.nan').fit(X_train_act2, y_train_act2)
+            # print("act2 done")
+            # mlp_act4 = NN.MLPRegressor(solver='adam', n_iter_no_change=10, momentum=0.9, learning_rate='adaptive',
+            #                            random_state=0, verbose=True, warm_start=True, early_stopping=True)
+            # nn_act4 = RandomizedSearchCV(mlp_act4, param_grid, cv=5, scoring='r2', verbose=5, error_score='np.nan').fit(
+            #     X_train_act4, y_train_act4)
+            # self.merck_model(nn_act2.best_estimator_, nn_act4.best_estimator_, X_test_act2, y_test_act2, X_test_act4,
+            #                  y_test_act4, "MLP")
         else:
-            act2 = pickle.load(PRETRAINED_MODEL + "Linear_act2_regression_model.sav")
-            act4 = pickle.load(PRETRAINED_MODEL + "Linear_act4_regression_model.sav")
-            self.merck_model(act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "LR")
+            act2 = pickle.load(open(PRETRAINED_MODEL + "Linear_act2_regression_model.sav", "rb"))
+            act4 = pickle.load(open(PRETRAINED_MODEL + "Linear_act4_regression_model.sav", "rb"))
+            self.merck_model(act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "LR", pretrained=True)
 
-            act2 = pickle.load(PRETRAINED_MODEL + "svr_act2_model.sav")
-            act4 = pickle.load(PRETRAINED_MODEL + "svr_act4_model.sav")
-            self.merck_model(act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "SVR")
+            act2 = pickle.load(open(PRETRAINED_MODEL + "svr_act2_model.sav", "rb"))
+            act4 = pickle.load(open(PRETRAINED_MODEL + "svr_act4_model.sav", "rb"))
+            self.merck_model(act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "SVR", pretrained=True)
 
-            act2 = pickle.load(PRETRAINED_MODEL + "dct_act2_model.sav")
-            act4 = pickle.load(PRETRAINED_MODEL + "dct_act4_model.sav")
-            self.merck_model(act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "DTC")
+            act2 = pickle.load(open(PRETRAINED_MODEL + "dct_act2_model.sav", "rb"))
+            act4 = pickle.load(open(PRETRAINED_MODEL + "dct_act4_model.sav", "rb"))
+            self.merck_model(act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "DTC", pretrained=True)
 
-            act2 = pickle.load(PRETRAINED_MODEL + "rfr_act2_model.sav")
-            act4 = pickle.load(PRETRAINED_MODEL + "rfr_act4_model.sav")
-            self.merck_model(act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "RFC")
+            act2 = pickle.load(open(PRETRAINED_MODEL + "rfr_act2_model.sav", "rb"))
+            act4 = pickle.load(open(PRETRAINED_MODEL + "rfr_act4_model.sav", "rb"))
+            self.merck_model(act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "RFC", pretrained=True)
 
-            act2 = pickle.load(PRETRAINED_MODEL + "ada_act2_model.sav")
-            act4 = pickle.load(PRETRAINED_MODEL + "ada_act4_model.sav")
-            self.merck_model(act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "Adaboost")
+            act2 = pickle.load(open(PRETRAINED_MODEL + "ada_act2_model.sav", "rb"))
+            act4 = pickle.load(open(PRETRAINED_MODEL + "ada_act4_model.sav", "rb"))
+            self.merck_model(act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "Adaboost",
+                             pretrained=True)
 
-            act2 = pickle.load(PRETRAINED_MODEL + "gau_act2_model.sav")
-            act4 = pickle.load(PRETRAINED_MODEL + "gau_act4_model.sav")
-            self.merck_model(act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "GPR")
+            act2 = pickle.load(open(PRETRAINED_MODEL + "gau_act2_model.sav", "rb"))
+            act4 = pickle.load(open(PRETRAINED_MODEL + "gau_act4_model.sav", "rb"))
+            self.merck_model(act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "GPR", pretrained=True)
 
-            act2 = pickle.load(PRETRAINED_MODEL + "mlp_act2_random_model.sav")
-            act4 = pickle.load(PRETRAINED_MODEL + "mlp_act4_random_model.sav")
-            self.merck_model(act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "MLP")
+            act2 = pickle.load(open(PRETRAINED_MODEL + "mlp_act2_random_model.sav", "rb"))
+            act4 = pickle.load(open(PRETRAINED_MODEL + "mlp_act4_random_model.sav", "rb"))
+            self.merck_model(act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "MLP", pretrained=True)
