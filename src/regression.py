@@ -68,6 +68,7 @@ class class_regression:
 
     def merck_model(self, act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, name, pretrained=False):
         print(name)
+        print(pretrained)
         act2_predict = act2.predict(X_test_act2)
         act4_predict = act4.predict(X_test_act4)
         act2_r2 = metrics.r2_score(y_test_act2, act2_predict)
@@ -365,8 +366,6 @@ class class_regression:
 
     def Bike_Sharing(self):
         print('Running Regression for 6.Bike_Sharing dataset')
-
-
 
     def Student_Performance(self):
         print('Running Regression for 7.Student_Performance dataset')
