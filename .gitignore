@@ -32,3 +32,12 @@ Results For Demo/StatlogAustralianMLP.sav
 Results For Demo/StatlogAustralianRFC.sav
 Results For Demo/StatlogAustralianSVM.sav
 Results For Demo/StatlogAustralianGNB.sav
+
+Results For Demo/YeastAda.sav
+Results For Demo/YeastDCT.sav
+Results For Demo/YeastGNN.sav
+Results For Demo/YeastKNN.sav
+Results For Demo/YeastLR.sav
+Results For Demo/YeastSVM.sav
+Results For Demo/YeastRF.sav
+Results For Demo/YeastNN.sav
