@@ -60,9 +60,9 @@ class class_classification:
         print("Training Accuracy: ", model.score(X_train, y_train))
         plot.plot_learning_curve(model, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=cv)
 
-    def run_classifier(self):
+    def run_classifier(self,userResponse):
         print('Running classifiers for the following datasets: \n')
-        self.Diabetic_Retinopathy()
+        self.Diabetic_Retinopathy(userResponse)
         # self.Default_of_credit_card_clients(userResponse)
         # self.Breast_Cancer_Wisconsin()
         # self.Statlog_Australian()
@@ -183,8 +183,14 @@ class class_classification:
             self.grid_search_cv(ada, param, X_train, y_train, X_test, y_test, "Diabetic_Ada_Boost")
         else:
 
-            #Logistic_Regression
-            self.load_pretrained_models("")
+            self.load_pretrained_models("Diabetic_SVM.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_Logistic_Regression.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_Decision_Tree.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_Random_Forest.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_AdaBoostClassifier.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_Neural_Network.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_Gaussian_Naives_Bayes.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_K_Neighbors.sav", X_train, y_train, X_test, y_test)
 
 
     def Default_of_credit_card_clients(self, userResponse):
@@ -672,89 +678,101 @@ class class_classification:
         y_train = y_train.astype(int)
         y_test = y_test.astype(int)
 
-        '''
-        ### **Logistic Regression**
-        '''
+        if(userResponse=='2'):
+            '''
+            ### **Logistic Regression**
+            '''
 
-        lr = sklearn.linear_model.LogisticRegression(random_state=0, max_iter=10000)
+            lr = sklearn.linear_model.LogisticRegression(random_state=0, max_iter=10000)
 
-        param = {'solver': ["sag", "saga", "liblinear"], 'C': [0.1, 0.2, 0.5, 1, 1.5, 2, 5, 7, 10, 12, 15]}
+            param = {'solver': ["sag", "saga", "liblinear"], 'C': [0.1, 0.2, 0.5, 1, 1.5, 2, 5, 7, 10, 12, 15]}
 
-        self.grid_search_cv(lr, param, X_train, y_train, X_test, y_test,"StatLogGerman_Logistic_Regression")
+            self.grid_search_cv(lr, param, X_train, y_train, X_test, y_test,"StatLogGerman_Logistic_Regression")
 
-        '''
-        ### K-**Neighbors**
-        '''
-        k_n = sklearn.neighbors.KNeighborsClassifier()
+            '''
+            ### K-**Neighbors**
+            '''
+            k_n = sklearn.neighbors.KNeighborsClassifier()
 
-        param = {'weights': ['uniform', 'distance'], 'n_neighbors': [5, 10, 15, 20, 50, 100, 200, 500]}
+            param = {'weights': ['uniform', 'distance'], 'n_neighbors': [5, 10, 15, 20, 50, 100, 200, 500]}
 
-        self.grid_search_cv(k_n, param, X_train, y_train, X_test, y_test, "StatLOgGerman_K_Neigbors")
-        '''
-        ### **SVM**
-        '''
-        svm = sklearn.svm.SVC(random_state=0)
+            self.grid_search_cv(k_n, param, X_train, y_train, X_test, y_test, "StatLOgGerman_K_Neigbors")
+            '''
+            ### **SVM**
+            '''
+            svm = sklearn.svm.SVC(random_state=0)
 
-        param = dict(kernel=['rbf', 'linear'],
-                     degree=[1, 2, 3],
-                     C=Stats.reciprocal(0.01, 2),
-                     gamma=Stats.reciprocal(0.01, 2))
+            param = dict(kernel=['rbf', 'linear'],
+                         degree=[1, 2, 3],
+                         C=Stats.reciprocal(0.01, 2),
+                         gamma=Stats.reciprocal(0.01, 2))
 
-        self.random_search_cv(svm, param, X_train, y_train, X_test, y_test, "StatLOgGerman_SVM")
-        '''
-        ### **Decision Tree**
-        '''
-        dt = sklearn.tree.DecisionTreeClassifier(random_state=0)
+            self.random_search_cv(svm, param, X_train, y_train, X_test, y_test, "StatLOgGerman_SVM")
+            '''
+            ### **Decision Tree**
+            '''
+            dt = sklearn.tree.DecisionTreeClassifier(random_state=0)
 
-        param = {'max_depth': np.arange(1, 20, 1),
-                 'splitter': ['best', 'random'],
-                 'max_features': np.arange(1, 19, 1),
-                 'min_samples_split': np.arange(2, 20, 1)}
+            param = {'max_depth': np.arange(1, 20, 1),
+                     'splitter': ['best', 'random'],
+                     'max_features': np.arange(1, 19, 1),
+                     'min_samples_split': np.arange(2, 20, 1)}
 
-        self.grid_search_cv(dt, param, X_train, y_train, X_test, y_test, "StatLOgGerman_Decision_Tree")
-        '''
-        ### **Random Forest**
-        '''
+            self.grid_search_cv(dt, param, X_train, y_train, X_test, y_test, "StatLOgGerman_Decision_Tree")
+            '''
+            ### **Random Forest**
+            '''
 
-        rf = sklearn.ensemble.RandomForestClassifier(n_estimators=100, random_state=0)
+            rf = sklearn.ensemble.RandomForestClassifier(n_estimators=100, random_state=0)
 
-        param = {'max_depth': np.arange(1, 20, 1),
-                 'max_features': np.array([5, 10, 15, 20]),
-                 'min_samples_split': np.array([2, 3, 5])}
+            param = {'max_depth': np.arange(1, 20, 1),
+                     'max_features': np.array([5, 10, 15, 20]),
+                     'min_samples_split': np.array([2, 3, 5])}
 
-        self.grid_search_cv(rf, param, X_train, y_train, X_test, y_test, "StatLOgGerman_Random_Forest")
-        '''
-        ## **Ada Boost**
-        '''
+            self.grid_search_cv(rf, param, X_train, y_train, X_test, y_test, "StatLOgGerman_Random_Forest")
+            '''
+            ## **Ada Boost**
+            '''
 
-        ada = sklearn.ensemble.AdaBoostClassifier(random_state=0)
+            ada = sklearn.ensemble.AdaBoostClassifier(random_state=0)
 
-        param = {'n_estimators': np.arange(50, 250, 10), 'algorithm': ['SAMME.R', 'SAMME']}
+            param = {'n_estimators': np.arange(50, 250, 10), 'algorithm': ['SAMME.R', 'SAMME']}
 
-        self.grid_search_cv(ada, param, X_train, y_train, X_test, y_test, "StatLOgGerman_AdaBoost")
+            self.grid_search_cv(ada, param, X_train, y_train, X_test, y_test, "StatLOgGerman_AdaBoost")
 
-        '''
-        ## **Neural Network**
-        '''
+            '''
+            ## **Neural Network**
+            '''
 
-        mlp = sklearn.neural_network.MLPClassifier(activation='relu', tol=1e-4, n_iter_no_change=10, momentum=0.9,
-                                                   learning_rate='adaptive', random_state=0, verbose=True,
-                                                   warm_start=True, early_stopping=True)
+            mlp = sklearn.neural_network.MLPClassifier(activation='relu', tol=1e-4, n_iter_no_change=10, momentum=0.9,
+                                                       learning_rate='adaptive', random_state=0, verbose=True,
+                                                       warm_start=True, early_stopping=True)
 
-        param = {
-            "solver": ['adam', 'sgd'],
-            "learning_rate_init": Stats.reciprocal(0.001, 0.1),
-            "hidden_layer_sizes": [(512,), (256, 128, 64, 32), (512, 256, 128, 64, 32)]
-        }
+            param = {
+                "solver": ['adam', 'sgd'],
+                "learning_rate_init": Stats.reciprocal(0.001, 0.1),
+                "hidden_layer_sizes": [(512,), (256, 128, 64, 32), (512, 256, 128, 64, 32)]
+            }
 
-        self.random_search_cv(mlp, param, X_train, y_train, X_test, y_test, "StatLOgGerman_Neural_Network")
-        '''
-        ## **Guassian Naive Bayes Classification**
-        '''
-        gb = sklearn.naive_bayes.GaussianNB().fit(X_train, y_train)
+            self.random_search_cv(mlp, param, X_train, y_train, X_test, y_test, "StatLOgGerman_Neural_Network")
+            '''
+            ## **Guassian Naive Bayes Classification**
+            '''
+            gb = sklearn.naive_bayes.GaussianNB().fit(X_train, y_train)
 
-        print(gb.score(X_train, y_train))
-        print(gb.score(X_test, y_test))
+            print(gb.score(X_train, y_train))
+            print(gb.score(X_test, y_test))
+        else:
+
+            self.load_pretrained_models("GermanStatlog_SVM.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("GermanStatlog_Logistic_Regression.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("GermanStatlog_Decision_Tree.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("GermanStatlog_Random_Forest.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("GermanStatlog_AdaBoostClassifier.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("GermanStatlog_Neural_Network.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("GermanStatlog_Gaussian_Naives_Bayes.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("GermanStatlog_K_Neighbors.sav", X_train, y_train, X_test, y_test)
+
 
         '''
         ## **Testing**
