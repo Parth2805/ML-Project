@@ -90,7 +90,7 @@ class class_regression:
     def get_regressor(self, userResponse):
         print('Running regressors for the following datasets: \n')
         # self.WineQuality()
-        # self.Communities_Crime()
+        self.Communities_Crime(userResponse)
         # self.QSAR_aquatic_toxicity()
         # self.Parkinson_Speech()
         # self.Facebook_metrics()
@@ -98,13 +98,117 @@ class class_regression:
         # self.Student_Performance()
         # self.Concrete_Compressive_Strength(userResponse)
         # self.SGEMM_GPU_kernel_performance()
-        self.Merck_Molecular_Activity_Challenge(userResponse)
+        # self.Merck_Molecular_Activity_Challenge(userResponse)
 
     def WineQuality(self):
         print('Running Regression for 1.WineQuality dataset')
 
-    def Communities_Crime(self):
+    def Communities_Crime(self, userResponse):
         print('Running Regression for 2.Communities_Crime dataset')
+
+        df = pd.read_csv(DATASETS + "communities.data", header=None,
+                         delimiter=',')
+        df = df.mask(df == '?').fillna(df.mean())
+
+        for column in df.columns:
+            if column != 3:
+                df[column] = df[column].astype(float)
+
+        df.fillna(0, inplace=True, axis=0);
+
+        df = df.iloc[:, 4:128]
+        df = df.T.reset_index(drop=True).T
+
+        X_train, X_test, y_train, y_test = train_test_split(df.iloc[:, 0:122], df.iloc[:, 122], test_size=0.2,
+                                                            random_state=0, shuffle=False)
+        if userResponse is "1":
+
+            # Linear Regression
+            lr_model = linear.LinearRegression().fit(X_train, y_train)
+            print(
+                "Linear Regression Mean Squared Error: ", metrics.mean_squared_error(y_test, lr_model.predict(X_test)))
+            print("Linear Regression R2 Score: ", metrics.r2_score(y_test, lr_model.predict(X_test)))
+
+            filename = "Community&Crime_linear_regression_model.sav"
+            pickle.dump(lr_model, open(RESULTS_FOR_DEMO + filename, 'wb'))
+
+            filename1 = "Community&Crime_linear_regression_model_best_param.sav"
+            pickle.dump(lr_model.get_params, open(RESULTS_FOR_DEMO + filename1, 'wb'))
+
+            # SVR
+            param = {'kernel': ['rbf'],
+                     'degree': [1, 2, 3, 4, 5, 6],
+                     'C': [1, 10, 100, 1000],
+                     'gamma': [1e-3, 1e-4]}
+
+            self.grid_search_cv(SVM.SVR(), param, X_train, y_train, X_test, y_test, "Communities&CrimeSVR", 5)
+
+            # DTR
+            param = {'max_depth': np.arange(1, 18, 1),
+                     'splitter': ['best', 'random'],
+                     'max_features': np.arange(1, 18, 1),
+                     'min_samples_split': np.arange(2, 20, 1)}
+            self.random_search_cv(Tree.DecisionTreeRegressor(random_state=0), param,
+                                  X_train, y_train, X_test, y_test, "Communities&CrimeDTR", 5)
+
+            # RFR
+            param = {'max_depth': np.arange(1, 20, 1),
+                     'max_features': np.array([1, 2, 5, 10, 15, 18]),
+                     'min_samples_split': np.array([2, 3, 5])}
+            self.random_search_cv(Ensemble.RandomForestRegressor(n_estimators=500, random_state=0),
+                                  param, X_train, y_train, X_test, y_test, "Communities&CrimeRFR", 5)
+
+            # NN
+            mlp = NN.MLPRegressor(activation='relu', n_iter_no_change=10, momentum=0.9, learning_rate='adaptive',
+                                  random_state=0, verbose=True, warm_start=True, early_stopping=True)
+            param_grid = {
+                "solver": ['adam'],
+                "learning_rate_init": Stats.reciprocal(0.001, 0.1),
+                "hidden_layer_sizes": [(128, 64, 32, 16), (32, 16, 8), (64, 32, 16)]
+            }
+            self.random_search_cv(mlp, param_grid, X_train, y_train, X_test, y_test, "Communities&CrimeNN", 5, 30)
+
+            # ADABOOST
+            param = {
+                "n_estimators": np.arange(50, 250, 10),
+                "loss": ['linear', 'square']
+            }
+            self.grid_search_cv(Ensemble.AdaBoostRegressor(random_state=0), param, X_train, y_train,
+                                X_test, y_test, "Communities&CrimeADA", 5)
+
+            # GPR
+            param = {
+                "alpha": [1e-10, 1e-9, 1e-8]
+            }
+            self.grid_search_cv(Gaussian.GaussianProcessRegressor(optimizer="fmin_l_bfgs_b", random_state=0),
+                                param, X_train, y_train, X_test, y_test, "Communities&CrimeGPR", 10)
+
+        else:
+            # SVR
+            self.load_pretrained_models("Communities_Crime_SVR_model", X_train, y_train, X_test, y_test, 5)
+
+            # DTC
+            self.load_pretrained_models("Communities_Crime_decsion_tree_model", X_train, y_train, X_test, y_test,
+                                        5)
+
+            # RFC
+            self.load_pretrained_models("Communities_Crime_random_forest_model", X_train, y_train, X_test, y_test,
+                                        5)
+
+            # LR
+            self.load_pretrained_models("Communities_Crime_Linear_regression_model", X_train, y_train, X_test, y_test,
+                                        5)
+
+            # Adaboost
+            self.load_pretrained_models("Communities_Crime_adaboost_model", X_train, y_train, X_test, y_test, 5)
+
+            # GNB
+            self.load_pretrained_models("Communities_Crime_gaussian_concrete_model", X_train, y_train, X_test, y_test,
+                                        10)
+
+            # MLP
+            self.load_pretrained_models("Communities_Crime_neural_network_model", X_train, y_train, X_test, y_test,
+                                        5)
 
     def QSAR_aquatic_toxicity(self):
         print('Running Regression for 3.QSAR_aquatic_toxicity dataset')

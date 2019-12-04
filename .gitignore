@@ -16,3 +16,73 @@ Datasets/Concrete_Data.xls
 Datasets/ac2_cache.npz
 Datasets/ac4_cache.npz
 Results For Demo/merckResults.txt
+
+Datasets/australian.xlsx
+Datasets/communities.data
+Datasets/yeast.data
+
+Pretrained Models/Communities_Crime_Linear_regression_model.sav
+Pretrained Models/Communities_Crime_SVR_model.sav
+Pretrained Models/Communities_Crime_adaboost_model.sav
+Pretrained Models/Communities_Crime_decsion_tree_model.sav
+Pretrained Models/Communities_Crime_gaussian_concrete_model.sav
+Pretrained Models/Communities_Crime_neural_network_model.sav
+Pretrained Models/Communities_Crime_random_forest_model.sav
+
+Pretrained Models/statlog_australian_adaboost_model.sav
+Pretrained Models/statlog_australian_gaussian_grid_model.sav
+Pretrained Models/statlog_australian_k_nearest_neighbours_modal.sav
+Pretrained Models/statlog_australian_logistic_regression_model.sav
+Pretrained Models/statlog_australian_neurel_network_model.sav
+Pretrained Models/statlog_australian_random_forest_model.sav
+Pretrained Models/statlog_australian_svm_model.sav
+Pretrained Models/statlog_australian_tree_model.sav
+Pretrained Models/yeast_adaboost_model.sav
+Pretrained Models/yeast_gaussian_grid_model.sav
+Pretrained Models/yeast_k_nearest_neighbours_modal.sav
+Pretrained Models/yeast_logistic_regression_model.sav
+Pretrained Models/yeast_neurel_network_model.sav
+Pretrained Models/yeast_random_forest_model.sav
+Pretrained Models/yeast_svm_model.sav
+Pretrained Models/yeast_tree_model.sav
+
+
+Results For Demo/Communities&CrimeADA Learning Curve.png
+Results For Demo/Communities&CrimeADABestParams.sav
+Results For Demo/Communities&CrimeADAModel.sav
+Results For Demo/Communities&CrimeDTR Learning Curve.png
+Results For Demo/Communities&CrimeDTRBestParams.sav
+Results For Demo/Communities&CrimeDTRModel.sav
+Results For Demo/Communities&CrimeGPR Learning Curve.png
+Results For Demo/Communities&CrimeGPRBestParams.sav
+Results For Demo/Communities&CrimeGPRModel.sav
+Results For Demo/Communities&CrimeNN Learning Curve.png
+Results For Demo/Communities&CrimeNNBestParams.sav
+Results For Demo/Communities&CrimeNNModel.sav
+Results For Demo/Communities&CrimeRFR Learning Curve.png
+Results For Demo/Communities&CrimeRFRBestParams.sav
+Results For Demo/Communities&CrimeRFRModel.sav
+Results For Demo/Communities&CrimeSVR Learning Curve.png
+Results For Demo/Communities&CrimeSVRBestParams.sav
+Results For Demo/Communities&CrimeSVRModel.sav
+Results For Demo/Community&Crime_linear_regression_model.sav
+Results For Demo/Community&Crime_linear_regression_model_best_param.sav
+Results For Demo/StatlogAustralianABC.sav
+Results For Demo/StatlogAustralianDCT.sav
+Results For Demo/StatlogAustralianGNB.sav
+Results For Demo/StatlogAustralianKNN.sav
+Results For Demo/StatlogAustralianLRC.sav
+Results For Demo/StatlogAustralianMLP.sav
+Results For Demo/StatlogAustralianRFC.sav
+Results For Demo/StatlogAustralianSVM.sav
+Results For Demo/YeastAda.sav
+Results For Demo/YeastDCT.sav
+Results For Demo/YeastGNN.sav
+Results For Demo/YeastKNN.sav
+Results For Demo/YeastLR.sav
+Results For Demo/YeastNN.sav
+Results For Demo/YeastRF.sav
+Results For Demo/YeastSVM.sav
+
+
+

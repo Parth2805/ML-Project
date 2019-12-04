@@ -15,8 +15,8 @@ import sklearn.neural_network as NN
 import sklearn.preprocessing as Preprocessing
 import sklearn.svm
 import sklearn.tree as Tree
-from imblearn.combine import SMOTETomek
-from imblearn.over_sampling import SMOTE
+# from imblearn.combine import SMOTETomek
+# from imblearn.over_sampling import SMOTE
 from scipy.io import arff
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.model_selection import train_test_split
