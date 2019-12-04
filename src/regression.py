@@ -68,6 +68,7 @@ class class_regression:
 
     def merck_model(self, act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, name, pretrained=False):
         print(name)
+        print(pretrained)
         act2_predict = act2.predict(X_test_act2)
         act4_predict = act4.predict(X_test_act4)
         act2_r2 = metrics.r2_score(y_test_act2, act2_predict)
@@ -431,24 +432,24 @@ class class_regression:
                                                                                                         y_train_act4)
             self.merck_model(gau_act2, gau_act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "GPR")
 
-            # # MLP
-            # param_grid = {
-            #     "activation": ['relu', 'tanh'],
-            #     "learning_rate_init": Stats.reciprocal(0.001, 0.1),
-            #     "hidden_layer_sizes": [(512, 256, 128, 64, 32), (128, 64, 32, 16), (64, 32, 16)]
-            # }
-            #
-            # mlp_act2 = NN.MLPRegressor(solver='adam', n_iter_no_change=10, momentum=0.9, learning_rate='adaptive',
-            #                            random_state=0, verbose=True, warm_start=True, early_stopping=True)
-            # nn_act2 = model_select.RandomizedSearchCV(mlp_act2, param_grid, cv=5, scoring='r2', verbose=5,
-            #                                           error_score='np.nan').fit(X_train_act2, y_train_act2)
-            # print("act2 done")
-            # mlp_act4 = NN.MLPRegressor(solver='adam', n_iter_no_change=10, momentum=0.9, learning_rate='adaptive',
-            #                            random_state=0, verbose=True, warm_start=True, early_stopping=True)
-            # nn_act4 = RandomizedSearchCV(mlp_act4, param_grid, cv=5, scoring='r2', verbose=5, error_score='np.nan').fit(
-            #     X_train_act4, y_train_act4)
-            # self.merck_model(nn_act2.best_estimator_, nn_act4.best_estimator_, X_test_act2, y_test_act2, X_test_act4,
-            #                  y_test_act4, "MLP")
+            # MLP
+            param_grid = {
+                "activation": ['relu', 'tanh'],
+                "learning_rate_init": Stats.reciprocal(0.001, 0.1),
+                "hidden_layer_sizes": [(512, 256, 128, 64, 32), (128, 64, 32, 16), (64, 32, 16)]
+            }
+
+            mlp_act2 = NN.MLPRegressor(solver='adam', n_iter_no_change=10, momentum=0.9, learning_rate='adaptive',
+                                       random_state=0, verbose=True, warm_start=True, early_stopping=True)
+            nn_act2 = model_select.RandomizedSearchCV(mlp_act2, param_grid, cv=5, scoring='r2', verbose=5,
+                                                      error_score='np.nan').fit(X_train_act2, y_train_act2)
+            print("act2 done")
+            mlp_act4 = NN.MLPRegressor(solver='adam', n_iter_no_change=10, momentum=0.9, learning_rate='adaptive',
+                                       random_state=0, verbose=True, warm_start=True, early_stopping=True)
+            nn_act4 = RandomizedSearchCV(mlp_act4, param_grid, cv=5, scoring='r2', verbose=5, error_score='np.nan').fit(
+                X_train_act4, y_train_act4)
+            self.merck_model(nn_act2.best_estimator_, nn_act4.best_estimator_, X_test_act2, y_test_act2, X_test_act4,
+                             y_test_act4, "MLP")
         else:
             act2 = pickle.load(open(PRETRAINED_MODEL + "Linear_act2_regression_model.sav", "rb"))
             act4 = pickle.load(open(PRETRAINED_MODEL + "Linear_act4_regression_model.sav", "rb"))
