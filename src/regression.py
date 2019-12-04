@@ -90,9 +90,9 @@ class class_regression:
     def get_regressor(self, userResponse):
         print('Running regressors for the following datasets: \n')
         # self.WineQuality()
-        self.Communities_Crime(userResponse)
+        # self.Communities_Crime(userResponse)
         # self.QSAR_aquatic_toxicity()
-        # self.Parkinson_Speech()
+        self.Parkinson_Speech(userResponse)
         # self.Facebook_metrics()
         # self.Bike_Sharing()
         # self.Student_Performance()
@@ -121,7 +121,7 @@ class class_regression:
 
         X_train, X_test, y_train, y_test = train_test_split(df.iloc[:, 0:122], df.iloc[:, 122], test_size=0.2,
                                                             random_state=0, shuffle=False)
-        if userResponse is "1":
+        if userResponse is "2":
 
             # Linear Regression
             lr_model = linear.LinearRegression().fit(X_train, y_train)
@@ -261,14 +261,112 @@ class class_regression:
             "hidden_layer_sizes": [(512,), (256, 128, 64, 32), (512, 256, 128, 64, 32)]
         }
 
-    def Parkinson_Speech(self):
+    def Parkinson_Speech(self, userResponse):
         print('Running Regression for 4.Parkinson_Speech dataset')
+
+        df = pd.read_csv(DATASETS + "train_data.txt", header=None, delimiter=',')
+
+        # Interchanging Last two columns
+        df_28 = df.iloc[:, 28]
+        df_27 = df.iloc[:, 27]
+        df = df.iloc[:, :27]
+        df = pd.concat([df, df_28, df_27], axis=1, ignore_index=True)
+
+        df = df.iloc[:, 1:29]
+        df = df.T.reset_index(drop=True).T
+
+        # Train Test Split
+        X_train, X_test, y_train, y_test = train_test_split(df.iloc[:, 0:27], df.iloc[:, 27], test_size=0.2,
+                                                            random_state=0, shuffle=False)
+        if userResponse is "1":
+
+            # LINEAR REGRESSION
+            lr_model = linear.LinearRegression().fit(X_train, y_train)
+            print(
+                "Linear Regression Mean Squared Error: ", metrics.mean_squared_error(y_test, lr_model.predict(X_test)))
+            print("Linear Regression R2 Score: ", metrics.r2_score(y_test, lr_model.predict(X_test)))
+            filename = "Parkinson_Linear_regression_model.sav"
+            pickle.dump(lr_model, open(RESULTS_FOR_DEMO + filename, 'wb'))
+            filename1 = "Parkinson_Linear_regression_model_best_param.sav"
+            pickle.dump(lr_model.get_params, open(RESULTS_FOR_DEMO + filename1, 'wb'))
+
+            # SVR
+            param = {'kernel': ['rbf'],
+                     'C': [1, 10, 100, 1000],
+                     'gamma': [1e-3, 1e-4, 1e-2, 1e-1, 1]}
+            self.grid_search_cv(SVM.SVR(), param, X_train, y_train, X_test, y_test, "ParkinsonSVR", cv=5)
+
+            # DTR
+            param = {'max_depth': np.arange(1, 18, 1),
+                     'splitter': ['best', 'random'],
+                     'max_features': np.arange(1, 18, 1),
+                     'min_samples_split': np.arange(2, 20, 1)}
+            self.random_search_cv(Tree.DecisionTreeRegressor(random_state=0), param, X_train, y_train, X_test, y_test,
+                                  "ParkinsonDTR", cv=5)
+
+            # RFR
+            param = {'max_depth': np.arange(1, 20, 1),
+                     'min_samples_split': np.array([2, 3, 5])}
+            self.grid_search_cv(Ensemble.RandomForestRegressor(n_estimators=100, random_state=0), param, X_train,
+                                y_train,
+                                X_test, y_test, "ParkinsonRFR", cv=5)
+
+
+            # NN
+            param = {
+                "solver": ['adam'],
+                "learning_rate_init": Stats.reciprocal(0.001, 0.1),
+                "hidden_layer_sizes": [(128, 64, 32, 16), (32, 16, 8), (64, 32, 16)]
+            }
+            self.random_search_cv(
+                NN.MLPRegressor(activation='relu', n_iter_no_change=10, momentum=0.9, learning_rate='adaptive',
+                                random_state=0, verbose=True, warm_start=True, early_stopping=True),
+                param, X_train, y_train, X_test, y_test, "ParkinsonNN", 5)
+
+            # ADABOOST
+            param = {
+                "n_estimators": np.arange(50, 250, 10),
+                "loss": ['linear', 'square']
+            }
+            self.grid_search_cv(Ensemble.AdaBoostRegressor(random_state=0), param, X_train, y_train, X_test, y_test,
+                                "ParkinsonADA", 5)
+
+            # GPR
+            param = {
+                "alpha": [1e-10, 1e-9, 1e-8]
+            }
+            self.grid_search_cv(Gaussian.GaussianProcessRegressor(optimizer="fmin_l_bfgs_b", random_state=0),
+                                param, X_train, y_train, X_test, y_test, "ParkinsonGPR", 10)
+
+        else:
+            # SVR
+            self.load_pretrained_models("Parkinson_SVR_model", X_train, y_train, X_test, y_test, 5)
+
+            # DTR
+            self.load_pretrained_models("Parkinson_decision_tree_model", X_train, y_train, X_test, y_test, 5)
+
+            # RFC
+            self.load_pretrained_models("Parkinson_random_forest_model", X_train, y_train, X_test, y_test, 5)
+
+            # LR
+            self.load_pretrained_models("Parkinson_Linear_regression_model", X_train, y_train, X_test, y_test, 5)
+
+            # Adaboost
+            self.load_pretrained_models("Parkinson_adaboost_model", X_train, y_train, X_test, y_test, 5)
+
+            # GNB
+            self.load_pretrained_models("Parkinson_gaussian_model", X_train, y_train, X_test, y_test, 10)
+
+            # MLP
+            self.load_pretrained_models("Parkinson_neural_network_model", X_train, y_train, X_test, y_test, 5)
 
     def Facebook_metrics(self):
         print('Running Regression for 5.Facebook_metrics dataset')
 
     def Bike_Sharing(self):
         print('Running Regression for 6.Bike_Sharing dataset')
+
+
 
     def Student_Performance(self):
         print('Running Regression for 7.Student_Performance dataset')

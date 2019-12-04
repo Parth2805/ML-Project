@@ -20,14 +20,7 @@ Results For Demo/merckResults.txt
 Datasets/australian.xlsx
 Datasets/communities.data
 Datasets/yeast.data
-
-Pretrained Models/Communities_Crime_Linear_regression_model.sav
-Pretrained Models/Communities_Crime_SVR_model.sav
-Pretrained Models/Communities_Crime_adaboost_model.sav
-Pretrained Models/Communities_Crime_decsion_tree_model.sav
-Pretrained Models/Communities_Crime_gaussian_concrete_model.sav
-Pretrained Models/Communities_Crime_neural_network_model.sav
-Pretrained Models/Communities_Crime_random_forest_model.sav
+Datasets/train_data.txt
 
 Pretrained Models/statlog_australian_adaboost_model.sav
 Pretrained Models/statlog_australian_gaussian_grid_model.sav
@@ -37,6 +30,7 @@ Pretrained Models/statlog_australian_neurel_network_model.sav
 Pretrained Models/statlog_australian_random_forest_model.sav
 Pretrained Models/statlog_australian_svm_model.sav
 Pretrained Models/statlog_australian_tree_model.sav
+
 Pretrained Models/yeast_adaboost_model.sav
 Pretrained Models/yeast_gaussian_grid_model.sav
 Pretrained Models/yeast_k_nearest_neighbours_modal.sav
@@ -45,6 +39,23 @@ Pretrained Models/yeast_neurel_network_model.sav
 Pretrained Models/yeast_random_forest_model.sav
 Pretrained Models/yeast_svm_model.sav
 Pretrained Models/yeast_tree_model.sav
+
+Pretrained Models/Communities_Crime_Linear_regression_model.sav
+Pretrained Models/Communities_Crime_SVR_model.sav
+Pretrained Models/Communities_Crime_adaboost_model.sav
+Pretrained Models/Communities_Crime_decsion_tree_model.sav
+Pretrained Models/Communities_Crime_gaussian_concrete_model.sav
+Pretrained Models/Communities_Crime_neural_network_model.sav
+Pretrained Models/Communities_Crime_random_forest_model.sav
+
+Pretrained Models/Parkinson_adaboost_model.sav
+Pretrained Models/Parkinson_decision_tree_model.sav
+Pretrained Models/Parkinson_gaussian_model.sav
+Pretrained Models/Parkinson_Linear_regression_model.sav
+Pretrained Models/Parkinson_neural_network_model.sav
+Pretrained Models/Parkinson_SVR_model.sav
+Pretrained Models/Parkinson_random_forest_model.sav
+
 
 
 Results For Demo/Communities&CrimeADA Learning Curve.png
@@ -67,6 +78,7 @@ Results For Demo/Communities&CrimeSVRBestParams.sav
 Results For Demo/Communities&CrimeSVRModel.sav
 Results For Demo/Community&Crime_linear_regression_model.sav
 Results For Demo/Community&Crime_linear_regression_model_best_param.sav
+
 Results For Demo/StatlogAustralianABC.sav
 Results For Demo/StatlogAustralianDCT.sav
 Results For Demo/StatlogAustralianGNB.sav
@@ -75,6 +87,7 @@ Results For Demo/StatlogAustralianLRC.sav
 Results For Demo/StatlogAustralianMLP.sav
 Results For Demo/StatlogAustralianRFC.sav
 Results For Demo/StatlogAustralianSVM.sav
+
 Results For Demo/YeastAda.sav
 Results For Demo/YeastDCT.sav
 Results For Demo/YeastGNN.sav
@@ -83,6 +96,28 @@ Results For Demo/YeastLR.sav
 Results For Demo/YeastNN.sav
 Results For Demo/YeastRF.sav
 Results For Demo/YeastSVM.sav
+
+Results For Demo/ParkinsonADA Learning Curve.png
+Results For Demo/ParkinsonADABestParams.sav
+Results For Demo/ParkinsonADAModel.sav
+Results For Demo/ParkinsonDTR Learning Curve.png
+Results For Demo/ParkinsonDTRBestParams.sav
+Results For Demo/ParkinsonDTRModel.sav
+Results For Demo/ParkinsonGPR Learning Curve.png
+Results For Demo/ParkinsonGPRBestParams.sav
+Results For Demo/ParkinsonGPRModel.sav
+Results For Demo/ParkinsonNN Learning Curve.png
+Results For Demo/ParkinsonNNBestParams.sav
+Results For Demo/ParkinsonNNModel.sav
+Results For Demo/ParkinsonRFR Learning Curve.png
+Results For Demo/ParkinsonRFRBestParams.sav
+Results For Demo/ParkinsonRFRModel.sav
+Results For Demo/ParkinsonSVR Learning Curve.png
+Results For Demo/ParkinsonSVRBestParams.sav
+Results For Demo/ParkinsonSVRModel.sav
+Results For Demo/Parkinson_Linear_regression_model.sav
+Results For Demo/Parkinson_Linear_regression_model_best_param.sav
+
 
 
 
