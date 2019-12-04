@@ -56,7 +56,7 @@ class class_classification:
 
     def load_pretrained_models(self, name, X_train, y_train, X_test, y_test, cv):
         print("Loading PreTrained model: ", name)
-        model = pickle.load(PRETRAINED_MODEL + name + ".sav")
+        model = pickle.load(open(PRETRAINED_MODEL + name + ".sav", 'rb'))
         print("Testing Accuracy: ", model.score(X_test, y_test))
         print("Training Accuracy: ", model.score(X_train, y_train))
         plot.plot_learning_curve(model, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=cv)
