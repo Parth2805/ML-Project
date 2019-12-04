@@ -4,7 +4,7 @@ import sys
 from pip._vendor.distlib.compat import raw_input
 
 # import regression
-from src import classification
+from src import classification, regression
 
 
 class main():
@@ -18,8 +18,8 @@ class main():
         else:
             print("Running classifier and Regression tests\n")
 
-            classifier = classification.class_classification()
-            classifier.run_classifier()
+            # classifier = classification.class_classification()
+            # classifier.run_classifier()
             #
             regressor = regression.class_regression()
             regressor.get_regressor()

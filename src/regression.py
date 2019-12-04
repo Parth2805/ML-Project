@@ -16,7 +16,7 @@ import sklearn.model_selection as model_select
 RESULTS_FOR_DEMO = "../Results For Demo/Regression/"
 DATASETS = "../Datasets/"
 PRETRAINED_MODEL = "../Pretrained Models/"
-
+DATASET_NAME=""
 
 class class_regression:
     '''Contains all the regression logic'''
@@ -41,7 +41,7 @@ class class_regression:
         print("Average HyperParameter Search Accuracy: ", model.best_score_)
         print("Testing Accuracy: ", model.best_estimator_.score(X_test, y_test))
         print("Training Accuracy: ", model.best_estimator_.score(X_train, y_train))
-        pickle.dump(model.best_estimator_, open(RESULTS_FOR_DEMO + "%s.sav" % name, 'wb'))
+        pickle.dump(model.best_estimator_, open(RESULTS_FOR_DEMO + DATASET_NAME + "%s.sav" % name, 'wb'))
         pickle.dump(model.best_params_, open(RESULTS_FOR_DEMO + "%s.sav" % name, 'wb'))
         # TODO: Add plotting code
 
@@ -55,19 +55,19 @@ class class_regression:
     def get_regressor(self):
         print('Running regressors for the following datasets: \n')
         self.WineQuality()
-        self.Communities_Crime()
-        self.QSAR_aquatic_toxicity()
-        self.Parkinson_Speech()
-        self.Facebook_metrics()
-        self.Bike_Sharing()
-        self.Student_Performance()
-        self.Concrete_Compressive_Strength()
-        self.SGEMM_GPU_kernel_performance()
-        self.Merck_Molecular_Activity_Challenge()
+        # self.Communities_Crime()
+        # self.QSAR_aquatic_toxicity()
+        # self.Parkinson_Speech()
+        # self.Facebook_metrics()
+        # self.Bike_Sharing()
+        # self.Student_Performance()
+        # self.Concrete_Compressive_Strength()
+        # self.SGEMM_GPU_kernel_performance()
+        # self.Merck_Molecular_Activity_Challenge()
 
     def WineQuality(self):
         print('Running Regression for 1.WineQuality dataset')
-
+        DATASET_NAME="WineQuality/"
         '''
         ### **Preprocessing**
         '''
@@ -102,17 +102,18 @@ class class_regression:
 
 
 
+
         '''
         ### **SVR**
         '''
         svm = sklearn.svm.SVR()
 
-        param = [{"kernel": ["rbf"],
-                  "degree": [1, 2, 3],
+        param = {"kernel": np.array(["rbf"]),
+                  "degree": np.array([1, 2, 3]),
                   "C": np.array([1, 2, 5, 10, 20]),
-                  "gamma": np.array([0.1, 1, 5, 10])}]
+                  "gamma": np.array([0.1, 1, 5, 10])}
 
-        self.grid_search_cv(svm,param,X_train,y_train,X_test,y_test,"WineQuality_SVM")
+        self.random_search_cv(svm,param,X_train,y_train,X_test,y_test,"WineQuality_SVR")
         '''
         ### **Decision Tree**
         '''
