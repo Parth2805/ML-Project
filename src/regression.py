@@ -4,7 +4,7 @@ import pickle
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import plot
+import matplotlib.pyplot as plot
 import scipy
 import scipy.stats as Stats
 import sklearn.ensemble as Ensemble
@@ -94,7 +94,7 @@ class class_regression:
 
     def get_regressor(self, userResponse):
         print('Running regressors for the following datasets: \n')
-        self.WineQuality()
+        self.WineQuality(userResponse)
         # self.Communities_Crime()
         # self.QSAR_aquatic_toxicity()
         # self.Parkinson_Speech()
@@ -105,9 +105,9 @@ class class_regression:
         # self.SGEMM_GPU_kernel_performance()
         # self.Merck_Molecular_Activity_Challenge()
 
-    def WineQuality(self):
+    def WineQuality(self, userResponse):
         print('Running Regression for 1.WineQuality dataset')
-        DATASET_NAME="WineQuality/"
+        DATASET_NAME = "WineQuality/"
         '''
         ### **Preprocessing**
         '''
@@ -122,8 +122,6 @@ class class_regression:
         data = np.vstack((data, data2))
         X_train, X_test, y_train, y_test = train_test_split(data[:, 0:11], data[:, 11], test_size=0.20, random_state=0)
 
-
-
         'Function for NAN'
         # print(data.shape)
         list = []
@@ -135,82 +133,84 @@ class class_regression:
                     list.append(data[i][j])
         # print(len(list) / 12)
 
-        '''
-        ### **Linear Regression**
-        '''
-        lr = sklearn.linear_model.LinearRegression().fit(X_train, y_train)
+        if (userResponse == '2'):
+            '''
+            ### **Linear Regression**
+            '''
+            lr = sklearn.linear_model.LinearRegression().fit(X_train, y_train)
 
+            '''
+            ### **SVR**
+            '''
+            svm = sklearn.svm.SVR()
 
+            param = {"kernel": np.array(["rbf"]),
+                     "degree": np.array([1, 2, 3]),
+                     "C": np.array([1, 2, 5, 10, 20]),
+                     "gamma": np.array([0.1, 1, 5, 10])}
 
+            self.random_search_cv(svm, param, X_train, y_train, X_test, y_test, "WineQuality_SVR")
+            '''
+            ### **Decision Tree**
+            '''
+            dt = sklearn.tree.DecisionTreeRegressor(random_state=0)
 
-        '''
-        ### **SVR**
-        '''
-        svm = sklearn.svm.SVR()
+            param = {'max_depth': np.arange(1, 15, 1),
+                     'splitter': ['best', 'random'],
+                     'max_features': np.arange(1, 11, 1),
+                     'min_samples_split': np.arange(2, 20, 1)}
+            self.grid_search_cv(dt, param, X_train, y_train, X_test, y_test, "WineQuality_Decision_Tree")
+            '''
+            ### **Random Forest**
+            '''
 
-        param = {"kernel": np.array(["rbf"]),
-                  "degree": np.array([1, 2, 3]),
-                  "C": np.array([1, 2, 5, 10, 20]),
-                  "gamma": np.array([0.1, 1, 5, 10])}
+            rf = sklearn.ensemble.RandomForestRegressor(n_estimators=100, random_state=0)
 
-        self.random_search_cv(svm,param,X_train,y_train,X_test,y_test,"WineQuality_SVR")
-        '''
-        ### **Decision Tree**
-        '''
-        dt = sklearn.tree.DecisionTreeRegressor(random_state=0)
+            param = {'max_depth': np.arange(1, 20, 1),
+                     'max_features': np.array([1, 2, 5, 11]),
+                     'min_samples_split': np.array([2, 3, 5])}
 
-        param = {'max_depth': np.arange(1, 15, 1),
-                 'splitter': ['best', 'random'],
-                 'max_features': np.arange(1, 11, 1),
-                 'min_samples_split': np.arange(2, 20, 1)}
-        self.grid_search_cv(dt, param, X_train, y_train, X_test, y_test,"WineQuality_Decision_Tree")
-        '''
-        ### **Random Forest**
-        '''
+            self.grid_search_cv(rf, param, X_train, y_train, X_test, y_test, "WineQuality_Random_Forest")
+            '''
+            ## **Ada Boost**
+            '''
 
-        rf = sklearn.ensemble.RandomForestRegressor(n_estimators=100, random_state=0)
+            ada = sklearn.ensemble.AdaBoostRegressor(random_state=0)
 
-        param = {'max_depth': np.arange(1, 20, 1),
-                 'max_features': np.array([1, 2, 5, 11]),
-                 'min_samples_split': np.array([2, 3, 5])}
+            param = dict(n_estimators=np.arange(50, 250, 10),
+                         loss=['linear', 'square']
+                         )
+            self.grid_search_cv(ada, param, X_train, y_train, X_test, y_test, "WineQuality_Ada_Boost")
+            '''
+            ## **Neural Network**
+            '''
+            mlp = sklearn.neural_network.MLPRegressor(activation='relu', n_iter_no_change=10, momentum=0.9,
+                                                      learning_rate='adaptive', random_state=0, verbose=True,
+                                                      warm_start=True, early_stopping=True, )
 
-        self.grid_search_cv(rf, param, X_train, y_train, X_test, y_test,"WineQuality_Random_Forest")
-        '''
-        ## **Ada Boost**
-        '''
+            param = {
+                "solver": ['adam'],
+                "learning_rate_init": reciprocal(0.001, 0.1),
+                "hidden_layer_sizes": [(512,), (256, 128, 64, 32), (512, 256, 128, 64, 32)]
+            }
 
-        ada = sklearn.ensemble.AdaBoostRegressor(random_state=0)
+            self.grid_search_cv(mlp, param, X_train, y_train, X_test, y_test, "WineQuality_Neural_Network")
+            '''
+            ## **Gaussian Process**
+            '''
+            gp = sklearn.gaussian_process.GaussianProcessRegressor(random_state=0, normalize_y=True, alpha=0.005).fit(
+                X_train, y_train)
+            print(gp.score(X_train, y_train))
+            print(gp.score(X_test, y_test))
+        else:
 
-        param = dict(n_estimators=np.arange(50, 250, 10),
-                     loss=['linear', 'square']
-                     )
-        self.grid_search_cv(ada, param, X_train, y_train, X_test, y_test,"WineQuality_Ada_Boost")
-        '''
-        ## **Neural Network**
-        '''
-        mlp = sklearn.neural_network.MLPRegressor(activation='relu', n_iter_no_change=10, momentum=0.9,
-                                                  learning_rate='adaptive', random_state=0, verbose=True,
-                                                  warm_start=True, early_stopping=True, )
-
-        param = {
-            "solver": ['adam'],
-            "learning_rate_init": reciprocal(0.001, 0.1),
-            "hidden_layer_sizes": [(512,), (256, 128, 64, 32), (512, 256, 128, 64, 32)]
-        }
-
-        self.grid_search_cv(mlp, param, X_train, y_train, X_test, y_test,"WineQuality_Neural_Network")
-        '''
-        ## **Gaussian Process**
-        '''
-        gp = sklearn.gaussian_process.GaussianProcessRegressor(random_state=0)
-
-        param = {
-
-            "n_restarts_optimizer": np.arange(0, 10, 1)
-        }
-
-        self.grid_search_cv(gp, param, X_train, y_train, X_test, y_test,"WineQuality_Gaussian_Process")
-
+            self.load_pretrained_models("Wine_SVR.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Wine_Linear_Regression.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Wine_Decision_Tree.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Wine_Random_Forest.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Wine_AdaBoostClassifier.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Wine_Neural_Network.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Wine_GaussianProcess.sav", X_train, y_train, X_test, y_test)
 
     def Communities_Crime(self):
         print('Running Regression for 2.Communities_Crime dataset')
@@ -269,14 +269,14 @@ class class_regression:
     def Parkinson_Speech(self):
         print('Running Regression for 4.Parkinson_Speech dataset')
 
-    def Facebook_metrics(self):
+    def Facebook_metrics(self, userResponse):
         print('Running Regression for 5.Facebook_metrics dataset')
 
         '''
         ### **Preprocessing**
         '''
 
-        file = "/content/drive/My Drive/Regression/5_Facebook/dataset_Facebook.csv"
+        file = "../Datasets/"
         df = pd.read_csv(file, sep=';')
 
         le = sklearn.preprocessing.LabelEncoder().fit(df.iloc[:, 1])
@@ -286,7 +286,6 @@ class class_regression:
         data = df.values
         print(data)
         X_train, X_test, y_train, y_test = train_test_split(data[:, 0:18], data[:, 18], test_size=0.20, random_state=0)
-
 
         'Function for NAN'
         list = []
@@ -298,80 +297,90 @@ class class_regression:
                     list.append(data[i][j])
         # print(len(list) / 19)
 
-        '''
-        ### **Linear Regression**
-        '''
+        if (userResponse == '2'):
+            '''
+            ### **Linear Regression**
+            '''
 
-        lr = sklearn.linear_model.LinearRegression().fit(X_train, y_train)
-        # print("Validation Score:",lr.score(X_train,y_train))
-        # print("Testing Score",lr.score(X_test,y_test))
+            lr = sklearn.linear_model.LinearRegression().fit(X_train, y_train)
+            # print("Validation Score:",lr.score(X_train,y_train))
+            # print("Testing Score",lr.score(X_test,y_test))
 
-        '''
-        ### **SVR**
-        '''
+            '''
+            ### **SVR**
+            '''
 
-        svm = sklearn.svm.SVR()
-        param = {
-            "kernel": ["linear"],
-            "C": np.arange(0.01, 2)
-        }
-        self.grid_search_cv(svm, param, X_train, y_train, X_test, y_test, "Facebook_SVR")
+            svm = sklearn.svm.SVR()
+            param = {
+                "kernel": ["linear"],
+                "C": np.arange(0.01, 2)
+            }
+            self.grid_search_cv(svm, param, X_train, y_train, X_test, y_test, "Facebook_SVR")
 
-        '''
-        ### **Decision Tree**
-        '''
-        dt = sklearn.tree.DecisionTreeRegressor(random_state=0)
+            '''
+            ### **Decision Tree**
+            '''
+            dt = sklearn.tree.DecisionTreeRegressor(random_state=0)
 
-        param = {'max_depth': np.arange(1, 18, 1),
-                 'splitter': ['best', 'random'],
-                 'max_features': np.arange(1, 18, 1),
-                 'min_samples_split': np.arange(2, 20, 1)}
-        self.grid_search_cv(dt, param, X_train, y_train, X_test, y_test, "Facebook_Decision_Tree")
+            param = {'max_depth': np.arange(1, 18, 1),
+                     'splitter': ['best', 'random'],
+                     'max_features': np.arange(1, 18, 1),
+                     'min_samples_split': np.arange(2, 20, 1)}
+            self.grid_search_cv(dt, param, X_train, y_train, X_test, y_test, "Facebook_Decision_Tree")
 
-        '''
-        ### **Random Forest**
-        '''
-        rf = sklearn.ensemble.RandomForestRegressor(n_estimators=100, random_state=0)
+            '''
+            ### **Random Forest**
+            '''
+            rf = sklearn.ensemble.RandomForestRegressor(n_estimators=100, random_state=0)
 
-        param = {'max_depth': np.arange(1, 20, 1),
-                 'max_features': np.array([1, 2, 5, 10, 15, 18]),
-                 'min_samples_split': np.array([2, 3, 5])}
+            param = {'max_depth': np.arange(1, 20, 1),
+                     'max_features': np.array([1, 2, 5, 10, 15, 18]),
+                     'min_samples_split': np.array([2, 3, 5])}
 
-        self.grid_search_cv(rf, param, X_train, y_train, X_test, y_test, "Facebook_Random_Forest")
-        '''
-        ## **Ada Boost**
-        '''
+            self.grid_search_cv(rf, param, X_train, y_train, X_test, y_test, "Facebook_Random_Forest")
+            '''
+            ## **Ada Boost**
+            '''
 
-        ada = sklearn.ensemble.AdaBoostRegressor(random_state=0)
+            ada = sklearn.ensemble.AdaBoostRegressor(random_state=0)
 
-        param = dict(n_estimators=np.arange(50, 250, 10),
-                     loss=['linear', 'square']
-                     )
+            param = dict(n_estimators=np.arange(50, 250, 10),
+                         loss=['linear', 'square']
+                         )
 
-        self.grid_search_cv(ada, param, X_train, y_train, X_test, y_test, "Facebook_Ada_Boost")
+            self.grid_search_cv(ada, param, X_train, y_train, X_test, y_test, "Facebook_Ada_Boost")
 
-        '''
-        ## **Neural Network**
-        '''
+            '''
+            ## **Neural Network**
+            '''
 
-        mlp = sklearn.neural_network.MLPRegressor(activation='relu', n_iter_no_change=10, momentum=0.9,
-                                                  learning_rate='adaptive', random_state=0, verbose=True,
-                                                  warm_start=True, early_stopping=True, )
+            mlp = sklearn.neural_network.MLPRegressor(activation='relu', n_iter_no_change=10, momentum=0.9,
+                                                      learning_rate='adaptive', random_state=0, verbose=True,
+                                                      warm_start=True, early_stopping=True, )
 
-        param = {
-            "solver": ['adam'],
-            "learning_rate_init": reciprocal(0.001, 0.1),
-            "hidden_layer_sizes": [(128, 64, 32, 16), (32, 16, 8), (64, 32, 16)]
-        }
-        self.grid_search_cv(mlp, param, X_train, y_train, X_test, y_test, "Facebook_Neural_Network")
-        '''
-        ## **Guassian Process**
-        '''
-        gp = sklearn.gaussian_process.GaussianProcessRegressor()
+            param = {
+                "solver": ['adam'],
+                "learning_rate_init": reciprocal(0.001, 0.1),
+                "hidden_layer_sizes": [(128, 64, 32, 16), (32, 16, 8), (64, 32, 16)]
+            }
+            self.grid_search_cv(mlp, param, X_train, y_train, X_test, y_test, "Facebook_Neural_Network")
+            '''
+            ## **Guassian Process**
+            '''
+            gp = sklearn.gaussian_process.GaussianProcessRegressor()
 
-        param = {'alpha': np.arange(0, 1, 0.001),
-                 'normalize_y': ['True', 'False']}
-        self.grid_search_cv(gp, param, X_train, y_train, X_test, y_test, "Facebook_Gaussian_Process")
+            param = {'alpha': np.arange(0, 1, 0.001),
+                     'normalize_y': ['True', 'False']}
+            self.grid_search_cv(gp, param, X_train, y_train, X_test, y_test, "Facebook_Gaussian_Process")
+        else:
+
+            self.load_pretrained_models("Facebook_SVR.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Facebook_Linear_Regression.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Facebook_Decision_Tree.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Facebook_Random_Forest.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Facebook_AdaBoostClassifier.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Facebook_Neural_Network.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Facebook_Gaussian_Process.sav", X_train, y_train, X_test, y_test)
 
     def Bike_Sharing(self):
         print('Running Regression for 6.Bike_Sharing dataset')

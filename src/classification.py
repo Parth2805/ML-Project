@@ -1,6 +1,6 @@
 import itertools
 import pickle
-
+import matplotlib.pyplot as plot
 import numpy as np
 import pandas as pd
 import scipy.stats as Stats
@@ -73,7 +73,7 @@ class class_classification:
         # self.Thoracic_Surgery_Data()
         # self.Seismic_Bumps(userResponse)
 
-    def Diabetic_Retinopathy(self):
+    def Diabetic_Retinopathy(self,userResponse):
         print('Running classification for 1.Diabetic Retinopathy dataset')
 
         file = DATASETS + "1_DiabeticRetinopathy.arff"
@@ -94,91 +94,98 @@ class class_classification:
         X_train[:, 8:18] = scaler.transform(X_train[:, 8:18])
         X_test[:, 8:18] = scaler.transform(X_test[:, 8:18])
 
-        '''Logistic Regression'''
+        if(userResponse == '2'):
 
-        lr = sklearn.linear_model.LogisticRegression(random_state=0, max_iter=10000)
+            '''Logistic Regression'''
 
-        param = {'solver': ["sag", "saga", "liblinear"],
-                 'C': [0.1, 0.2, 0.5, 1, 1.5, 2, 5, 7, 10, 12, 15]
-                 }
+            lr = sklearn.linear_model.LogisticRegression(random_state=0, max_iter=10000)
 
-        self.random_search_cv(lr, param, X_train, y_train, X_test, y_test, "Diabetic_LogisticRegression")
+            param = {'solver': ["sag", "saga", "liblinear"],
+                     'C': [0.1, 0.2, 0.5, 1, 1.5, 2, 5, 7, 10, 12, 15]
+                     }
 
-        '''
-        ### K-**Neighbors**
-        '''
+            self.random_search_cv(lr, param, X_train, y_train, X_test, y_test, "Diabetic_LogisticRegression")
+
+            '''
+            ### K-**Neighbors**
+            '''
 
 
-        k_n = sklearn.neighbors.KNeighborsClassifier()
+            k_n = sklearn.neighbors.KNeighborsClassifier()
 
-        param = {'weights': ['uniform', 'distance'], 'n_neighbors': [5, 10, 15, 20, 50, 100, 200, 500]}
+            param = {'weights': ['uniform', 'distance'], 'n_neighbors': [5, 10, 15, 20, 50, 100, 200, 500]}
 
-        self.random_search_cv(k_n, param, X_train, y_train, X_test, y_test, "Diabetic_K_Neighbors")
+            self.random_search_cv(k_n, param, X_train, y_train, X_test, y_test, "Diabetic_K_Neighbors")
 
-        '''
-        ### **SVM**
-        '''
+            '''
+            ### **SVM**
+            '''
 
-        svm = sklearn.svm.SVC(random_state=0)
+            svm = sklearn.svm.SVC(random_state=0)
 
-        param = dict(kernel=['rbf', 'linear'],
-                     degree=[1, 2, 3],
-                     C=Stats.reciprocal(0.01, 2),
-                     gamma=Stats.reciprocal(0.01, 2))
+            param = dict(kernel=['rbf', 'linear'],
+                         degree=[1, 2, 3],
+                         C=Stats.reciprocal(0.01, 2),
+                         gamma=Stats.reciprocal(0.01, 2))
 
-        self.random_search_cv(svm, param, X_train, y_train, X_test, y_test, "Diabetic_SVM")
+            self.random_search_cv(svm, param, X_train, y_train, X_test, y_test, "Diabetic_SVM")
 
-        '''
-        ### **Decision Tree**
-        '''
+            '''
+            ### **Decision Tree**
+            '''
 
-        dt = sklearn.tree.DecisionTreeClassifier(random_state=0)
+            dt = sklearn.tree.DecisionTreeClassifier(random_state=0)
 
-        param = {'max_depth': np.arange(1, 20, 1),
-                 'splitter': ['best', 'random'],
-                 'max_features': np.arange(1, 19, 1),
-                 'min_samples_split': np.arange(2, 20, 1)}
+            param = {'max_depth': np.arange(1, 20, 1),
+                     'splitter': ['best', 'random'],
+                     'max_features': np.arange(1, 19, 1),
+                     'min_samples_split': np.arange(2, 20, 1)}
 
-        self.grid_search_cv(dt, param, X_train, y_train, X_test, y_test, "Diabetic_Decision_Tree")
+            self.grid_search_cv(dt, param, X_train, y_train, X_test, y_test, "Diabetic_Decision_Tree")
 
-        '''
-        ### **Random Forest**
-        '''
-        rf = sklearn.ensemble.RandomForestClassifier(n_estimators=500, random_state=0)
+            '''
+            ### **Random Forest**
+            '''
+            rf = sklearn.ensemble.RandomForestClassifier(n_estimators=500, random_state=0)
 
-        param = {'max_depth': np.arange(1, 20, 1),
-                 'max_features': np.arange(1, 19, 1),
-                 'min_samples_split': np.arange(2, 20, 1)}
+            param = {'max_depth': np.arange(1, 20, 1),
+                     'max_features': np.arange(1, 19, 1),
+                     'min_samples_split': np.arange(2, 20, 1)}
 
-        self.random_search_cv(rf, param, X_train, y_train, X_test, y_test, "Diabetic_Random_Forest")
+            self.random_search_cv(rf, param, X_train, y_train, X_test, y_test, "Diabetic_Random_Forest")
 
-        '''
-        ### **Gaussian naive Bayes classification**
-        '''
+            '''
+            ### **Gaussian naive Bayes classification**
+            '''
 
-        gb = sklearn.naive_bayes.GaussianNB().fit(X_train, y_train)
+            gb = sklearn.naive_bayes.GaussianNB().fit(X_train, y_train)
 
-        print(gb.score(X_train, y_train))
-        print(gb.score(X_test, y_test))
+            print(gb.score(X_train, y_train))
+            print(gb.score(X_test, y_test))
 
-        '''
-        ### **Neural Network**
-        '''
+            '''
+            ### **Neural Network**
+            '''
 
-        nn = sklearn.neural_network.MLPClassifier(hidden_layer_sizes=(20, 15, 20, 2), random_state=0,
-                                                     max_iter=1000).fit(X_train, y_train)
+            nn = sklearn.neural_network.MLPClassifier(hidden_layer_sizes=(20, 15, 20, 2), random_state=0,
+                                                         max_iter=1000).fit(X_train, y_train)
 
-        '''
-        ### **Ada Boost**
-        '''
+            '''
+            ### **Ada Boost**
+            '''
 
-        ada = sklearn.ensemble.AdaBoostClassifier(random_state=0)
+            ada = sklearn.ensemble.AdaBoostClassifier(random_state=0)
 
-        param = dict(n_estimators=np.arange(50, 250, 10),
-                     algorithm=['SAMME.R', 'SAMME']
-                     )
+            param = dict(n_estimators=np.arange(50, 250, 10),
+                         algorithm=['SAMME.R', 'SAMME']
+                         )
 
-        self.grid_search_cv(ada, param, X_train, y_train, X_test, y_test, "Diabetic_Ada_Boost")
+            self.grid_search_cv(ada, param, X_train, y_train, X_test, y_test, "Diabetic_Ada_Boost")
+        else:
+
+            #Logistic_Regression
+            self.load_pretrained_models("")
+
 
     def Default_of_credit_card_clients(self, userResponse):
         df = pd.read_excel(DATASETS + "default of credit card clients.xls", skiprows=1)
