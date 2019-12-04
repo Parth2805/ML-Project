@@ -17,11 +17,11 @@ class main():
         else:
             print("Running classifier and Regression tests\n")
 
-            classifier = classification.class_classification()
-            classifier.run_classifier(user_response)
-            #
-            # regressor = regression.class_regression()
-            # regressor.get_regressor()
+            # classifier = classification.class_classification()
+            # classifier.run_classifier(user_response)
+
+            regressor = regression.class_regression()
+            regressor.get_regressor(user_response)
             # cifar10.Cifar10(sys.argv[1], user_response)
 
 
