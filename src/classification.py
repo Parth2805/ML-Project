@@ -22,7 +22,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn.preprocessing import StandardScaler
 
-RESULTS_FOR_DEMO = "../Results For Demo/Classification/"
+RESULTS_FOR_DEMO = "../Results For Demo/"
 DATASETS = "../Datasets/"
 PRETRAINED_MODEL = "../Pretrained Models/"
 

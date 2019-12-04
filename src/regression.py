@@ -311,11 +311,11 @@ class class_regression:
         '''
 
         svm = sklearn.svm.SVR()
-        param = [{
+        param = {
             "kernel": ["linear"],
             "C": np.arange(0.01, 2)
-        }]
-
+        }
+        self.grid_search_cv(svm, param, X_train, y_train, X_test, y_test, "Facebook_SVR")
 
         '''
         ### **Decision Tree**
@@ -326,6 +326,7 @@ class class_regression:
                  'splitter': ['best', 'random'],
                  'max_features': np.arange(1, 18, 1),
                  'min_samples_split': np.arange(2, 20, 1)}
+        self.grid_search_cv(dt, param, X_train, y_train, X_test, y_test, "Facebook_Decision_Tree")
 
         '''
         ### **Random Forest**
@@ -336,7 +337,7 @@ class class_regression:
                  'max_features': np.array([1, 2, 5, 10, 15, 18]),
                  'min_samples_split': np.array([2, 3, 5])}
 
-
+        self.grid_search_cv(rf, param, X_train, y_train, X_test, y_test, "Facebook_Random_Forest")
         '''
         ## **Ada Boost**
         '''
@@ -347,7 +348,7 @@ class class_regression:
                      loss=['linear', 'square']
                      )
 
-
+        self.grid_search_cv(ada, param, X_train, y_train, X_test, y_test, "Facebook_Ada_Boost")
 
         '''
         ## **Neural Network**
@@ -357,12 +358,12 @@ class class_regression:
                                                   learning_rate='adaptive', random_state=0, verbose=True,
                                                   warm_start=True, early_stopping=True, )
 
-        param_grid = {
+        param = {
             "solver": ['adam'],
             "learning_rate_init": reciprocal(0.001, 0.1),
             "hidden_layer_sizes": [(128, 64, 32, 16), (32, 16, 8), (64, 32, 16)]
         }
-
+        self.grid_search_cv(mlp, param, X_train, y_train, X_test, y_test, "Facebook_Neural_Network")
         '''
         ## **Guassian Process**
         '''
@@ -370,7 +371,7 @@ class class_regression:
 
         param = {'alpha': np.arange(0, 1, 0.001),
                  'normalize_y': ['True', 'False']}
-
+        self.grid_search_cv(gp, param, X_train, y_train, X_test, y_test, "Facebook_Gaussian_Process")
 
     def Bike_Sharing(self):
         print('Running Regression for 6.Bike_Sharing dataset')
