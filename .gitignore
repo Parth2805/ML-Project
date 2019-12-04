@@ -11,3 +11,4 @@ Datasets/5_GermanData.xlsx
 Datasets/default of credit card clients.xls
 Datasets/Faults.xlsx
 Datasets/seismic-bumps.csv
+*.pyc
