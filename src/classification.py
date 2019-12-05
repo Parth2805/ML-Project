@@ -70,7 +70,7 @@ class class_classification:
         # self.Statlog_German()
         # self.Steel_Plates_Faults(userResponse)
         # self.Adult()
-        # self.Yeast(userResponse)
+        self.Yeast(userResponse)
         # self.Thoracic_Surgery_Data()
         # self.Seismic_Bumps(userResponse)
 
@@ -874,33 +874,33 @@ class class_classification:
 
         else:
             # ADABOOST
-            self.load_pretrained_models("statlog_australian_adaboost_model", X_train, y_train, X_test, y_test, 3)
+            self.load_pretrained_models("StatlogAustralianABCModel", X_train, y_train, X_test, y_test, 3)
 
             # DTC
-            self.load_pretrained_models("statlog_australian_tree_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("StatlogAustralianDCTModel", X_train, y_train, X_test, y_test, 5)
 
             # GNB
-            self.load_pretrained_models("statlog_australian_gaussian_grid_model", X_train, y_train, X_test, y_test,
+            self.load_pretrained_models("StatlogAustralianGNBModel", X_train, y_train, X_test, y_test,
                                         5)
 
             # KNN
-            self.load_pretrained_models("statlog_australian_k_nearest_neighbours_modal", X_train, y_train, X_test,
+            self.load_pretrained_models("StatlogAustralianKNNModel", X_train, y_train, X_test,
                                         y_test, 3)
 
             # LR
-            self.load_pretrained_models("statlog_australian_logistic_regression_model", X_train, y_train, X_test,
+            self.load_pretrained_models("StatlogAustralianLRCModel", X_train, y_train, X_test,
                                         y_test, 3)
 
             # MLP
-            self.load_pretrained_models("statlog_australian_neurel_network_model", X_train, y_train, X_test, y_test,
+            self.load_pretrained_models("StatlogAustralianMLPModel", X_train, y_train, X_test, y_test,
                                         3)
 
             # RF
-            self.load_pretrained_models("statlog_australian_random_forest_model", X_train, y_train, X_test, y_test,
+            self.load_pretrained_models("StatlogAustralianRFCModel", X_train, y_train, X_test, y_test,
                                         5)
 
             # SVM
-            self.load_pretrained_models("statlog_australian_svm_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("StatlogAustralianSVMModel", X_train, y_train, X_test, y_test, 5)
 
     def Statlog_German(self):
         print('Running classification for 5.Statlog German dataset')
@@ -1551,33 +1551,33 @@ class class_classification:
             self.grid_search_cv(GaussianNB(), param_grid, X_train, y_train, X_test, y_test, "YeastGNN", 5)
         else:
             # ADABOOST
-            self.load_pretrained_models("yeast_adaboost_model", X_train, y_train, X_test, y_test, 3)
+            self.load_pretrained_models("YeastAdaModel", X_train, y_train, X_test, y_test, 3)
 
             # DTC
-            self.load_pretrained_models("yeast_gaussian_grid_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("YeastGNNModel", X_train, y_train, X_test, y_test, 5)
 
             # KNN
-            self.load_pretrained_models("yeast_k_nearest_neighbours_modal", X_train, y_train, X_test, y_test,
+            self.load_pretrained_models("YeastKNNModel", X_train, y_train, X_test, y_test,
                                         5)
 
             # LR
-            self.load_pretrained_models("yeast_logistic_regression_model", X_train, y_train, X_test,
+            self.load_pretrained_models("YeastLRModel", X_train, y_train, X_test,
                                         y_test, 3)
 
             # NN
-            self.load_pretrained_models("yeast_neurel_network_model", X_train, y_train, X_test,
+            self.load_pretrained_models("YeastNNModel", X_train, y_train, X_test,
                                         y_test, 3)
 
             # RF
-            self.load_pretrained_models("yeast_random_forest_model", X_train, y_train, X_test, y_test,
+            self.load_pretrained_models("YeastRFModel", X_train, y_train, X_test, y_test,
                                         3)
 
             # SVM
-            self.load_pretrained_models("yeast_svm_model", X_train, y_train, X_test, y_test,
+            self.load_pretrained_models("YeastSVMModel", X_train, y_train, X_test, y_test,
                                         5)
 
             # DCT
-            self.load_pretrained_models("yeast_tree_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("YeastDCTModel", X_train, y_train, X_test, y_test, 5)
 
     def Thoracic_Surgery_Data(self):
         print('Running classification for 9.Thoracic Surgery Data dataset')

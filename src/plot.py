@@ -43,7 +43,7 @@ def plot_confusion_matrix(cm, classes,
     plt.axis('scaled')
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
-    plt.savefig(PATH + title + ".jpg")
+    plt.savefig(PATH + title + ".png")
 
 
 def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
@@ -73,4 +73,4 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
              label="Cross-validation score")
 
     plt.legend(loc="best")
-    plt.savefig(PATH + title + ".jpg")
+    plt.savefig(PATH + title + ".png")
