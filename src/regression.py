@@ -141,7 +141,7 @@ class class_regression:
 
             '''RANDOM FOREST REGRESSOR'''
 
-            param_grid = {'max_depth': np.arange(5, 20,3),
+            param_grid = {'max_depth': np.arange(5, 20, 3),
                           'min_samples_split': np.array([2, 3, 5])}
 
             self.grid_search_cv(Ensemble.RandomForestRegressor(random_state=0), param_grid, X_train, y_train,
@@ -178,7 +178,8 @@ class class_regression:
                                   learning_rate='adaptive', random_state=0,
                                   verbose=True, warm_start=True, early_stopping=True)
 
-            self.random_search_cv(mlp, param_grid, X_train, y_train, X_test, y_test, "NeuralNetwork_QSARAquaticToxicity_model")
+            self.random_search_cv(mlp, param_grid, X_train, y_train, X_test, y_test,
+                                  "NeuralNetwork_QSARAquaticToxicity_model")
         else:
             # SVM
             self.load_pretrained_models("SVR_QSARAquaticToxicity_model", X_train, y_train, X_test, y_test, 5)
@@ -293,7 +294,8 @@ class class_regression:
                                   learning_rate='adaptive', random_state=0,
                                   verbose=True, warm_start=True, early_stopping=True)
 
-            self.random_search_cv(mlp, param_grid, X_train, y_train, X_test, y_test, "NeuralNetwork_Student_Performance_model")
+            self.random_search_cv(mlp, param_grid, X_train, y_train, X_test, y_test,
+                                  "NeuralNetwork_Student_Performance_model")
         else:
             # SVM
             self.load_pretrained_models("SVR_Student_Performance_model", X_train, y_train, X_test, y_test, 5)
