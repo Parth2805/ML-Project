@@ -1,6 +1,6 @@
 import itertools
 import pickle
-import matplotlib.pyplot as plot
+from src import plot
 import numpy as np
 import pandas as pd
 import scipy.stats as Stats
@@ -62,11 +62,11 @@ class class_classification:
 
     def run_classifier(self,userResponse):
         print('Running classifiers for the following datasets: \n')
-        self.Diabetic_Retinopathy(userResponse)
+        # self.Diabetic_Retinopathy(userResponse)
         # self.Default_of_credit_card_clients(userResponse)
         # self.Breast_Cancer_Wisconsin()
         # self.Statlog_Australian()
-        # self.Statlog_German()
+        self.Statlog_German(userResponse)
         # self.Steel_Plates_Faults(userResponse)
         # self.Adult()
         # self.Yeast()
@@ -662,7 +662,7 @@ class class_classification:
     def Statlog_Australian(self):
         print('Running classification for 4.Statlog Australian dataset')
 
-    def Statlog_German(self):
+    def Statlog_German(self,userResponse):
         print('Running classification for 5.Statlog German dataset')
         '''
         ### **Preprocessing**

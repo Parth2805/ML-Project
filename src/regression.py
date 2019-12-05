@@ -4,7 +4,7 @@ import pickle
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plot
+from src import plot
 import scipy
 import scipy.stats as Stats
 import sklearn.ensemble as Ensemble
@@ -94,11 +94,11 @@ class class_regression:
 
     def get_regressor(self, userResponse):
         print('Running regressors for the following datasets: \n')
-        self.WineQuality(userResponse)
+        # self.WineQuality(userResponse)
         # self.Communities_Crime()
         # self.QSAR_aquatic_toxicity()
         # self.Parkinson_Speech()
-        # self.Facebook_metrics()
+        self.Facebook_metrics(userResponse)
         # self.Bike_Sharing()
         # self.Student_Performance()
         # self.Concrete_Compressive_Strength()
@@ -138,6 +138,13 @@ class class_regression:
             ### **Linear Regression**
             '''
             lr = sklearn.linear_model.LinearRegression().fit(X_train, y_train)
+            print("Mean Squared Error: ",metrics.mean_squared_error(y_test, lr.predict(X_test)))
+            print("R2 Score: ", metrics.r2_score(y_test, lr.predict(X_test)))
+            name="WineQuality_Linear_Regression"
+            pickle.dump(lr, open(RESULTS_FOR_DEMO + "%sModel.sav" % name, 'wb'))
+            pickle.dump(lr.get_params, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
+            plot.plot_learning_curve(lr, name + " Learning Curve", X_train, y_train, (0.5, 1.01),cv=5)
+
 
             '''
             ### **SVR**
@@ -187,10 +194,9 @@ class class_regression:
             mlp = sklearn.neural_network.MLPRegressor(activation='relu', n_iter_no_change=10, momentum=0.9,
                                                       learning_rate='adaptive', random_state=0, verbose=True,
                                                       warm_start=True, early_stopping=True, )
-
             param = {
-                "solver": ['adam'],
-                "learning_rate_init": reciprocal(0.001, 0.1),
+                "solver": np.array(['adam']),
+                "learning_rate_init": np.arange(0.001, 0.1),
                 "hidden_layer_sizes": [(512,), (256, 128, 64, 32), (512, 256, 128, 64, 32)]
             }
 
@@ -200,8 +206,16 @@ class class_regression:
             '''
             gp = sklearn.gaussian_process.GaussianProcessRegressor(random_state=0, normalize_y=True, alpha=0.005).fit(
                 X_train, y_train)
-            print(gp.score(X_train, y_train))
-            print(gp.score(X_test, y_test))
+            # print(gp.score(X_train, y_train))
+            # print(gp.score(X_test, y_test))
+            name="WineQuality_Gaussian_Process"
+            print("Mean Squared Error: ",
+                  metrics.mean_squared_error(y_test, gp.predict(X_test)))
+            print("R2 Score: ", metrics.r2_score(y_test, gp.predict(X_test)))
+            pickle.dump(gp, open(RESULTS_FOR_DEMO + "%sModel.sav" % name, 'wb'))
+            pickle.dump(gp.get_params, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
+            plot.plot_learning_curve(gp, name + " Learning Curve", X_train, y_train, (0.5, 1.01),cv=5)
+
         else:
 
             self.load_pretrained_models("Wine_SVR", X_train, y_train, X_test, y_test)
@@ -276,7 +290,7 @@ class class_regression:
         ### **Preprocessing**
         '''
 
-        file = "../Datasets/"
+        file = "../Datasets/5_Facebook.csv"
         df = pd.read_csv(file, sep=';')
 
         le = sklearn.preprocessing.LabelEncoder().fit(df.iloc[:, 1])
@@ -303,8 +317,12 @@ class class_regression:
             '''
 
             lr = sklearn.linear_model.LinearRegression().fit(X_train, y_train)
-            # print("Validation Score:",lr.score(X_train,y_train))
-            # print("Testing Score",lr.score(X_test,y_test))
+            print("Mean Squared Error: ", metrics.mean_squared_error(y_test, lr.predict(X_test)))
+            print("R2 Score: ", metrics.r2_score(y_test, lr.predict(X_test)))
+            name = "Facebook_Linear_Regression"
+            pickle.dump(lr, open(RESULTS_FOR_DEMO + "%sModel.sav" % name, 'wb'))
+            pickle.dump(lr.get_params, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
+            plot.plot_learning_curve(lr, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=5)
 
             '''
             ### **SVR**
@@ -360,7 +378,7 @@ class class_regression:
 
             param = {
                 "solver": ['adam'],
-                "learning_rate_init": reciprocal(0.001, 0.1),
+                "learning_rate_init": np.arange(0.001, 0.1),
                 "hidden_layer_sizes": [(128, 64, 32, 16), (32, 16, 8), (64, 32, 16)]
             }
             self.grid_search_cv(mlp, param, X_train, y_train, X_test, y_test, "Facebook_Neural_Network")
