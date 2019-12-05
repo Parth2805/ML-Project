@@ -18,9 +18,10 @@ Datasets/ac4_cache.npz
 Results For Demo/merckResults.txt
 
 Datasets/australian.xlsx
-Datasets/communities.data
 Datasets/yeast.data
+Datasets/communities.data
 Datasets/train_data.txt
+Datasets/hour.csv
 
 Pretrained Models/statlog_australian_adaboost_model.sav
 Pretrained Models/statlog_australian_gaussian_grid_model.sav
@@ -56,7 +57,13 @@ Pretrained Models/Parkinson_neural_network_model.sav
 Pretrained Models/Parkinson_SVR_model.sav
 Pretrained Models/Parkinson_random_forest_model.sav
 
-
+Pretrained Models/Bike_Sharing_adaboost_model.sav
+Pretrained Models/Bike_Sharing_decision_tree_model.sav
+Pretrained Models/Bike_Sharing_Linear_regression_model.sav
+Pretrained Models/Bike_Sharing_neural_network_model.sav
+Pretrained Models/Bike_Sharing_random_forest_model.sav
+Pretrained Models/Bike_Sharing_SVR_model.sav
+Pretrained Models/Bike_Sharing_gaussian_model.sav
 
 Results For Demo/Communities&CrimeADA Learning Curve.png
 Results For Demo/Communities&CrimeADABestParams.sav
@@ -117,6 +124,22 @@ Results For Demo/ParkinsonSVRBestParams.sav
 Results For Demo/ParkinsonSVRModel.sav
 Results For Demo/Parkinson_Linear_regression_model.sav
 Results For Demo/Parkinson_Linear_regression_model_best_param.sav
+
+
+Results For Demo/BikeSharingADA Learning Curve.png
+Results For Demo/BikeSharingADABestParams.sav
+Results For Demo/BikeSharingADAModel.sav
+Results For Demo/BikeSharingDTR Learning Curve.png
+Results For Demo/BikeSharingDTRBestParams.sav
+Results For Demo/BikeSharingDTRModel.sav
+Results For Demo/BikeSharingLRBestParams.sav
+Results For Demo/BikeSharingLRModel.sav
+Results For Demo/BikeSharingNN Learning Curve.png
+Results For Demo/BikeSharingNNBestParams.sav
+Results For Demo/BikeSharingNNModel.sav
+Results For Demo/BikeSharingRFR Learning Curve.png
+Results For Demo/BikeSharingRFRBestParams.sav
+Results For Demo/BikeSharingRFRModel.sav
 
 
 
