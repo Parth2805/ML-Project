@@ -204,13 +204,13 @@ class class_regression:
             print(gp.score(X_test, y_test))
         else:
 
-            self.load_pretrained_models("Wine_SVR.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Wine_Linear_Regression.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Wine_Decision_Tree.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Wine_Random_Forest.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Wine_AdaBoostClassifier.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Wine_Neural_Network.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Wine_GaussianProcess.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Wine_SVR", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Wine_Linear_Regression", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Wine_Decision_Tree", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Wine_Random_Forest", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Wine_AdaBoostClassifier", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Wine_Neural_Network", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Wine_GaussianProcess", X_train, y_train, X_test, y_test)
 
     def Communities_Crime(self):
         print('Running Regression for 2.Communities_Crime dataset')
@@ -374,13 +374,13 @@ class class_regression:
             self.grid_search_cv(gp, param, X_train, y_train, X_test, y_test, "Facebook_Gaussian_Process")
         else:
 
-            self.load_pretrained_models("Facebook_SVR.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Facebook_Linear_Regression.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Facebook_Decision_Tree.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Facebook_Random_Forest.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Facebook_AdaBoostClassifier.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Facebook_Neural_Network.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Facebook_Gaussian_Process.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Facebook_SVR", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Facebook_Linear_Regression", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Facebook_Decision_Tree", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Facebook_Random_Forest", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Facebook_AdaBoostClassifier", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Facebook_Neural_Network", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Facebook_Gaussian_Process", X_train, y_train, X_test, y_test)
 
     def Bike_Sharing(self):
         print('Running Regression for 6.Bike_Sharing dataset')

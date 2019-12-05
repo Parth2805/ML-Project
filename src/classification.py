@@ -183,14 +183,14 @@ class class_classification:
             self.grid_search_cv(ada, param, X_train, y_train, X_test, y_test, "Diabetic_Ada_Boost")
         else:
 
-            self.load_pretrained_models("Diabetic_SVM.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Diabetic_Logistic_Regression.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Diabetic_Decision_Tree.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Diabetic_Random_Forest.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Diabetic_AdaBoostClassifier.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Diabetic_Neural_Network.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Diabetic_Gaussian_Naives_Bayes.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Diabetic_K_Neighbors.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_SVM", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_Logistic_Regression", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_Decision_Tree", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_Random_Forest", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_AdaBoostClassifier", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_Neural_Network", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_Gaussian_Naives_Bayes", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_K_Neighbors", X_train, y_train, X_test, y_test)
 
 
     def Default_of_credit_card_clients(self, userResponse):
@@ -764,14 +764,14 @@ class class_classification:
             print(gb.score(X_test, y_test))
         else:
 
-            self.load_pretrained_models("GermanStatlog_SVM.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("GermanStatlog_Logistic_Regression.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("GermanStatlog_Decision_Tree.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("GermanStatlog_Random_Forest.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("GermanStatlog_AdaBoostClassifier.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("GermanStatlog_Neural_Network.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("GermanStatlog_Gaussian_Naives_Bayes.sav", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("GermanStatlog_K_Neighbors.sav", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("GermanStatlog_SVM", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("GermanStatlog_Logistic_Regression", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("GermanStatlog_Decision_Tree", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("GermanStatlog_Random_Forest", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("GermanStatlog_AdaBoostClassifier", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("GermanStatlog_Neural_Network", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("GermanStatlog_Gaussian_Naives_Bayes", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("GermanStatlog_K_Neighbors", X_train, y_train, X_test, y_test)
 
 
         '''
