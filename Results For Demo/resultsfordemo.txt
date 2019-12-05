@@ -1,0 +1,10 @@
+print("results for demo")
+
+Grid Search CV kNN_WBC_model
+Best Estimator:  KNeighborsClassifier(algorithm='auto', leaf_size=5, metric='minkowski',
+                     metric_params=None, n_jobs=None, n_neighbors=5, p=2,
+                     weights='uniform')
+Average HyperParameter Search Accuracy:  0.964221824686941
+Testing Accuracy:  0.9714285714285714
+Training Accuracy:  0.9677996422182469
+

@@ -83,11 +83,11 @@ class class_regression:
         print('Running regressors for the following datasets: \n')
         # self.WineQuality()
         # self.Communities_Crime()
-        self.QSAR_aquatic_toxicity(userResponse)
+        # self.QSAR_aquatic_toxicity(userResponse)
         # self.Parkinson_Speech()
         # self.Facebook_metrics()
         # self.Bike_Sharing()
-        #self.Student_Performance(userResponse)
+        self.Student_Performance(userResponse)
         # self.Concrete_Compressive_Strength(userResponse)
         # self.SGEMM_GPU_kernel_performance()
         # self.Merck_Molecular_Activity_Challenge(userResponse)
@@ -124,7 +124,7 @@ class class_regression:
         if userResponse is "2":
             '''SVR'''
 
-            param_grid = {"kernel": ['linear', 'rbf'],
+            param_grid = {"kernel": ['rbf'],
                           "C": np.logspace(0, 3, 4),
                           "gamma": np.logspace(-2, 1, 4)}
 
@@ -133,7 +133,7 @@ class class_regression:
 
             '''DECISION TREE REGRESSOR'''
 
-            param_grid = {'max_depth': np.arange(1, 20, 2),
+            param_grid = {'max_depth': np.arange(5, 20, 2),
                           'splitter': ['best', 'random']}
 
             self.grid_search_cv(Tree.DecisionTreeRegressor(random_state=0), param_grid, X_train, y_train,
@@ -141,7 +141,7 @@ class class_regression:
 
             '''RANDOM FOREST REGRESSOR'''
 
-            param_grid = {'max_depth': np.arange(1, 20, 1),
+            param_grid = {'max_depth': np.arange(5, 20,3),
                           'min_samples_split': np.array([2, 3, 5])}
 
             self.grid_search_cv(Ensemble.RandomForestRegressor(random_state=0), param_grid, X_train, y_train,
@@ -240,7 +240,7 @@ class class_regression:
 
             '''SVR'''
 
-            param_grid = {"kernel": ['linear', 'rbf'],
+            param_grid = {"kernel": ['rbf'],
                           "C": np.logspace(0, 3, 4),
                           "gamma": np.logspace(-2, 1, 4)}
 
