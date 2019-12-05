@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 import plot
 import scipy.stats as Stats
-import sklearn
 import sklearn.ensemble as Ensemble
 import sklearn.linear_model  as Linear
 import sklearn.model_selection as model_select
@@ -468,8 +467,8 @@ class class_classification:
                 "weights": ['uniform', 'distance'],
                 "leaf_size": np.arange(5, 100, 10)
             }
-
-            self.grid_search_cv(sklearn.neighbors.KNeighborsClassifier(), param_grid, X_train, y_train, X_test,
+            knn = Neighbors.KNeighborsClassifier()
+            self.grid_search_cv(knn, param_grid, X_train, y_train, X_test,
                                 y_test, "kNN_WBC_model", 5)
 
             ''' Decision Tree CLASSIFICATION'''
@@ -480,7 +479,8 @@ class class_classification:
                           'criterion': ['gini', 'entropy']
                           }
 
-            self.grid_search_cv(Tree.DecisionTreeClassifier(random_state=0), param_grid, X_train, y_train, X_test,
+            dtc = Tree.DecisionTreeClassifier(random_state=0)
+            self.grid_search_cv(dtc, param_grid, X_train, y_train, X_test,
                                 y_test, "DecisionTree_WBC_model", 5)
 
             ''' SVM CLASSIFICATION'''
@@ -492,7 +492,8 @@ class class_classification:
                 'gamma': np.logspace(-2, 1, 4)
             }
 
-            self.random_search_cv(sklearn.svm.SVC(random_state=0), param_grid, X_train, y_train, X_test, y_test,
+            svm = sklearn.svm.SVC(random_state=0)
+            self.random_search_cv(svm, param_grid, X_train, y_train, X_test, y_test,
                                   "Svm_WBC_model", 5)
 
             '''RANDOM FOREST CLASSIFIER'''
@@ -504,7 +505,8 @@ class class_classification:
                           'criterion': ['gini', 'entropy']
                           }
 
-            self.random_search_cv(sklearn.ensemble.RandomForestClassifier(random_state=0), param_grid, X_train,
+            rfc = Ensemble.RandomForestClassifier(random_state=0)
+            self.random_search_cv(rfc, param_grid, X_train,
                                   y_train, X_test, y_test, "RandomForest_WBC_model", 5)
 
             '''ADABOOST CLASSIFIER'''
@@ -515,7 +517,8 @@ class class_classification:
                           'algorithm': ['SAMME', 'SAMME.R']
                           }
 
-            self.random_search_cv(sklearn.ensemble.AdaBoostClassifier(random_state=0), param_grid, X_train,
+            adaboost = Ensemble.AdaBoostClassifier(random_state=0)
+            self.random_search_cv(adaboost, param_grid, X_train,
                                   y_train, X_test, y_test, "Adaboost_WBC_model", 5)
 
             '''LOGISTIC REGRESSION CLASSIFIER'''
@@ -527,7 +530,9 @@ class class_classification:
                 'max_iter': [50, 100, 150],
                 'solver': ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga']
             }
-            self.random_search_cv(sklearn.linear_model.LogisticRegression(random_state=0), param_grid, X_train,
+
+            lr = Linear.LogisticRegression(multi_class='auto', random_state=0)
+            self.random_search_cv(lr, param_grid, X_train,
                                   y_train, X_test, y_test, "Logistic_WBC_model", 5)
 
             '''GAUSSIAN NAIVE BAYES CLASSIFIER'''
@@ -607,8 +612,8 @@ class class_classification:
                 "weights": ['uniform', 'distance'],
                 "leaf_size": np.arange(5, 100, 10)
             }
-
-            self.grid_search_cv(sklearn.neighbors.KNeighborsClassifier(), param_grid, X_train, y_train, X_test,
+            knn = Neighbors.KNeighborsClassifier()
+            self.grid_search_cv(knn, param_grid, X_train, y_train, X_test,
                                 y_test, "knearest_WDBC_model")
 
             ''' Decision Tree CLASSIFICATION'''
@@ -619,7 +624,9 @@ class class_classification:
                           'criterion': ['gini', 'entropy']
                           }
 
-            self.grid_search_cv(Tree.DecisionTreeClassifier(random_state=0), param_grid, X_train, y_train, X_test,
+            dtc = Tree.DecisionTreeClassifier(random_state=0)
+
+            self.grid_search_cv(dtc, param_grid, X_train, y_train, X_test,
                                 y_test, "tree_WDBC_model")
 
             ''' SVM CLASSIFICATION'''
@@ -631,7 +638,8 @@ class class_classification:
                 'gamma': np.logspace(-2, 1, 4)
             }
 
-            self.random_search_cv(sklearn.svm.SVC(random_state=0), param_grid, X_train, y_train, X_test, y_test,
+            svm = sklearn.svm.SVC(random_state=0)
+            self.random_search_cv(svm, param_grid, X_train, y_train, X_test, y_test,
                                   "svm_WDBC_model")
 
             '''RANDOM FOREST CLASSIFIER'''
@@ -643,7 +651,9 @@ class class_classification:
                           'criterion': ['gini', 'entropy']
                           }
 
-            self.random_search_cv(sklearn.ensemble.RandomForestClassifier(random_state=0), param_grid, X_train,
+            rfc = Ensemble.RandomForestClassifier(random_state=0)
+
+            self.random_search_cv(rfc, param_grid, X_train,
                                   y_train, X_test, y_test, "random_forest_WDBC_model")
 
             '''ADABOOST CLASSIFIER'''
@@ -654,7 +664,9 @@ class class_classification:
                           'algorithm': ['SAMME', 'SAMME.R']
                           }
 
-            self.random_search_cv(sklearn.ensemble.AdaBoostClassifier(random_state=0), param_grid, X_train,
+            adaboost = Ensemble.AdaBoostClassifier(random_state=0)
+
+            self.random_search_cv(adaboost, param_grid, X_train,
                                   y_train, X_test, y_test, "adaboost_WDBC_model")
 
             '''LOGISTIC REGRESSION CLASSIFIER'''
@@ -666,7 +678,10 @@ class class_classification:
                 'max_iter': [50, 100, 150],
                 'solver': ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga']
             }
-            self.random_search_cv(sklearn.linear_model.LogisticRegression(random_state=0), param_grid, X_train,
+
+            lr = Linear.LogisticRegression(multi_class='auto', random_state=0)
+
+            self.random_search_cv(lr, param_grid, X_train,
                                   y_train, X_test, y_test, "logistic_WDBC_model")
 
             '''GAUSSIAN NAIVE BAYES CLASSIFIER'''
@@ -760,8 +775,8 @@ class class_classification:
                 "weights": ['uniform', 'distance'],
                 "leaf_size": np.arange(5, 100, 10)
             }
-
-            self.grid_search_cv(sklearn.neighbors.KNeighborsClassifier(), param_grid, X_train, y_train, X_test,
+            knn = Neighbors.KNeighborsClassifier()
+            self.grid_search_cv(knn, param_grid, X_train, y_train, X_test,
                                 y_test, "knearest_WPBC_model")
 
             ''' Decision Tree CLASSIFICATION'''
@@ -772,8 +787,9 @@ class class_classification:
                 'max_leaf_nodes': np.arange(5, 50, 5),
                 'criterion': ['gini', 'entropy']
             }
+            dtc = Tree.DecisionTreeClassifier(random_state=0)
 
-            self.grid_search_cv(Tree.DecisionTreeClassifier(random_state=0), param_grid, X_train, y_train, X_test,
+            self.grid_search_cv(dtc, param_grid, X_train, y_train, X_test,
                                 y_test, "tree_WPBC_model")
 
             ''' SVM CLASSIFICATION'''
@@ -784,8 +800,9 @@ class class_classification:
                 'C': np.logspace(0, 3, 4),
                 'gamma': np.logspace(-2, 1, 4)
             }
+            svm = sklearn.svm.SVC(random_state=0)
 
-            self.random_search_cv(sklearn.svm.SVC(random_state=0), param_grid, X_train, y_train, X_test, y_test,
+            self.random_search_cv(svm, param_grid, X_train, y_train, X_test, y_test,
                                   "svm_WPBC_model")
 
             '''RANDOM FOREST CLASSIFIER'''
@@ -796,8 +813,9 @@ class class_classification:
                           'max_leaf_nodes': np.arange(5, 50, 5),
                           'criterion': ['gini', 'entropy']
                           }
+            rfc = Ensemble.RandomForestClassifier(random_state=0)
 
-            self.random_search_cv(sklearn.ensemble.RandomForestClassifier(random_state=0), param_grid, X_train,
+            self.random_search_cv(rfc, param_grid, X_train,
                                   y_train, X_test, y_test, "random_forest_WPBC_model")
 
             '''ADABOOST CLASSIFIER'''
@@ -808,7 +826,9 @@ class class_classification:
                           'algorithm': ['SAMME', 'SAMME.R']
                           }
 
-            self.random_search_cv(sklearn.ensemble.AdaBoostClassifier(random_state=0), param_grid, X_train,
+            adaboost = Ensemble.AdaBoostClassifier(random_state=0)
+
+            self.random_search_cv(adaboost, param_grid, X_train,
                                   y_train, X_test, y_test, "adaboost_WPBC_model")
 
             '''LOGISTIC REGRESSION CLASSIFIER'''
@@ -820,7 +840,10 @@ class class_classification:
                 'max_iter': [50, 100, 150],
                 'solver': ['lbfgs', 'liblinear', 'sag', 'saga']
             }
-            self.random_search_cv(sklearn.linear_model.LogisticRegression(random_state=0), param_grid, X_train,
+
+            lr = Linear.LogisticRegression(multi_class='auto', random_state=0)
+
+            self.random_search_cv(lr, param_grid, X_train,
                                   y_train, X_test, y_test, "logistic_WPBC_model")
 
             '''GAUSSIAN NAIVE BAYES CLASSIFIER'''
@@ -1356,7 +1379,8 @@ class class_classification:
                 "weights": ['uniform', 'distance']
             }
 
-            self.grid_search_cv(sklearn.neighbors.KNeighborsClassifier(), param_grid, X_train, y_train, X_test,
+            knn = Neighbors.KNeighborsClassifier()
+            self.grid_search_cv(knn, param_grid, X_train, y_train, X_test,
                                 y_test, "knearest_Adult_model", cv=3)
 
             ''' Decision Tree CLASSIFICATION'''
@@ -1368,7 +1392,8 @@ class class_classification:
                 'criterion': ['gini', 'entropy']
             }
 
-            self.grid_search_cv(Tree.DecisionTreeClassifier(random_state=0), param_grid, X_train, y_train, X_test,
+            dtc = Tree.DecisionTreeClassifier(random_state=0)
+            self.grid_search_cv(dtc, param_grid, X_train, y_train, X_test,
                                 y_test, "tree_Adult_model", cv=3)
 
             ''' SVM CLASSIFICATION'''
@@ -1379,8 +1404,8 @@ class class_classification:
                 'C': np.logspace(0, 3, 4),
                 'gamma': np.logspace(-2, 1, 4)
             }
-
-            self.random_search_cv(sklearn.svm.SVC(random_state=0), param_grid, X_train, y_train, X_test, y_test,
+            svm = sklearn.svm.SVC(random_state=0)
+            self.random_search_cv(svm, param_grid, X_train, y_train, X_test, y_test,
                                   "svm_Adult_model", cv=3)
 
             '''RANDOM FOREST CLASSIFIER'''
@@ -1391,8 +1416,8 @@ class class_classification:
                           'max_leaf_nodes': np.arange(5, 20, 5),
                           'criterion': ['gini', 'entropy']
                           }
-
-            self.random_search_cv(sklearn.ensemble.RandomForestClassifier(random_state=0), param_grid, X_train,
+            rfc = Ensemble.RandomForestClassifier(random_state=0)
+            self.random_search_cv(rfc, param_grid, X_train,
                                   y_train, X_test, y_test, "random_forest_Adult_model", cv=3)
 
             '''ADABOOST CLASSIFIER'''
@@ -1402,8 +1427,8 @@ class class_classification:
                           'learning_rate': np.arange(0.1, 1.1, 0.1),
                           'algorithm': ['SAMME', 'SAMME.R']
                           }
-
-            self.random_search_cv(sklearn.ensemble.AdaBoostClassifier(random_state=0), param_grid, X_train,
+            adaboost = Ensemble.AdaBoostClassifier(random_state=0)
+            self.random_search_cv(adaboost, param_grid, X_train,
                                   y_train, X_test, y_test, "adaboost_Adult_model", cv=3)
 
             '''LOGISTIC REGRESSION CLASSIFIER'''
@@ -1415,7 +1440,9 @@ class class_classification:
                 'max_iter': [50, 100, 150],
                 'solver': ['liblinear', 'sag', 'saga']
             }
-            self.random_search_cv(sklearn.linear_model.LogisticRegression(random_state=0), param_grid, X_train,
+
+            lr = Linear.LogisticRegression(multi_class='auto', random_state=0)
+            self.random_search_cv(lr, param_grid, X_train,
                                   y_train, X_test, y_test, "logistic_Adult_model", cv=3)
 
             '''GAUSSIAN NAIVE BAYES CLASSIFIER'''
@@ -1492,8 +1519,8 @@ class class_classification:
                 "weights": ['uniform', 'distance'],
                 "leaf_size": np.arange(5, 100, 5)
             }
-
-            self.grid_search_cv(sklearn.neighbors.KNeighborsClassifier(), param_grid, X_train, y_train, X_test,
+            knn = Neighbors.KNeighborsClassifier()
+            self.grid_search_cv(knn, param_grid, X_train, y_train, X_test,
                                 y_test, "knearest_Thoracic_Surgery_Data_model", cv=3)
 
             ''' Decision Tree CLASSIFICATION'''
@@ -1504,8 +1531,9 @@ class class_classification:
                 'max_leaf_nodes': np.arange(5, 30, 5),
                 'criterion': ['gini', 'entropy']
             }
+            dtc = Tree.DecisionTreeClassifier(random_state=0)
 
-            self.grid_search_cv(Tree.DecisionTreeClassifier(random_state=0), param_grid, X_train, y_train, X_test,
+            self.grid_search_cv(dtc, param_grid, X_train, y_train, X_test,
                                 y_test, "tree_Thoracic_Surgery_Data_model", cv=3)
 
             ''' SVM CLASSIFICATION'''
@@ -1516,8 +1544,8 @@ class class_classification:
                 'C': np.logspace(0, 3, 4),
                 'gamma': np.logspace(-2, 1, 4)
             }
-
-            self.random_search_cv(sklearn.svm.SVC(random_state=0), param_grid, X_train, y_train, X_test, y_test,
+            svm = sklearn.svm.SVC(random_state=0)
+            self.random_search_cv(svm, param_grid, X_train, y_train, X_test, y_test,
                                   "svm_Thoracic_Surgery_Data_model", cv=3)
 
             '''RANDOM FOREST CLASSIFIER'''
@@ -1529,7 +1557,9 @@ class class_classification:
                           'criterion': ['gini', 'entropy']
                           }
 
-            self.grid_search_cv(sklearn.ensemble.RandomForestClassifier(random_state=0), param_grid, X_train,
+            rfc = Ensemble.RandomForestClassifier(random_state=0)
+
+            self.grid_search_cv(rfc, param_grid, X_train,
                                 y_train, X_test, y_test, "random_forest_Thoracic_Surgery_Data_model", cv=3)
 
             '''ADABOOST CLASSIFIER'''
@@ -1540,7 +1570,9 @@ class class_classification:
                           'algorithm': ['SAMME', 'SAMME.R']
                           }
 
-            self.random_search_cv(sklearn.ensemble.AdaBoostClassifier(random_state=0), param_grid, X_train,
+            adaboost = Ensemble.AdaBoostClassifier(random_state=0)
+
+            self.random_search_cv(adaboost, param_grid, X_train,
                                   y_train, X_test, y_test, "adaboost_Thoracic_Surgery_Data_model", cv=3)
 
             '''LOGISTIC REGRESSION CLASSIFIER'''
@@ -1552,7 +1584,8 @@ class class_classification:
                 'max_iter': [50, 100, 150],
                 'solver': ['liblinear', 'sag', 'saga']
             }
-            self.random_search_cv(sklearn.linear_model.LogisticRegression(random_state=0), param_grid, X_train,
+            lr = Linear.LogisticRegression(multi_class='auto', random_state=0)
+            self.random_search_cv(lr, param_grid, X_train,
                                   y_train, X_test, y_test, "logistic_Thoracic_Surgery_Data_model", cv=3)
 
             '''GAUSSIAN NAIVE BAYES CLASSIFIER'''
