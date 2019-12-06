@@ -1,9 +1,9 @@
 import sys
 
-import cifar10 as cifar10
+# import cifar10 as cifar10
 import classification
 import regression
-from cifar10 import CNN
+# from cifar10 import CNN
 from pip._vendor.distlib.compat import raw_input
 
 

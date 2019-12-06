@@ -13,6 +13,7 @@ Datasets/5_GermanData.xlsx
 Datasets/default of credit card clients.xls
 Datasets/Faults.xlsx
 Datasets/seismic-bumps.csv
+__pycache__
 Results/classification_10_class_balance.png
 Datasets/Concrete_Data.xls
 Datasets/ac2_cache.npz

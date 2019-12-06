@@ -1,9 +1,8 @@
 import itertools
 import pickle
-
+from src import plot
 import numpy as np
 import pandas as pd
-import plot
 import scipy.stats as Stats
 import sklearn
 import sklearn.ensemble as Ensemble
@@ -60,20 +59,20 @@ class class_classification:
         print("Testing Accuracy: ", model.score(X_test, y_test))
         print("Training Accuracy: ", model.score(X_train, y_train))
 
-    def run_classifier(self, userResponse):
+    def run_classifier(self,userResponse):
         print('Running classifiers for the following datasets: \n')
-        # self.Diabetic_Retinopathy()
+        self.Diabetic_Retinopathy(userResponse)
         # self.Default_of_credit_card_clients(userResponse)
         # self.Breast_Cancer_Wisconsin()
-        # self.Statlog_Australian(userResponse)
-        # self.Statlog_German()
-        self.Steel_Plates_Faults(userResponse)
+        # self.Statlog_Australian()
+        self.Statlog_German(userResponse)
+        # self.Steel_Plates_Faults(userResponse)
         # self.Adult()
         # self.Yeast(userResponse)
         # self.Thoracic_Surgery_Data()
         # self.Seismic_Bumps(userResponse)
 
-    def Diabetic_Retinopathy(self):
+    def Diabetic_Retinopathy(self,userResponse):
         print('Running classification for 1.Diabetic Retinopathy dataset')
 
         file = DATASETS + "1_DiabeticRetinopathy.arff"
@@ -94,226 +93,112 @@ class class_classification:
         X_train[:, 8:18] = scaler.transform(X_train[:, 8:18])
         X_test[:, 8:18] = scaler.transform(X_test[:, 8:18])
 
-        '''Logistic Regression'''
+        if(userResponse == '2'):
 
-        lr = sklearn.linear_model.LogisticRegression(random_state=0, max_iter=10000)
+            '''Logistic Regression'''
 
-        param = {'solver': ["sag", "saga", "liblinear"],
-                 'C': [0.1, 0.2, 0.5, 1, 1.5, 2, 5, 7, 10, 12, 15]
-                 }
+            lr = sklearn.linear_model.LogisticRegression(random_state=0, max_iter=10000)
 
-        self.random_search_cv(lr, param, X_train, y_train, X_test, y_test, "DiabeticLogisticRegression", 3)
+            param = {'solver': ["sag", "saga", "liblinear"],
+                     'C': [0.1, 0.2, 0.5, 1, 1.5, 2, 5, 7, 10, 12, 15]
+                     }
 
-        # %%
-        '''
-        ### K-**Neighbors**
-        '''
-        # %%
+            self.random_search_cv(lr, param, X_train, y_train, X_test, y_test, "Diabetic_LogisticRegression")
 
-        k_n = sklearn.neighbors.KNeighborsClassifier()
+            '''
+            ### K-**Neighbors**
+            '''
 
-        param = {'weights': ['uniform', 'distance'], 'n_neighbors': [5, 10, 15, 20, 50, 100, 200, 500]}
 
-        # # model = sklearn.model_selection.RandomizedSearchCV(estimator=k_n, param_distributions=param, cv=5,
-        #                                                     random_state=0).fit(X_train, y_train)
-        #  print('Best Score: ', model.best_score_)
-        #  print('Best Params: ', model.best_params_)
-        #
-        #  # %%
-        #  filename = 'K_Neighbors.sav'
-        #  pickle.dump(model, open(filename, 'wb'))
-        #  filename = 'K_Neighbors_best_param.sav'
-        #  pickle.dump(model.best_params_, open(filename, 'wb'))
+            k_n = sklearn.neighbors.KNeighborsClassifier()
 
-        # %%
-        '''
-        ### **SVM**
-        '''
-        # %%
+            param = {'weights': ['uniform', 'distance'], 'n_neighbors': [5, 10, 15, 20, 50, 100, 200, 500]}
 
-        svm = sklearn.svm.SVC(random_state=0)
+            self.random_search_cv(k_n, param, X_train, y_train, X_test, y_test, "Diabetic_K_Neighbors")
 
-        param = dict(kernel=['rbf', 'linear'],
-                     degree=[1, 2, 3],
-                     C=Stats.reciprocal(0.01, 2),
-                     gamma=Stats.reciprocal(0.01, 2))
+            '''
+            ### **SVM**
+            '''
 
-        # model = sklearn.model_selection.RandomizedSearchCV(estimator=svm, param_distributions=param, verbose=10,
-        #                                                    cv=5).fit(X_train, y_train)
-        #
-        # print('Best Score: ', model.best_score_)
-        # print('Best Params: ', model.best_params_)
-        #
-        # # %%
-        # filename = 'SVM.sav'
-        # pickle.dump(model, open(filename, 'wb'))
-        # filename = 'SVM_best_param.sav'
-        # pickle.dump(model.best_params_, open(filename, 'wb'))
+            svm = sklearn.svm.SVC(random_state=0)
 
-        # %%
-        '''
-        ### **Decision Tree**
-        '''
+            param = dict(kernel=['rbf', 'linear'],
+                         degree=[1, 2, 3],
+                         C=Stats.reciprocal(0.01, 2),
+                         gamma=Stats.reciprocal(0.01, 2))
 
-        # %%
+            self.random_search_cv(svm, param, X_train, y_train, X_test, y_test, "Diabetic_SVM")
 
-        dt = sklearn.tree.DecisionTreeClassifier(random_state=0)
+            '''
+            ### **Decision Tree**
+            '''
 
-        param = {'max_depth': np.arange(1, 20, 1),
-                 'splitter': ['best', 'random'],
-                 'max_features': np.arange(1, 19, 1),
-                 'min_samples_split': np.arange(2, 20, 1)}
+            dt = sklearn.tree.DecisionTreeClassifier(random_state=0)
 
-        # model = sklearn.model_selection.GridSearchCV(estimator=dt, param_grid=param, verbose=3, cv=5).fit(X_train,
-        #                                                                                                   y_train)
-        #
-        # print('Best Score: ', model.best_score_)
-        # print('Best Params: ', model.best_params_)
-        #
-        # # %%
-        # filename = 'Decision_Tree.sav'
-        # pickle.dump(model, open(filename, 'wb'))
-        # filename = 'Decision_Tree_best_param.sav'
-        # pickle.dump(model.best_params_, open(filename, 'wb'))
-        #
-        # print(model.score(X_train, y_train))
-        # print(model.score(X_test, y_test))
+            param = {'max_depth': np.arange(1, 20, 1),
+                     'splitter': ['best', 'random'],
+                     'max_features': np.arange(1, 19, 1),
+                     'min_samples_split': np.arange(2, 20, 1)}
 
-        # %%
-        '''
-        ### **Random Forest**
-        '''
+            self.grid_search_cv(dt, param, X_train, y_train, X_test, y_test, "Diabetic_Decision_Tree")
 
-        # %%
-        rf = sklearn.ensemble.RandomForestClassifier(n_estimators=500, random_state=0)
+            '''
+            ### **Random Forest**
+            '''
+            rf = sklearn.ensemble.RandomForestClassifier(n_estimators=500, random_state=0)
 
-        param = {'max_depth': np.arange(1, 20, 1),
-                 'max_features': np.arange(1, 19, 1),
-                 'min_samples_split': np.arange(2, 20, 1)}
+            param = {'max_depth': np.arange(1, 20, 1),
+                     'max_features': np.arange(1, 19, 1),
+                     'min_samples_split': np.arange(2, 20, 1)}
 
-        # model = sklearn.model_selection.RandomizedSearchCV(estimator=rf, param_distributions=param, verbose=3,
-        #                                                    cv=5).fit(X_train, y_train)
-        #
-        # print('Best Score: ', model.best_score_)
-        # print('Best Params: ', model.best_params_)
-        #
-        # # %%
-        # model = sklearn.ensemble.RandomForestClassifier(n_estimators=500, random_state=0, min_samples_split=6,
-        #                                                 max_features=2, max_depth=12).fit(X_train, y_train)
-        #
-        # # %%
-        # print(model.score(X_train, y_train))
-        # print(model.score(X_test, y_test))
-        #
-        # # %%
-        # filename = 'Random_Forest.sav'
-        # pickle.dump(model, open(path + filename, 'wb'))
-        # filename = 'Random_Forest_best_param.sav'
-        # pickle.dump(model.get_params, open(path + filename, 'wb'))
+            self.random_search_cv(rf, param, X_train, y_train, X_test, y_test, "Diabetic_Random_Forest")
 
-        # %%
-        '''
-        ### **Gaussian naive Bayes classification**
-        '''
-        # %%
+            '''
+            ### **Gaussian naive Bayes classification**
+            '''
 
-        gb = sklearn.naive_bayes.GaussianNB().fit(X_train, y_train)
+            gb = sklearn.naive_bayes.GaussianNB().fit(X_train, y_train)
+            name="Diabetic_Gaussian_Naive_Bayes"
+            print("Testing Accuracy: ", gb.score(X_test, y_test))
+            print("Training Accuracy: ", gb.score(X_train, y_train))
+            pickle.dump(gb, open(RESULTS_FOR_DEMO + "%sModel.sav" % name, 'wb'))
+            pickle.dump(gb.get_params, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
+            plot.plot_learning_curve(gb, name + " Learning Curve", X_train, y_train, (0.5, 1.01),cv=5)
 
-        print(gb.score(X_train, y_train))
-        print(gb.score(X_test, y_test))
+            '''
+            ### **Neural Network**
+            '''
 
-        # %%
-        # filename = 'Guassain_Naives_Bayes.sav'
-        # pickle.dump(model, open(path + filename, 'wb'))
-        # filename = 'Guassain_Naives_Bayes_best_param.sav'
-        # pickle.dump(model.get_params, open(path + filename, 'wb'))
+            nn = sklearn.neural_network.MLPClassifier(hidden_layer_sizes=(20, 15, 20, 2), random_state=0,
+                                                         max_iter=1000).fit(X_train, y_train)
+            name="Diabetic_Neural_Network"
+            print("Testing Accuracy: ", nn.score(X_test, y_test))
+            print("Training Accuracy: ", nn.score(X_train, y_train))
+            pickle.dump(nn, open(RESULTS_FOR_DEMO + "%sModel.sav" % name, 'wb'))
+            pickle.dump(nn.get_params, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
+            plot.plot_learning_curve(nn, name + " Learning Curve", X_train, y_train, (0.5, 1.01),cv=5)
+            '''
+            ### **Ada Boost**
+            '''
 
-        # %%
-        '''
-        ### **Neural Network**
-        '''
+            ada = sklearn.ensemble.AdaBoostClassifier(random_state=0)
 
-        model = sklearn.neural_network.MLPClassifier(hidden_layer_sizes=(20, 15, 20, 2), random_state=0,
-                                                     max_iter=1000).fit(X_train, y_train)
+            param = dict(n_estimators=np.arange(50, 250, 10),
+                         algorithm=['SAMME.R', 'SAMME']
+                         )
 
-        # %%
-        # mlp = sklearn.neural_network.MLPClassifier(activation='relu', tol=1e-4, n_iter_no_change=10, momentum=0.9,
-        #                                            learning_rate='adaptive', random_state=0, verbose=True,
-        #                                            warm_start=True, early_stopping=True)
-        #
-        # param_grid = {
-        #     "solver": ['adam', 'sgd'],
-        #     "learning_rate_init": reciprocal(0.001, 0.1),
-        #     "hidden_layer_sizes": [(512,), (256, 128, 64, 32), (512, 256, 128, 64, 32)]
-        # }
-        # model = sklearn.model_selection.RandomizedSearchCV(mlp, param_grid, n_iter=30, cv=5, scoring="accuracy",
-        #                                                    verbose=5).fit(X_train, y_train)
-        #
-        # # %%
-        # print(model.best_params_)
-        # print(model.score(X_test, y_test))
-        # print(model.score(X_train, y_train))
-        #
-        # # %%
-        # filename = 'Neural_Network.sav'
-        # pickle.dump(model, open(path + filename, 'wb'))
-        # filename = 'Neural_Network_best_param.sav'
-        # pickle.dump(model.best_params_, open(path + filename, 'wb'))
+            self.grid_search_cv(ada, param, X_train, y_train, X_test, y_test, "Diabetic_Ada_Boost")
+        else:
 
-        # %%
-        '''
+            self.load_pretrained_models("Diabetic_SVMModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_LogisticRegressionModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_Decision_TreeModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_Random_ForestModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_Ada_BoostModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_Neural_NetworkModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_Gaussian_Naive_BayesModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_K_NeighborsModel", X_train, y_train, X_test, y_test)
 
-        '''
-
-        # %%
-        '''
-        ### **Ada Boost**
-        '''
-
-        # %%
-        ada = sklearn.ensemble.AdaBoostClassifier(random_state=0)
-
-        param = dict(n_estimators=np.arange(50, 250, 10),
-                     algorithm=['SAMME.R', 'SAMME']
-                     )
-
-        # model = sklearn.model_selection.GridSearchCV(estimator=ada, param_grid=param, verbose=10, cv=5).fit(X_train,
-        #                                                                                                     y_train)
-        #
-        # print('Best Score: ', model.best_score_)
-        # print('Best Params: ', model.best_params_)
-        #
-        # # %%
-        # print("Validation Score:", model.best_score_)
-        # print("Testing Score:", model.best_estimator_.score(X_test, y_test))
-        #
-        # # %%
-        # filename = 'AdaBoostClassifier.sav'
-        # pickle.dump(model, open(path + filename, 'wb'))
-        # filename = 'AdaBoostClassifier_best_param.sav'
-        # pickle.dump(model.best_params_, open(path + filename, 'wb'))
-
-        # %%
-        '''
-        ## **Testing**
-        '''
-
-        # %%
-        # model = sklearn.neural_network.MLPClassifier(hidden_layer_sizes=(20, 15, 20, 2), random_state=0,
-        #                                              max_iter=1000).fit(X_train, y_train)
-        # print(mlp.score(X_train, y_train))
-        # print(mlp.score(X_test, y_test))
-        #
-        # # %%
-        # filename = 'Neural_Network.sav'
-        # pickle.dump(model, open(path + filename, 'wb'))
-        # filename = 'Neural_Network_best_param.sav'
-        # pickle.dump(model.get_params, open(path + filename, 'wb'))
-        #
-        # # %%
-        # filename = 'Neural_Network.sav'
-        # model = pickle.load(open(path + filename, 'rb'))
-        # print(model.get_params)
 
     def Default_of_credit_card_clients(self, userResponse):
         df = pd.read_excel(DATASETS + "default of credit card clients.xls", skiprows=1)
@@ -784,378 +669,122 @@ class class_classification:
     def Statlog_Australian(self, userResponse):
         print('Running classification for 4.Statlog Australian dataset')
 
-        df = pd.read_excel('../Datasets/australian.xlsx', header=None,
-                           index=False)
-        df_train, df_test = train_test_split(df, test_size=0.2, random_state=0)
-
-        X_train = df_train.iloc[:, 0:14]
-        y_train = df_train.iloc[:, 14]
-
-        X_test = df_test.iloc[:, 0:14]
-        y_test = df_test.iloc[:, 14]
-
-        scaler = Preprocessing.StandardScaler().fit(X_train.iloc[:, [12, 13]])
-        X_train.loc[:, [12, 13]] = scaler.transform(X_train.iloc[:, [12, 13]])
-        X_test.loc[:, [12, 13]] = scaler.transform(X_test.iloc[:, [12, 13]])
-
-        if userResponse is "2":
-
-            # SVM
-            param_grid = {'C': [0.01, 0.1, 1],
-                          'gamma': [0.01, 0.1, 1]}
-            self.grid_search_cv(sklearn.svm.SVC(kernel='rbf', random_state=0), param_grid, X_train, y_train, X_test,
-                                y_test, "StatlogAustralianSVM", 5)
-
-            # DECISION TREE CLASSIFIER
-            param_grid = {'max_depth': np.arange(3, 10),
-                          'criterion': ['gini'],
-                          'max_leaf_nodes': [5, 10, 20, 100],
-                          'min_samples_split': [2, 5, 10, 20]}
-            self.grid_search_cv(Tree.DecisionTreeClassifier(random_state=0), param_grid, X_train, y_train,
-                                X_test, y_test, "StatlogAustralianDCT", 5)
-
-            # RANDOM FOREST CLASSIFIER
-            param_grid = {'max_depth': np.arange(3, 10),
-                          'criterion': ['gini'],
-                          'max_leaf_nodes': [5, 10],
-                          'min_samples_split': [2, 5],
-                          'n_estimators': [estimator for estimator in (2 ** i for i in range(0, 8))]}
-            self.grid_search_cv(Ensemble.RandomForestClassifier(random_state=0), param_grid, X_train, y_train,
-                                X_test, y_test, "StatlogAustralianRFC", cv=5)
-
-            # ADABOOST CLASSIFIER
-            param_grid = {
-                "n_estimators": [30, 50, 70, 100],
-                "learning_rate": [0.5, 0.7, 1, 2],
-                "algorithm": ["SAMME", "SAMME.R"]
-            }
-            self.grid_search_cv(Ensemble.AdaBoostClassifier(random_state=0), param_grid,
-                                X_train, y_train, X_test, y_test, "StatlogAustralianABC", 3)
-
-            # LOGISTIC REGRESSION CLASSIFIER
-            param_grid = {
-                'penalty': ['l1', 'l2'],
-                'C': Stats.reciprocal(0.001, 1000),
-                'solver': ['liblinear']
-            }
-            self.random_search_cv(Linear.LogisticRegression(random_state=0), param_grid, X_train, y_train, X_test,
-                                  y_test, "StatlogAustralianLRC", 3)
-
-            # K NEAREST NAIGHBOUR CLASSIFIER
-
-            param_grid = {
-                "n_neighbors": [5, 10, 50],
-                "weights": ['uniform', 'distance'],
-                "leaf_size": [15, 30, 50, 100]
-            }
-            self.grid_search_cv(Neighbors.KNeighborsClassifier(), param_grid, X_train, y_train,
-                                X_test, y_test, "StatlogAustralianKNN", 3)
-
-            # GAUSSIAN NAIVE BAY
-
-            param_grid = {
-                "var_smoothing": [1e-07, 1e-08, 1e-09]
-            }
-            self.grid_search_cv(GaussianNB(), param_grid, X_train, y_train, X_test, y_test, "StatlogAustralianGNB", 5)
-
-            # NEURAL NETWORKS
-
-            param_grid = {
-                "solver": ['adam', 'sgd'],
-                "learning_rate_init": [0.001, 0.01, 0.1],
-                "hidden_layer_sizes": [(128, 64, 32, 16, 2), (512, 256, 128, 64, 32)]
-            }
-            self.grid_search_cv(
-                NN.MLPClassifier(activation='relu', tol=1e-4, n_iter_no_change=10, momentum=0.9, \
-                                 learning_rate='adaptive', verbose=True, warm_start=True, \
-                                 early_stopping=True), param_grid, X_train, y_train, X_test, y_test,
-                "StatlogAustralianMLP", 3)
-
-        else:
-            # ADABOOST
-            self.load_pretrained_models("StatlogAustralianABCModel", X_train, y_train, X_test, y_test)
-
-            # DTC
-            self.load_pretrained_models("StatlogAustralianDCTModel", X_train, y_train, X_test, y_test)
-
-            # GNB
-            self.load_pretrained_models("StatlogAustralianGNBModel", X_train, y_train, X_test, y_test)
-
-            # KNN
-            self.load_pretrained_models("StatlogAustralianKNNModel", X_train, y_train, X_test, y_test)
-
-            # LR
-            self.load_pretrained_models("StatlogAustralianLRCModel", X_train, y_train, X_test, y_test)
-
-            # MLP
-            self.load_pretrained_models("StatlogAustralianMLPModel", X_train, y_train, X_test, y_test)
-
-            # RF
-            self.load_pretrained_models("StatlogAustralianRFCModel", X_train, y_train, X_test, y_test)
-
-            # SVM
-            self.load_pretrained_models("StatlogAustralianSVMModel", X_train, y_train, X_test, y_test)
-
-    def Statlog_German(self):
+    def Statlog_German(self,userResponse):
         print('Running classification for 5.Statlog German dataset')
-
-        # %%
         '''
         ### **Preprocessing**
         '''
 
-        # %%
         file = "../Datasets/5_GermanData.xlsx"
         df = pd.read_excel(file, header=None)
-        # print(df)
         data = pd.DataFrame(df)
         data = data.values
-        print(data)
-
         data = data.astype(float)
-
         X_train, X_test, y_train, y_test = train_test_split(data[:, 0:23], data[:, 24], test_size=0.20, random_state=0)
-
         y_train = y_train.astype(int)
         y_test = y_test.astype(int)
 
-        # %%
-        '''
-        ### **Logistic Regression**
-        '''
+        if(userResponse=='2'):
+            '''
+            ### **Logistic Regression**
+            '''
 
-        # %%
-        lr = sklearn.linear_model.LogisticRegression(random_state=0, max_iter=10000)
+            lr = sklearn.linear_model.LogisticRegression(random_state=0, max_iter=10000)
 
-        param = {'solver': ["sag", "saga", "liblinear"], 'C': [0.1, 0.2, 0.5, 1, 1.5, 2, 5, 7, 10, 12, 15]}
+            param = {'solver': ["sag", "saga", "liblinear"], 'C': [0.1, 0.2, 0.5, 1, 1.5, 2, 5, 7, 10, 12, 15]}
 
-        self.random_search_cv(lr, param, X_train, y_train, X_test, y_test)
-        # model = sklearn.model_selection.GridSearchCV(estimator=lr, param_grid=param, cv=5, scoring='roc_auc',
-        #                                              verbose=5).fit(X_train, y_train)
-        # print('Best Score: ', model.best_score_)
-        # print('Best Params: ', model.best_params_)
-        #
-        # # %%
-        # print("Validation Score:", model.best_score_)
-        # print("Testing Score:", model.best_estimator_.score(X_test, y_test))
-        #
-        # # %%
-        # filename = 'Logistic_Regression.sav'
-        # pickle.dump(model, open(filename, 'wb'))
-        # filename = 'Logistic_Regression_best_param.sav'
-        # pickle.dump(model.best_params_, open(filename, 'wb'))
+            self.grid_search_cv(lr, param, X_train, y_train, X_test, y_test,"StatLogGerman_Logistic_Regression")
 
-        # %%
-        '''
-        ### K-**Neighbors**
-        '''
+            '''
+            ### K-**Neighbors**
+            '''
+            k_n = sklearn.neighbors.KNeighborsClassifier()
 
-        # %%
-        k_n = sklearn.neighbors.KNeighborsClassifier()
+            param = {'weights': ['uniform', 'distance'], 'n_neighbors': [5, 10, 15, 20, 50, 100, 200, 500]}
 
-        param = {'weights': ['uniform', 'distance'], 'n_neighbors': [5, 10, 15, 20, 50, 100, 200, 500]}
+            self.grid_search_cv(k_n, param, X_train, y_train, X_test, y_test, "StatLOgGerman_K_Neigbors")
+            '''
+            ### **SVM**
+            '''
+            svm = sklearn.svm.SVC(random_state=0)
 
-        # model = sklearn.model_selection.GridSearchCV(estimator=k_n, param_grid=param, cv=5).fit(X_train, y_train)
-        # print('Best Score: ', model.best_score_)
-        # print('Best Params: ', model.best_params_)
-        #
-        # # %%
-        # print("Validation Score:", model.best_score_)
-        # print("Testing Score:", model.best_estimator_.score(X_test, y_test))
-        #
-        # # %%
-        # filename = 'K_Neighbors.sav'
-        # pickle.dump(model, open(filename, 'wb'))
-        # filename = 'K_Neighbors_best_param.sav'
-        # pickle.dump(model.best_params_, open(filename, 'wb'))
+            param = dict(kernel=['rbf', 'linear'],
+                         degree=[1, 2, 3],
+                         C=Stats.reciprocal(0.01, 2),
+                         gamma=Stats.reciprocal(0.01, 2))
 
-        # %%
-        '''
-        ### **SVM**
-        '''
+            self.random_search_cv(svm, param, X_train, y_train, X_test, y_test, "StatLOgGerman_SVM")
+            '''
+            ### **Decision Tree**
+            '''
+            dt = sklearn.tree.DecisionTreeClassifier(random_state=0)
 
-        # %%
-        svm = sklearn.svm.SVC(random_state=0)
+            param = {'max_depth': np.arange(1, 20, 1),
+                     'splitter': ['best', 'random'],
+                     'max_features': np.arange(1, 19, 1),
+                     'min_samples_split': np.arange(2, 20, 1)}
 
-        param = dict(kernel=['rbf', 'linear'],
-                     degree=[1, 2, 3],
-                     C=Stats.reciprocal(0.01, 2),
-                     gamma=Stats.reciprocal(0.01, 2))
+            self.grid_search_cv(dt, param, X_train, y_train, X_test, y_test, "StatLOgGerman_Decision_Tree")
+            '''
+            ### **Random Forest**
+            '''
 
-        # model = sklearn.model_selection.RandomizedSearchCV(estimator=svm, param_distributions=param, verbose=10, cv=5,
-        #                                                    random_state=0).fit(X_train, y_train)
-        #
-        # print('Best Score: ', model.best_score_)
-        # print('Best Params: ', model.best_params_)
-        #
-        # # %%
-        # print("Validation Score:", model.best_score_)
-        # print("Testing Score:", model.best_estimator_.score(X_test, y_test))
-        #
-        # # %%
-        # filename = 'SVM.sav'
-        # pickle.dump(model, open(filename, 'wb'))
-        # filename = 'SVM_best_param.sav'
-        # pickle.dump(model.best_params_, open(filename, 'wb'))
+            rf = sklearn.ensemble.RandomForestClassifier(n_estimators=100, random_state=0)
 
-        # %%
-        '''
-        ### **Decision Tree**
-        '''
+            param = {'max_depth': np.arange(1, 20, 1),
+                     'max_features': np.array([5, 10, 15, 20]),
+                     'min_samples_split': np.array([2, 3, 5])}
 
-        # %%
-        dt = sklearn.tree.DecisionTreeClassifier(random_state=0)
+            self.grid_search_cv(rf, param, X_train, y_train, X_test, y_test, "StatLOgGerman_Random_Forest")
+            '''
+            ## **Ada Boost**
+            '''
 
-        param = {'max_depth': np.arange(1, 20, 1),
-                 'splitter': ['best', 'random'],
-                 'max_features': np.arange(1, 19, 1),
-                 'min_samples_split': np.arange(2, 20, 1)}
+            ada = sklearn.ensemble.AdaBoostClassifier(random_state=0)
 
-        # model = sklearn.model_selection.GridSearchCV(estimator=dt, param_grid=param, verbose=3, cv=5).fit(X_train,
-        #                                                                                                   y_train)
-        #
-        # print('Best Score: ', model.best_score_)
-        # print('Best Params: ', model.best_params_)
+            param = {'n_estimators': np.arange(50, 250, 10), 'algorithm': ['SAMME.R', 'SAMME']}
 
-        # %%
-        # model = sklearn.tree.DecisionTreeClassifier(class_weight=None, criterion='gini', max_depth=6,
-        #                                             max_features=11, max_leaf_nodes=None,
-        #                                             min_impurity_decrease=0.0, min_impurity_split=None,
-        #                                             min_samples_leaf=1, min_samples_split=7,
-        #                                             min_weight_fraction_leaf=0.0, presort=False,
-        #                                             random_state=0, splitter='random').fit(X_train, y_train)
-        #
-        # # %%
-        # print(model.score)
-        # print(model.score(X_train, y_train))
-        # print(model.score(X_test, y_test))
-        #
-        # # %%
-        # filename = 'Decision_Tree.sav'
-        # pickle.dump(model, open(path + filename, 'wb'))
-        # filename = 'Decision_Tree_best_param.sav'
-        # pickle.dump(model.get_params, open(path + filename, 'wb'))
-        # Best Params:  {'max_depth': 6, 'max_features': 11, 'min_samples_split': 7, 'splitter': 'random'}
+            self.grid_search_cv(ada, param, X_train, y_train, X_test, y_test, "StatLOgGerman_AdaBoost")
 
-        # %%
-        '''
-        ### **Random Forest**
-        '''
+            '''
+            ## **Neural Network**
+            '''
 
-        # %%
-        rf = sklearn.ensemble.RandomForestClassifier(n_estimators=100, random_state=0)
+            mlp = sklearn.neural_network.MLPClassifier(activation='relu', tol=1e-4, n_iter_no_change=10, momentum=0.9,
+                                                       learning_rate='adaptive', random_state=0, verbose=True,
+                                                       warm_start=True, early_stopping=True)
 
-        param = {'max_depth': np.arange(1, 20, 1),
-                 'max_features': np.array([5, 10, 15, 20]),
-                 'min_samples_split': np.array([2, 3, 5])}
+            param = {
+                "solver": ['adam', 'sgd'],
+                "learning_rate_init": Stats.reciprocal(0.001, 0.1),
+                "hidden_layer_sizes": [(512,), (256, 128, 64, 32), (512, 256, 128, 64, 32)]
+            }
 
-        # model = sklearn.model_selection.GridSearchCV(estimator=rf, param_grid=param, verbose=3, cv=5).fit(X_train,
-        #                                                                                                   y_train)
-        #
-        # print('Best Score: ', model.best_score_)
-        # print('Best Params: ', model.best_params_)
-        #
-        # # %%
-        # print("Validation Score:", model.best_score_)
-        # print("Testing Score:", model.best_estimator_.score(X_test, y_test))
-        #
-        # # %%
-        # filename = 'Random_Forest.sav'
-        # pickle.dump(model, open(path + filename, 'wb'))
-        # filename = 'Random_Forest_best_param.sav'
-        # pickle.dump(model.best_params_, open(path + filename, 'wb'))
+            self.random_search_cv(mlp, param, X_train, y_train, X_test, y_test, "StatLOgGerman_Neural_Network")
+            '''
+            ## **Guassian Naive Bayes Classification**
+            '''
+            gb = sklearn.naive_bayes.GaussianNB().fit(X_train, y_train)
 
-        # %%
+            name = "StatLOgGerman_Gaussian_Naive_Bayes"
+            print("Testing Accuracy: ", gb.score(X_test, y_test))
+            print("Training Accuracy: ", gb.score(X_train, y_train))
+            pickle.dump(gb, open(RESULTS_FOR_DEMO + "%sModel.sav" % name, 'wb'))
+            pickle.dump(gb.get_params, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
+            plot.plot_learning_curve(gb, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=5)
 
-        # %%
-        '''
 
-        '''
+        else:
 
-        # %%
-        '''
-        ## **Ada Boost**
-        '''
+            self.load_pretrained_models("StatlOgGerman_SVMModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("StatlOgGerman_Logistic_RegressionModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("StatlOgGerman_Decision_TreeModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("StatlOgGerman_Random_ForestModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("StatlOgGerman_AdaBoostModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("StatlOgGerman_Neural_NetworkModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("StatlOgGerman_Gaussian_Naive_BayesModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("StatlOgGerman_K_NeigborsModel", X_train, y_train, X_test, y_test)
 
-        # %%
-        ada = sklearn.ensemble.AdaBoostClassifier(random_state=0)
-
-        param = {'n_estimators': np.arange(50, 250, 10), 'algorithm': ['SAMME.R', 'SAMME']}
-
-        # model = sklearn.model_selection.GridSearchCV(estimator=ada, param_grid=param, verbose=10, cv=5).fit(X_train,
-        #                                                                                                     y_train)
-        #
-        # print('Best Score: ', model.best_score_)
-        # print('Best Params: ', model.best_params_)
-        #
-        # # %%
-        # print("Validation Score:", model.best_score_)
-        # print("Testing Score:", model.best_estimator_.score(X_test, y_test))
-        #
-        # # %%
-        # filename = 'AdaBoostClassifier.sav'
-        # pickle.dump(model, open(path + filename, 'wb'))
-        # filename = 'AdaBoostClassifier_best_param.sav'
-        # pickle.dump(model.best_params_, open(path + filename, 'wb'))
-
-        # %%
-        '''
-        ## **Neural Network**
-        '''
-
-        # %%
-        mlp = sklearn.neural_network.MLPClassifier(activation='relu', tol=1e-4, n_iter_no_change=10, momentum=0.9,
-                                                   learning_rate='adaptive', random_state=0, verbose=True,
-                                                   warm_start=True, early_stopping=True)
-
-        param_grid = {
-            "solver": ['adam', 'sgd'],
-            "learning_rate_init": Stats.reciprocal(0.001, 0.1),
-            "hidden_layer_sizes": [(512,), (256, 128, 64, 32), (512, 256, 128, 64, 32)]
-        }
-
-        # model = sklearn.model_selection.RandomizedSearchCV(mlp, param_grid, n_iter=30, cv=5, scoring="accuracy",
-        #                                                    verbose=5).fit(X_train, y_train)
-        #
-        # # %%
-        # print(model.best_estimator_)
-        # print(model.best_score_)
-        # print(model.best_estimator_.score(X_test, y_test))
-        #
-        # # %%
-        # filename = 'Neural_Network.sav'
-        # pickle.dump(model, open(path + filename, 'wb'))
-        # filename = 'Neural_Network_best_param.sav'
-        # pickle.dump(model.best_params_, open(path + filename, 'wb'))
-
-        # %%
-        '''
-        ## **Guassian Naive Bayes Classification**
-        '''
-
-        # %%
-        model = sklearn.naive_bayes.GaussianNB().fit(X_train, y_train)
-
-        print(gb.score(X_train, y_train))
-        print(gb.score(X_test, y_test))
-
-        # %%
-        # filename = 'Guassain_Naives_Bayes.sav'
-        # pickle.dump(model, open(path + filename, 'wb'))
-        # filename = 'Guassain_Naives_Bayes_best_param.sav'
-        # pickle.dump(model.get_params, open(path + filename, 'wb'))
-
-        # %%
-        '''
-        ## **Testing**
-        '''
-
-        # %%
-        # model = sklearn.neural_network.MLPClassifier(hidden_layer_sizes=(24, 2), random_state=0, max_iter=1000).fit(
-        #     X_train, y_train)
-        #
-        # print(model.score(X_train, y_train))
-        # print(model.score(X_test, y_test))
 
     def Steel_Plates_Faults(self, userResponse):
         print('Running classification for 6.Steel Plates Faults dataset')
