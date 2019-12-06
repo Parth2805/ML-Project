@@ -66,11 +66,11 @@ class class_classification:
         # self.Diabetic_Retinopathy()
         # self.Default_of_credit_card_clients(userResponse)
         # self.Breast_Cancer_Wisconsin()
-        # self.Statlog_Australian()
+        # self.Statlog_Australian(userResponse)
         # self.Statlog_German()
         self.Steel_Plates_Faults(userResponse)
         # self.Adult()
-        # self.Yeast()
+        # self.Yeast(userResponse)
         # self.Thoracic_Surgery_Data()
         # self.Seismic_Bumps(userResponse)
 
@@ -782,8 +782,120 @@ class class_classification:
 
         self.random_search_cv(self, mlp, param_grid, 5, X_train, y_train)
 
-    def Statlog_Australian(self):
+    def Statlog_Australian(self, userResponse):
         print('Running classification for 4.Statlog Australian dataset')
+
+        df = pd.read_excel('../Datasets/australian.xlsx', header=None,
+                           index=False)
+        df_train, df_test = train_test_split(df, test_size=0.2, random_state=0)
+
+        X_train = df_train.iloc[:, 0:14]
+        y_train = df_train.iloc[:, 14]
+
+        X_test = df_test.iloc[:, 0:14]
+        y_test = df_test.iloc[:, 14]
+
+        scaler = Preprocessing.StandardScaler().fit(X_train.iloc[:, [12, 13]])
+        X_train.loc[:, [12, 13]] = scaler.transform(X_train.iloc[:, [12, 13]])
+        X_test.loc[:, [12, 13]] = scaler.transform(X_test.iloc[:, [12, 13]])
+
+        if userResponse is "2":
+
+            # SVM
+            param_grid = {'C': [0.01, 0.1, 1],
+                          'gamma': [0.01, 0.1, 1]}
+            self.grid_search_cv(sklearn.svm.SVC(kernel='rbf', random_state=0), param_grid, X_train, y_train, X_test,
+                                y_test, "StatlogAustralianSVM", 5)
+
+            # DECISION TREE CLASSIFIER
+            param_grid = {'max_depth': np.arange(3, 10),
+                          'criterion': ['gini'],
+                          'max_leaf_nodes': [5, 10, 20, 100],
+                          'min_samples_split': [2, 5, 10, 20]}
+            self.grid_search_cv(Tree.DecisionTreeClassifier(random_state=0), param_grid, X_train, y_train,
+                                X_test, y_test, "StatlogAustralianDCT", 5)
+
+            # RANDOM FOREST CLASSIFIER
+            param_grid = {'max_depth': np.arange(3, 10),
+                          'criterion': ['gini'],
+                          'max_leaf_nodes': [5, 10],
+                          'min_samples_split': [2, 5],
+                          'n_estimators': [estimator for estimator in (2 ** i for i in range(0, 8))]}
+            self.grid_search_cv(Ensemble.RandomForestClassifier(random_state=0), param_grid, X_train, y_train,
+                                X_test, y_test, "StatlogAustralianRFC", cv=5)
+
+            # ADABOOST CLASSIFIER
+            param_grid = {
+                "n_estimators": [30, 50, 70, 100],
+                "learning_rate": [0.5, 0.7, 1, 2],
+                "algorithm": ["SAMME", "SAMME.R"]
+            }
+            self.grid_search_cv(Ensemble.AdaBoostClassifier(random_state=0), param_grid,
+                                X_train, y_train, X_test, y_test, "StatlogAustralianABC", 3)
+
+            # LOGISTIC REGRESSION CLASSIFIER
+            param_grid = {
+                'penalty': ['l1', 'l2'],
+                'C': Stats.reciprocal(0.001, 1000),
+                'solver': ['liblinear']
+            }
+            self.random_search_cv(Linear.LogisticRegression(random_state=0), param_grid, X_train, y_train, X_test,
+                                  y_test, "StatlogAustralianLRC", 3)
+
+            # K NEAREST NAIGHBOUR CLASSIFIER
+
+            param_grid = {
+                "n_neighbors": [5, 10, 50],
+                "weights": ['uniform', 'distance'],
+                "leaf_size": [15, 30, 50, 100]
+            }
+            self.grid_search_cv(Neighbors.KNeighborsClassifier(), param_grid, X_train, y_train,
+                                X_test, y_test, "StatlogAustralianKNN", 3)
+
+            # GAUSSIAN NAIVE BAY
+
+            param_grid = {
+                "var_smoothing": [1e-07, 1e-08, 1e-09]
+            }
+            self.grid_search_cv(GaussianNB(), param_grid, X_train, y_train, X_test, y_test, "StatlogAustralianGNB", 5)
+
+            # NEURAL NETWORKS
+
+            param_grid = {
+                "solver": ['adam', 'sgd'],
+                "learning_rate_init": [0.001, 0.01, 0.1],
+                "hidden_layer_sizes": [(128, 64, 32, 16, 2), (512, 256, 128, 64, 32)]
+            }
+            self.grid_search_cv(
+                NN.MLPClassifier(activation='relu', tol=1e-4, n_iter_no_change=10, momentum=0.9, \
+                                 learning_rate='adaptive', verbose=True, warm_start=True, \
+                                 early_stopping=True), param_grid, X_train, y_train, X_test, y_test,
+                "StatlogAustralianMLP", 3)
+
+        else:
+            # ADABOOST
+            self.load_pretrained_models("StatlogAustralianABCModel", X_train, y_train, X_test, y_test)
+
+            # DTC
+            self.load_pretrained_models("StatlogAustralianDCTModel", X_train, y_train, X_test, y_test)
+
+            # GNB
+            self.load_pretrained_models("StatlogAustralianGNBModel", X_train, y_train, X_test, y_test)
+
+            # KNN
+            self.load_pretrained_models("StatlogAustralianKNNModel", X_train, y_train, X_test, y_test)
+
+            # LR
+            self.load_pretrained_models("StatlogAustralianLRCModel", X_train, y_train, X_test, y_test)
+
+            # MLP
+            self.load_pretrained_models("StatlogAustralianMLPModel", X_train, y_train, X_test, y_test)
+
+            # RF
+            self.load_pretrained_models("StatlogAustralianRFCModel", X_train, y_train, X_test, y_test)
+
+            # SVM
+            self.load_pretrained_models("StatlogAustralianSVMModel", X_train, y_train, X_test, y_test)
 
     def Statlog_German(self):
         print('Running classification for 5.Statlog German dataset')
@@ -1349,8 +1461,113 @@ class class_classification:
 
         self.random_search_cv(self, mlp, param_grid, 5, X_train, y_train)
 
-    def Yeast(self):
+    def Yeast(self, userResponse):
         print('Running classification for 8.Yeast dataset')
+
+        df = pd.read_csv("../Datasets/yeast.data", header=None, delim_whitespace=True)
+        encoder = Preprocessing.LabelEncoder()
+        encoder.fit(df.iloc[:, 0])
+        df.iloc[:, 0] = encoder.transform(df.iloc[:, 0])
+        encoder.fit(df.iloc[:, 9])
+        df.iloc[:, 9] = encoder.transform(df.iloc[:, 9])
+        X_train, X_test, y_train, y_test = train_test_split(df.iloc[:, 0:9], df.iloc[:, 9], test_size=0.2,
+                                                            random_state=0, shuffle=False)
+        scaler = Preprocessing.StandardScaler().fit(X_train.iloc[:, [0]])
+        X_train.iloc[:, [0]] = scaler.fit_transform(X_train.iloc[:, [0]])
+        X_test.iloc[:, [0]] = scaler.fit_transform(X_test.iloc[:, [0]])
+
+        if userResponse is "2":
+
+            # LOGISTIC REGRESSION
+            param = {'solver': ["lbfgs"],
+                     'C': Stats.reciprocal(0.001, 1000),
+                     }
+            lr = Linear.LogisticRegression(random_state=0, multi_class='ovr', max_iter=10000)
+            self.random_search_cv(lr, param, X_train, y_train, X_test, y_test, "YeastLR", 5)
+
+            # K NEAREST NEIGHBOURS
+            param = {
+                "n_neighbors": [10, 50, 100],
+                "weights": ['uniform', 'distance'],
+                "leaf_size": [15, 30, 50, 100]
+            }
+            self.grid_search_cv(Neighbors.KNeighborsClassifier(),
+                                param, X_train, y_train, X_test, y_test, "YeastKNN", 5)
+
+            # SVM
+            param = {'kernel': ['rbf', 'linear'],
+                     'degree': [1, 2, 3, 4, 5, 6],
+                     'C': [1, 10, 100, 1000],
+                     'gamma': [1e-3, 1e-4]}
+            self.grid_search_cv(sklearn.svm.SVC(random_state=0, class_weight="balanced"), param, X_train, y_train,
+                                X_test, y_test, "YeastSVM", 5)
+
+            # DECISION TREE CLASSIFIER
+            dt = Tree.DecisionTreeClassifier(random_state=0, class_weight="balanced")
+            param = {'max_depth': np.arange(3, 10),
+                     'criterion': ['gini'],
+                     'max_leaf_nodes': [5, 10, 20, 100],
+                     'min_samples_split': [2, 5, 10, 20]}
+            self.grid_search_cv(dt, param, X_train, y_train, X_test, y_test, "YeastDCT", 5)
+
+            # RANDOM FOREST
+            param_grid = {'max_depth': np.arange(3, 10),
+                          'max_features': np.arange(1, 9, 1),
+                          'max_leaf_nodes': [5, 10, 15, 50, 100],
+                          'min_samples_split': [2, 5],
+                          }
+            self.random_search_cv(Ensemble.RandomForestClassifier(n_estimators=500, random_state=0),
+                                  param_grid, X_train, y_train, X_test, y_test, "YeastRF", 5)
+
+            # ADABOOST CLASSIFIER
+            param_grid = {
+                "n_estimators": [30, 50, 70, 100],
+                "learning_rate": [0.5, 0.7, 1, 2],
+                "algorithm": ["SAMME", "SAMME.R"]
+            }
+            self.grid_search_cv(Ensemble.AdaBoostClassifier(random_state=0), param_grid, X_train,
+                                y_train, X_test, y_test, "YeastAda", 3)
+
+            # NEURAL NETWORK
+            param_grid = {
+                "solver": ['adam', 'sgd'],
+                "learning_rate_init": [0.001, 0.01, 0.1],
+                "hidden_layer_sizes": [(1024,), (128, 64, 32), (512,), (256, 128, 64, 32), (512, 256, 128, 64, 32)]
+            }
+            self.grid_search_cv(
+                NN.MLPClassifier(activation='relu', tol=1e-4, n_iter_no_change=10, momentum=0.9, \
+                                 learning_rate='adaptive', verbose=True, warm_start=True, \
+                                 early_stopping=True), param_grid, X_train, y_train, X_test, y_test, "YeastNN", 3)
+
+            # GAUSSIAN NAIVE BAY
+            param_grid = {
+                "var_smoothing": [1e-07, 1e-08, 1e-09]
+            }
+            self.grid_search_cv(GaussianNB(), param_grid, X_train, y_train, X_test, y_test, "YeastGNN", 5)
+        else:
+            # ADABOOST
+            self.load_pretrained_models("YeastAdaModel", X_train, y_train, X_test, y_test)
+
+            # DTC
+            self.load_pretrained_models("YeastGNNModel", X_train, y_train, X_test, y_test)
+
+            # KNN
+            self.load_pretrained_models("YeastKNNModel", X_train, y_train, X_test, y_test)
+
+            # LR
+            self.load_pretrained_models("YeastLRModel", X_train, y_train, X_test, y_test)
+
+            # NN
+            self.load_pretrained_models("YeastNNModel", X_train, y_train, X_test,y_test)
+
+            # RF
+            self.load_pretrained_models("YeastRFModel", X_train, y_train, X_test, y_test)
+
+            # SVM
+            self.load_pretrained_models("YeastSVMModel", X_train, y_train, X_test, y_test)
+
+            # DCT
+            self.load_pretrained_models("YeastDCTModel", X_train, y_train, X_test, y_test)
 
     def Thoracic_Surgery_Data(self):
         print('Running classification for 9.Thoracic Surgery Data dataset')
