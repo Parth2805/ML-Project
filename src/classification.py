@@ -15,8 +15,8 @@ import sklearn.neural_network as NN
 import sklearn.preprocessing as Preprocessing
 import sklearn.svm
 import sklearn.tree as Tree
-from imblearn.combine import SMOTETomek
-from imblearn.over_sampling import SMOTE
+# from imblearn.combine import SMOTETomek
+# from imblearn.over_sampling import SMOTE
 from scipy.io import arff
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.model_selection import train_test_split
@@ -54,16 +54,17 @@ class class_classification:
         pickle.dump(model.best_params_, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
         plot.plot_learning_curve(model.best_estimator_, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=cv)
 
-    def load_pretrained_models(self, name, X_train, y_train, X_test, y_test):
+    def load_pretrained_models(self, name, X_train, y_train, X_test, y_test, cv):
         print("Loading PreTrained model: ", name)
         model = pickle.load(open(PRETRAINED_MODEL + name + ".sav", 'rb'))
         print("Testing Accuracy: ", model.score(X_test, y_test))
         print("Training Accuracy: ", model.score(X_train, y_train))
+        plot.plot_learning_curve(model, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=cv)
 
     def run_classifier(self, userResponse):
         print('Running classifiers for the following datasets: \n')
         # self.Diabetic_Retinopathy()
-        self.Default_of_credit_card_clients(userResponse)
+        # self.Default_of_credit_card_clients(userResponse)
         # self.Breast_Cancer_Wisconsin()
         # self.Statlog_Australian()
         # self.Statlog_German()
@@ -71,7 +72,7 @@ class class_classification:
         # self.Adult()
         # self.Yeast()
         # self.Thoracic_Surgery_Data()
-        self.Seismic_Bumps(userResponse)
+        # self.Seismic_Bumps(userResponse)
 
     def Diabetic_Retinopathy(self):
         print('Running classification for 1.Diabetic Retinopathy dataset')
@@ -407,28 +408,28 @@ class class_classification:
             self.random_search_cv(nn, param_grid, X_train, y_train, X_test, y_test, "DefaultCreditCardMLP", cv=3)
         else:
             # SVM
-            self.load_pretrained_models("DefaultCreditCardSVMModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("svm_default_client_grid_model", X_train, y_train, X_test, y_test, 3)
 
             # DTC
-            self.load_pretrained_models("DefaultCreditCardDTCModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("tree_default_client_grid_model", X_train, y_train, X_test, y_test, 3)
 
             # RFC
-            self.load_pretrained_models("DefaultCreditCardRFCModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("random_forest_default_client_grid_model", X_train, y_train, X_test, y_test, 3)
 
             # LR
-            self.load_pretrained_models("DefaultCreditCardLRModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("logistic_default_client_random_model", X_train, y_train, X_test, y_test, 3)
 
             # Adaboost
-            self.load_pretrained_models("DefaultCreditCardAdaboostModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("adaboost_default_client_grid_model", X_train, y_train, X_test, y_test, 3)
 
             # KNN
-            self.load_pretrained_models("DefaultCreditCardKNNModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("knearest_default_client_grid_model", X_train, y_train, X_test, y_test, 3)
 
             # GNB
-            self.load_pretrained_models("DefaultCreditCardGaussianModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("gaussian_default_client_grid_model", X_train, y_train, X_test, y_test, 3)
 
             # MLP
-            self.load_pretrained_models("DefaultCreditCardMLPModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("mlp_default_client_random_model", X_train, y_train, X_test, y_test, 3)
 
     def Breast_Cancer_Wisconsin(self):
         print('Running classification for 3.Breast Cancer Wisconsin dataset')
@@ -1082,7 +1083,8 @@ class class_classification:
         y_test = df_test.iloc[:, 27]
         # print(X_test.shape, y_test.shape, X_train.shape, y_train.shape)
 
-        scaler = Preprocessing.StandardScaler().fit(X_train.iloc[:, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 21, 22, 23]])
+        scaler = Preprocessing.StandardScaler().fit \
+            (X_train.iloc[:, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 21, 22, 23]])
         encoder = Preprocessing.LabelEncoder()
 
         encoder.fit(classes)
@@ -1122,7 +1124,7 @@ class class_classification:
             self.grid_search_cv(rfc, params_grid, X_train_scaled, y_train_labels, X_test_scaled, y_test_labels,
                                 "SteelFaultsRFC", cv=3)
 
-            # LR #does not converge
+            # LR
             params_grid = {
                 "penalty": ['l2'],
                 "C": Stats.reciprocal(0.001, 1000),
@@ -1133,7 +1135,7 @@ class class_classification:
             lr = Linear.LogisticRegression(multi_class='auto', random_state=0)
             self.random_search_cv(lr, params_grid, X_train_scaled, y_train_labels, X_test_scaled, y_test_labels,
                                   "DefaultCreditCardLR", cv=3)
-            #
+
             # Adaboost
             params_grid = {
                 "n_estimators": [50, 70, 100, 120, 150, 200, 250],
@@ -1173,37 +1175,37 @@ class class_classification:
             self.random_search_cv(mlp, params_grid, X_train_scaled, y_train_labels, X_test_scaled, y_test_labels,
                                   "SteelFaultsMLP", cv=3)
         else:
-            # # SVM
-            self.load_pretrained_models("SteelFaultsSVMModel", X_train_scaled, y_train_labels, X_test_scaled,
-                                        y_test_labels)
+            # SVM
+            self.load_pretrained_models("svm_faults_grid_model", X_train_scaled, y_train_labels, X_test_scaled,
+                                        y_test_labels, 3)
 
             # DTC
-            self.load_pretrained_models("SteelFaultsDTCModel", X_train_scaled, y_train_labels, X_test_scaled,
-                                        y_test_labels)
+            self.load_pretrained_models("tree_faults_grid_model", X_train_scaled, y_train_labels, X_test_scaled,
+                                        y_test_labels, 3)
 
             # RFC
-            self.load_pretrained_models("SteelFaultsRFCModel", X_train_scaled, y_train_labels, X_test_scaled,
-                                        y_test_labels)
+            self.load_pretrained_models("random_forest_faults_grid_model", X_train_scaled, y_train_labels,
+                                        X_test_scaled,
+                                        y_test_labels, 3)
 
-            # # LR
-            # self.load_pretrained_models("SteelFaultsLRModel", X_train_scaled, y_train_labels, X_test_scaled,
-            #                             y_test_labels)
+            # LR
+            self.load_pretrained_models("logistic_faults_grid_model", X_train_scaled, y_train_labels, X_test_scaled,
+                                        y_test_labels, 3)
 
             # Adaboost
-            self.load_pretrained_models("SteelFaultsAdaboostModel", X_train_scaled, y_train_labels, X_test_scaled,
-                                        y_test_labels)
+            self.load_pretrained_models("adaboost_faults_grid_model", X_train_scaled, y_train_labels, X_test_scaled,
+                                        y_test_labels, 3)
 
             # KNN
-            self.load_pretrained_models("SteelFaultsKNNModel", X_train_scaled, y_train_labels, X_test_scaled,
-                                        y_test_labels)
+            self.load_pretrained_models("kNearest_faults_grid_model", X_train_scaled, y_train_labels, X_test_scaled,
+                                        y_test_labels, 3)
 
             # GNB
-            self.load_pretrained_models("SteelFaultsGaussianModel", X_train_scaled, y_train_labels, X_test_scaled,
-                                        y_test)
+            self.load_pretrained_models("gaussian_faults_grid_model", X_train_scaled, y_train, X_test_scaled, y_test, 3)
 
             # MLP
-            self.load_pretrained_models("SteelFaultsMLPModel", X_train_scaled, y_train_labels, X_test_scaled,
-                                        y_test_labels)
+            self.load_pretrained_models("mlp_faults_grid_model", X_train_scaled, y_train_labels, X_test_scaled,
+                                        y_test_labels, 3)
 
     def Adult(self):
         print('Running classification for 7.Adult dataset')
@@ -1577,27 +1579,30 @@ class class_classification:
                                   "SeismicBumpsMLP", cv=3)
         else:
             # SVM
-            self.load_pretrained_models("SeismicBumpsSVMModel", X_smote_train, y_smote_train, X_test_scaled, y_test)
+            self.load_pretrained_models("svm_bumps_grid_model", X_smote_train, y_smote_train, X_test_scaled, y_test, 3)
 
             # DTC
-            self.load_pretrained_models("SeismicBumpsDTCModel", X_smote_train, y_smote_train, X_test_scaled, y_test)
+            self.load_pretrained_models("tree_bumps_grid_model", X_smote_train, y_smote_train, X_test_scaled, y_test, 3)
 
             # RFC
-            self.load_pretrained_models("SeismicBumpsRFCModel", X_smote_train, y_smote_train, X_test_scaled, y_test, )
+            self.load_pretrained_models("random_bumps_grid_model", X_smote_train, y_smote_train, X_test_scaled, y_test,
+                                        3)
 
             # LR
-            self.load_pretrained_models("SeismicBumpsLRModel", X_smote_train, y_smote_train, X_test_scaled, y_test)
+            self.load_pretrained_models("logistic_bumps_grid_model", X_smote_train, y_smote_train, X_test_scaled,
+                                        y_test, 3)
 
             # Adaboost
-            self.load_pretrained_models("SeismicBumpsAdaboostModel", X_smote_train, y_smote_train, X_test_scaled,
-                                        y_test)
+            self.load_pretrained_models("adaboost_bumps_grid_model", X_smote_train, y_smote_train, X_test_scaled,
+                                        y_test, 3)
 
             # KNN
-            self.load_pretrained_models("SeismicBumpsKNNModel", X_smote_train, y_smote_train, X_test_scaled, y_test)
+            self.load_pretrained_models("kNearest_bumps_grid_model", X_smote_train, y_smote_train, X_test_scaled,
+                                        y_test, 3)
 
             # GNB
-            self.load_pretrained_models("SeismicBumpsGaussianModel", X_smote_train, y_smote_train, X_test_scaled,
-                                        y_test)
+            self.load_pretrained_models("gaussian_bumps_grid_model", X_smote_train, y_smote_train, X_test_scaled,
+                                        y_test, 3)
 
             # MLP
-            self.load_pretrained_models("SeismicBumpsMLPModel", X_smote_train, y_smote_train, X_test_scaled, y_test)
+            self.load_pretrained_models("mlp_bumps_grid_model", X_smote_train, y_smote_train, X_test_scaled, y_test, 3)
