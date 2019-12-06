@@ -15,8 +15,8 @@ import sklearn.neural_network as NN
 import sklearn.preprocessing as Preprocessing
 import sklearn.svm
 import sklearn.tree as Tree
-# from imblearn.combine import SMOTETomek
-# from imblearn.over_sampling import SMOTE
+from imblearn.combine import SMOTETomek
+from imblearn.over_sampling import SMOTE
 from scipy.io import arff
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.model_selection import train_test_split
@@ -65,11 +65,11 @@ class class_classification:
         # self.Diabetic_Retinopathy()
         self.Default_of_credit_card_clients(userResponse)
         # self.Breast_Cancer_Wisconsin()
-        self.Statlog_Australian(userResponse)
+        # self.Statlog_Australian(userResponse)
         # self.Statlog_German()
-        # self.Steel_Plates_Faults(userResponse)
+        self.Steel_Plates_Faults(userResponse)
         # self.Adult()
-        self.Yeast(userResponse)
+        # self.Yeast(userResponse)
         # self.Thoracic_Surgery_Data()
         self.Seismic_Bumps(userResponse)
 

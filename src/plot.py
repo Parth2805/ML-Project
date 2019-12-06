@@ -19,6 +19,7 @@ def plot_training_val_graph(training_acc, training_loss, validation_acc, validat
     plt.savefig(PATH + "cpu_loss_plot.png")
     plt.show(block=True)
 
+
 def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
                         n_jobs=None, train_sizes=np.linspace(.1, 1.0, 5)):
     print(title)
