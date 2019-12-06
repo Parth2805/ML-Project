@@ -53,16 +53,15 @@ class class_classification:
         pickle.dump(model.best_params_, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
         plot.plot_learning_curve(model.best_estimator_, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=cv)
 
-    def load_pretrained_models(self, name, X_train, y_train, X_test, y_test, cv):
+    def load_pretrained_models(self, name, X_train, y_train, X_test, y_test):
         print("Loading PreTrained model: ", name)
         model = pickle.load(open(PRETRAINED_MODEL + name + ".sav", 'rb'))
         print("Testing Accuracy: ", model.score(X_test, y_test))
         print("Training Accuracy: ", model.score(X_train, y_train))
-        plot.plot_learning_curve(model, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=cv)
 
     def run_classifier(self,userResponse):
         print('Running classifiers for the following datasets: \n')
-        # self.Diabetic_Retinopathy(userResponse)
+        self.Diabetic_Retinopathy(userResponse)
         # self.Default_of_credit_card_clients(userResponse)
         # self.Breast_Cancer_Wisconsin()
         # self.Statlog_Australian()
@@ -159,9 +158,12 @@ class class_classification:
             '''
 
             gb = sklearn.naive_bayes.GaussianNB().fit(X_train, y_train)
-
-            print(gb.score(X_train, y_train))
-            print(gb.score(X_test, y_test))
+            name="Diabetic_Gaussian_Naive_Bayes"
+            print("Testing Accuracy: ", gb.score(X_test, y_test))
+            print("Training Accuracy: ", gb.score(X_train, y_train))
+            pickle.dump(gb, open(RESULTS_FOR_DEMO + "%sModel.sav" % name, 'wb'))
+            pickle.dump(gb.get_params, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
+            plot.plot_learning_curve(gb, name + " Learning Curve", X_train, y_train, (0.5, 1.01),cv=5)
 
             '''
             ### **Neural Network**
@@ -169,7 +171,12 @@ class class_classification:
 
             nn = sklearn.neural_network.MLPClassifier(hidden_layer_sizes=(20, 15, 20, 2), random_state=0,
                                                          max_iter=1000).fit(X_train, y_train)
-
+            name="Diabetic_Neural_Network"
+            print("Testing Accuracy: ", nn.score(X_test, y_test))
+            print("Training Accuracy: ", nn.score(X_train, y_train))
+            pickle.dump(nn, open(RESULTS_FOR_DEMO + "%sModel.sav" % name, 'wb'))
+            pickle.dump(nn.get_params, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
+            plot.plot_learning_curve(nn, name + " Learning Curve", X_train, y_train, (0.5, 1.01),cv=5)
             '''
             ### **Ada Boost**
             '''
@@ -183,14 +190,14 @@ class class_classification:
             self.grid_search_cv(ada, param, X_train, y_train, X_test, y_test, "Diabetic_Ada_Boost")
         else:
 
-            self.load_pretrained_models("Diabetic_SVM", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Diabetic_Logistic_Regression", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Diabetic_Decision_Tree", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Diabetic_Random_Forest", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Diabetic_AdaBoostClassifier", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Diabetic_Neural_Network", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Diabetic_Gaussian_Naives_Bayes", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Diabetic_K_Neighbors", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_SVMModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_LogisticRegressionModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_Decision_TreeModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_Random_ForestModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_Ada_BoostModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_Neural_NetworkModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_Gaussian_Naive_BayesModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Diabetic_K_NeighborsModel", X_train, y_train, X_test, y_test)
 
 
     def Default_of_credit_card_clients(self, userResponse):
@@ -672,7 +679,6 @@ class class_classification:
         df = pd.read_excel(file, header=None)
         data = pd.DataFrame(df)
         data = data.values
-        print(data)
         data = data.astype(float)
         X_train, X_test, y_train, y_test = train_test_split(data[:, 0:23], data[:, 24], test_size=0.20, random_state=0)
         y_train = y_train.astype(int)
@@ -760,30 +766,25 @@ class class_classification:
             '''
             gb = sklearn.naive_bayes.GaussianNB().fit(X_train, y_train)
 
-            print(gb.score(X_train, y_train))
-            print(gb.score(X_test, y_test))
+            name = "StatLOgGerman_Gaussian_Naive_Bayes"
+            print("Testing Accuracy: ", gb.score(X_test, y_test))
+            print("Training Accuracy: ", gb.score(X_train, y_train))
+            pickle.dump(gb, open(RESULTS_FOR_DEMO + "%sModel.sav" % name, 'wb'))
+            pickle.dump(gb.get_params, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
+            plot.plot_learning_curve(gb, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=5)
+
+
         else:
 
-            self.load_pretrained_models("GermanStatlog_SVM", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("GermanStatlog_Logistic_Regression", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("GermanStatlog_Decision_Tree", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("GermanStatlog_Random_Forest", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("GermanStatlog_AdaBoostClassifier", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("GermanStatlog_Neural_Network", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("GermanStatlog_Gaussian_Naives_Bayes", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("GermanStatlog_K_Neighbors", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("StatlOgGerman_SVMModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("StatlOgGerman_Logistic_RegressionModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("StatlOgGerman_Decision_TreeModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("StatlOgGerman_Random_ForestModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("StatlOgGerman_AdaBoostModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("StatlOgGerman_Neural_NetworkModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("StatlOgGerman_Gaussian_Naive_BayesModel", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("StatlOgGerman_K_NeigborsModel", X_train, y_train, X_test, y_test)
 
-
-        '''
-        ## **Testing**
-        '''
-
-        # %%
-        # model = sklearn.neural_network.MLPClassifier(hidden_layer_sizes=(24, 2), random_state=0, max_iter=1000).fit(
-        #     X_train, y_train)
-        #
-        # print(model.score(X_train, y_train))
-        # print(model.score(X_test, y_test))
 
     def Steel_Plates_Faults(self, userResponse):
         print('Running classification for 6.Steel Plates Faults dataset')

@@ -62,13 +62,13 @@ class class_regression:
         pickle.dump(model.best_params_, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
         plot.plot_learning_curve(model.best_estimator_, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=cv)
 
-    def load_pretrained_models(self, name, X_train, y_train, X_test, y_test, cv):
+    def load_pretrained_models(self, name, X_test, y_test):
         print("Loading PreTrained model: ", name)
         model = pickle.load(open(PRETRAINED_MODEL + name + ".sav", 'rb'))
         print("Mean Squared Error: ",
               metrics.mean_squared_error(y_test, model.predict(X_test)))
         print("R2 Score: ", metrics.r2_score(y_test, model.predict(X_test)))
-        plot.plot_learning_curve(model, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=cv)
+
 
     def merck_model(self, act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, name, pretrained=False):
         print(name)
@@ -94,7 +94,7 @@ class class_regression:
 
     def get_regressor(self, userResponse):
         print('Running regressors for the following datasets: \n')
-        # self.WineQuality(userResponse)
+        self.WineQuality(userResponse)
         # self.Communities_Crime()
         # self.QSAR_aquatic_toxicity()
         # self.Parkinson_Speech()
@@ -218,13 +218,13 @@ class class_regression:
 
         else:
 
-            self.load_pretrained_models("Wine_SVR", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Wine_Linear_Regression", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Wine_Decision_Tree", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Wine_Random_Forest", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Wine_AdaBoostClassifier", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Wine_Neural_Network", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Wine_GaussianProcess", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("WineQuality_SVRModel",X_test, y_test)
+            self.load_pretrained_models("WineQuality_Linear_RegressionModel", X_test, y_test)
+            self.load_pretrained_models("WineQuality_Decision_TreeModel", X_test, y_test)
+            self.load_pretrained_models("WineQuality_Random_ForestModel", X_test, y_test)
+            self.load_pretrained_models("WineQuality_Ada_BoostModel", X_test, y_test)
+            self.load_pretrained_models("WineQuality_Neural_NetworkModel", X_test, y_test)
+            self.load_pretrained_models("WineQuality_Gaussian_ProcessModel", X_test, y_test)
 
     def Communities_Crime(self):
         print('Running Regression for 2.Communities_Crime dataset')
@@ -392,13 +392,13 @@ class class_regression:
             self.grid_search_cv(gp, param, X_train, y_train, X_test, y_test, "Facebook_Gaussian_Process")
         else:
 
-            self.load_pretrained_models("Facebook_SVR", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Facebook_Linear_Regression", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Facebook_Decision_Tree", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Facebook_Random_Forest", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Facebook_AdaBoostClassifier", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Facebook_Neural_Network", X_train, y_train, X_test, y_test)
-            self.load_pretrained_models("Facebook_Gaussian_Process", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Facebook_SVRModel", X_test, y_test)
+            self.load_pretrained_models("Facebook_Linear_RegressionModel", X_test, y_test)
+            self.load_pretrained_models("Facebook_Decision_TreeModel", X_test, y_test)
+            self.load_pretrained_models("Facebook_Random_ForestModel", X_test, y_test)
+            self.load_pretrained_models("Facebook_Ada_BoostModel", X_test, y_test)
+            self.load_pretrained_models("Facebook_Neural_NetworkModel", X_test, y_test)
+            self.load_pretrained_models("Facebook_Gaussian_ProcessModel", X_test, y_test)
 
     def Bike_Sharing(self):
         print('Running Regression for 6.Bike_Sharing dataset')
