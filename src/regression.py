@@ -91,11 +91,11 @@ class class_regression:
     def get_regressor(self, userResponse):
         print('Running regressors for the following datasets: \n')
         # self.WineQuality()
-        self.Communities_Crime(userResponse)
+        # self.Communities_Crime(userResponse)
         # self.QSAR_aquatic_toxicity()
-        self.Parkinson_Speech(userResponse)
+        # self.Parkinson_Speech(userResponse)
         # self.Facebook_metrics()
-        # self.Bike_Sharing(userResponse)
+        self.Bike_Sharing(userResponse)
         # self.Student_Performance()
         # self.Concrete_Compressive_Strength(userResponse)
         # self.SGEMM_GPU_kernel_performance()
@@ -130,10 +130,10 @@ class class_regression:
                 "Linear Regression Mean Squared Error: ", metrics.mean_squared_error(y_test, lr_model.predict(X_test)))
             print("Linear Regression R2 Score: ", metrics.r2_score(y_test, lr_model.predict(X_test)))
 
-            filename = "Community&Crime_linear_regression_model.sav"
+            filename = "Communities&CrimeLRModel.sav"
             pickle.dump(lr_model, open(RESULTS_FOR_DEMO + filename, 'wb'))
 
-            filename1 = "Community&Crime_linear_regression_model_best_param.sav"
+            filename1 = "Communities&CrimeLRBestParams.sav"
             pickle.dump(lr_model.get_params, open(RESULTS_FOR_DEMO + filename1, 'wb'))
 
             # SVR
@@ -186,29 +186,25 @@ class class_regression:
 
         else:
             # SVR
-            self.load_pretrained_models("Communities_Crime_SVR_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("Communities&CrimeSVRModel", X_train, y_train, X_test, y_test, 5)
 
             # DTC
-            self.load_pretrained_models("Communities_Crime_decsion_tree_model", X_train, y_train, X_test, y_test,
-                                        5)
+            self.load_pretrained_models("Communities&CrimeDTRModel", X_train, y_train, X_test, y_test, 5)
 
             # RFC
-            self.load_pretrained_models("Communities_Crime_random_forest_model", X_train, y_train, X_test, y_test,
-                                        5)
+            self.load_pretrained_models("Communities&CrimeRFRModel", X_train, y_train, X_test, y_test, 5)
+
             # LR
-            self.load_pretrained_models("Communities_Crime_Linear_regression_model", X_train, y_train, X_test, y_test,
-                                        5)
+            self.load_pretrained_models("Communities&CrimeLRModel", X_train, y_train, X_test, y_test, 5)
 
             # Adaboost
-            self.load_pretrained_models("Communities_Crime_adaboost_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("Communities&CrimeADAModel", X_train, y_train, X_test, y_test, 5)
 
-            # GNB
-            self.load_pretrained_models("Communities_Crime_gaussian_concrete_model", X_train, y_train, X_test, y_test,
-                                        10)
+            # GPR
+            self.load_pretrained_models("Communities&CrimeGPRModel", X_train, y_train, X_test, y_test, 10)
 
             # MLP
-            self.load_pretrained_models("Communities_Crime_neural_network_model", X_train, y_train, X_test, y_test,
-                                        5)
+            self.load_pretrained_models("Communities&CrimeNNModel", X_train, y_train, X_test, y_test, 5)
 
     def QSAR_aquatic_toxicity(self):
         print('Running Regression for 3.QSAR_aquatic_toxicity dataset')
@@ -285,9 +281,9 @@ class class_regression:
             print(
                 "Linear Regression Mean Squared Error: ", metrics.mean_squared_error(y_test, lr_model.predict(X_test)))
             print("Linear Regression R2 Score: ", metrics.r2_score(y_test, lr_model.predict(X_test)))
-            filename = "Parkinson_Linear_regression_model.sav"
+            filename = "ParkinsonLRModel.sav"
             pickle.dump(lr_model, open(RESULTS_FOR_DEMO + filename, 'wb'))
-            filename1 = "Parkinson_Linear_regression_model_best_param.sav"
+            filename1 = "ParkinsonLRBestParams.sav"
             pickle.dump(lr_model.get_params, open(RESULTS_FOR_DEMO + filename1, 'wb'))
 
             # SVR
@@ -339,25 +335,25 @@ class class_regression:
 
         else:
             # SVR
-            self.load_pretrained_models("Parkinson_SVR_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("ParkinsonSVRModel", X_train, y_train, X_test, y_test, 5)
 
             # DTR
-            self.load_pretrained_models("Parkinson_decision_tree_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("ParkinsonDTRModel", X_train, y_train, X_test, y_test, 5)
 
             # RFC
-            self.load_pretrained_models("Parkinson_random_forest_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("ParkinsonRFRModel", X_train, y_train, X_test, y_test, 5)
 
             # LR
-            # self.load_pretrained_models("Parkinson_Linear_regression_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("ParkinsonLRModel", X_train, y_train, X_test, y_test, 5)
 
             # Adaboost
-            self.load_pretrained_models("Parkinson_adaboost_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("ParkinsonADAModel", X_train, y_train, X_test, y_test, 5)
 
-            # GNB
-            self.load_pretrained_models("Parkinson_gaussian_model", X_train, y_train, X_test, y_test, 10)
+            # GPR
+            self.load_pretrained_models("ParkinsonGPRModel", X_train, y_train, X_test, y_test, 10)
 
             # MLP
-            self.load_pretrained_models("Parkinson_neural_network_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("ParkinsonNNModel", X_train, y_train, X_test, y_test, 5)
 
     def Facebook_metrics(self):
         print('Running Regression for 5.Facebook_metrics dataset')
@@ -434,27 +430,26 @@ class class_regression:
                                   param, X_train, y_train, X_test, y_test, "BikeSharingGPR", 3)
 
         else:
-
             # SVR
-            self.load_pretrained_models("Bike_Sharing_SVR_model", X_train, y_train, X_test, y_test, 3)
+            self.load_pretrained_models("BikeSharingSVRModel", X_train, y_train, X_test, y_test, 3)
 
             # DTR
-            self.load_pretrained_models("Bike_Sharing_decision_tree_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("BikeSharingDTRModel", X_train, y_train, X_test, y_test, 5)
 
             # RFC
-            self.load_pretrained_models("Bike_Sharing_random_forest_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("BikeSharingRFRModel", X_train, y_train, X_test, y_test, 5)
 
             # LR
-            self.load_pretrained_models("Bike_Sharing_Linear_regression_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("BikeSharingLRModel", X_train, y_train, X_test, y_test, 5)
 
             # Adaboost
-            self.load_pretrained_models("Bike_Sharing_adaboost_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("BikeSharingADAModel", X_train, y_train, X_test, y_test, 5)
 
-            # GNB
-            self.load_pretrained_models("Bike_Sharing_gaussian_model", X_train, y_train, X_test, y_test, 3)
+            # GPR
+            self.load_pretrained_models("BikeSharingGPRModel", X_train, y_train, X_test, y_test, 3)
 
             # MLP
-            self.load_pretrained_models("Bike_Sharing_neural_network_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("BikeSharingNNModel", X_train, y_train, X_test, y_test, 5)
 
     def Student_Performance(self):
         print('Running Regression for 7.Student_Performance dataset')
