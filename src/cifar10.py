@@ -1,9 +1,11 @@
-import os
-import pickle
-
 import matplotlib.pyplot as plt
 import numpy as np
+import os
+import pickle
 import plot
+import pydotplus as pdp
+import sklearn.model_selection as model_select
+import sklearn.tree as Tree
 import torch
 import torch.nn as nn
 from sklearn import preprocessing
@@ -17,6 +19,9 @@ TOLERANCE = 1e-4
 device = torch.device('cpu')
 DEMO_PATH = "../Results For Demo/"
 labels = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
+PRETRAINED_MODEL = "../Pretrained Models/"
+TREE_MODEL = "Decision_tree_classifier_cifar10"
+RESULTS_FOR_DEMO = "../Results For Demo/"
 
 
 class CNN(nn.Module):
@@ -135,8 +140,8 @@ def unpickle(file):
     return dictionary
 
 
-def train_model(path):
-    print(os.path.isdir(path))
+def train_model(path, userResponse):
+    print("Path Exists: ", os.path.isdir(path))
     batch_1 = unpickle(path + "/data_batch_1")
     batch_2 = unpickle(path + "/data_batch_2")
     batch_3 = unpickle(path + "/data_batch_3")
@@ -154,7 +159,7 @@ def train_model(path):
     test_labels = np.array(list(test_batch[b'labels']))
     labels = label_names[b'label_names']
     labels = np.where(labels == b'airplane', 'airplane', labels)
-    print(labels)
+    print("Labels: ", labels)
     training_data = train_data.reshape(train_data.shape[0], N_CHANNELS, SIZE, SIZE)
     testing_data = test_data.reshape(test_data.shape[0], N_CHANNELS, SIZE, SIZE)
     lb = preprocessing.LabelBinarizer()
@@ -163,11 +168,7 @@ def train_model(path):
 
     training_data, validation_data, training_labels, validation_labels = train_test_split(training_data,
                                                                                           training_labels,
-                                                                                          test_size=0.1,
-                                                                                          random_state=0)
-    net = CNN()
-    loss_fn = nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(net.parameters(), lr=0.001)
+                                                                                          test_size=0.1, random_state=0)
     torch_train_data = torch.tensor(training_data, dtype=torch.float32)
     torch_train_labels = torch.tensor(training_labels, dtype=torch.int64)
     torch_val_data = torch.tensor(validation_data, dtype=torch.float32)
@@ -175,12 +176,71 @@ def train_model(path):
     torch_test_data = torch.tensor(testing_data, dtype=torch.float32)
     torch_test_labels = torch.tensor(testing_labels, dtype=torch.int64)
     batch_size = 128
-    train(net, torch_train_data, torch_train_labels, torch_val_data, torch_val_labels, batch_size, optimizer, loss_fn)
-    test_accuracy(torch_test_data, torch_test_labels, net)
+    net = CNN()
+    loss_fn = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(net.parameters(), lr=0.001)
+    if userResponse is "2":
+        print("training model")
+        train(net, torch_train_data, torch_train_labels, torch_val_data, torch_val_labels, batch_size, optimizer,
+              loss_fn)
+        net = torch.load(RESULTS_FOR_DEMO + MODEL_NAME, map_location=device)
+        test_acc, test_loss = test(torch_test_data, torch_test_labels, optimizer, loss_fn, net['net'])
+        print("Testing Accuracy {0} | Testing Loss {1}".format(test_acc, test_loss))
 
-    VBP = VanillaBackprop(net, loss_fn)
-    activation_maximization(VBP)
-    fgst(net, testing_data, torch_test_data, loss_fn)
+        print("Activation Maximization")
+        VBP = VanillaBackprop(net, loss_fn)
+        activation_maximization(VBP)
+
+        print("FGST")
+        fgst(net, testing_data, torch_test_data, loss_fn)
+        train_DTC(training_data, train_labels, testing_data, test_labels)
+
+    else:
+        print("pretrained models")
+        loaded_model = torch.load(PRETRAINED_MODEL + MODEL_NAME, map_location=device)
+        # print(loaded_model['net'])
+        test_acc, test_loss = test(torch_test_data, torch_test_labels, optimizer, loss_fn, loaded_model['net'])
+        print("Testing Accuracy {0} | Testing Accuracy {1}".format(test_acc, test_loss))
+        print("Activation Maximization")
+        VBP = VanillaBackprop(loaded_model['net'], loss_fn)
+        activation_maximization(VBP)
+
+        print("FGST")
+        fgst(loaded_model['net'], testing_data, torch_test_data, loss_fn)
+
+        dct_loaded_model = pickle.load(open(PRETRAINED_MODEL + TREE_MODEL + ".sav", 'rb'))
+        n_samples, channels, height, width = testing_data.shape
+        dct_testing_data = testing_data.reshape(n_samples, channels * height * width)
+        tree_pred = dct_loaded_model.score(dct_testing_data, test_labels)
+        print("Tree Model Pretrained Accuracy: ", tree_pred)
+
+
+def train_DTC(training_data, train_labels, testing_data, test_labels):
+    n_samples, channels, height, width = training_data.shape
+    dct_training_data = training_data.reshape(n_samples, channels * height * width)
+    dct_testing_data = testing_data.reshape(n_samples, channels * height * width)
+    hyper_params = {'max_depth': np.arange(5, 50, 5),
+                    'max_leaf_nodes': np.arange(5, 50, 5),
+                    'min_samples_leaf': [5, 10],
+                    'min_samples_split': [3, 5, 10]
+                    }
+
+    dtree_model = model_select.RandomizedSearchCV(
+        Tree.DecisionTreeClassifier(random_state=0, criterion='entropy'), param_distributions=hyper_params,
+        verbose=3, cv=3, scoring="accuracy").fit(dct_training_data, train_labels)
+    tree_pred = dtree_model.score(dct_testing_data, test_labels)
+    print("Tree Model Trained Accuracy: ", tree_pred)
+
+    filename = "Decision_tree_classifier_cifar10.sav"
+    pickle.dump(dtree_model.best_estimator_, open(DEMO_PATH + "%s" % filename, 'wb'))
+    filename = "Decision_tree_classifier_cifar10_best_params.sav"
+    pickle.dump(dtree_model.best_params_, open(DEMO_PATH + "%s" % filename, 'wb'))
+    sklearn.tree.plot_tree(dtree_model.best_estimator_, fontsize=12)
+    filename = "Decision_tree_plot"
+    dot_data = Tree.export_graphviz(dtree_model.best_estimator_, out_file=None, filled=True, rounded=True,
+                                    special_characters=True)
+    graph = pdp.graph_from_dot_data(dot_data)
+    graph.write_pdf(DEMO_PATH + "%s" % filename + ".pdf")
 
 
 def fwd_pass(X, y, optimizer, loss_fn, net, train=False):
@@ -197,12 +257,6 @@ def fwd_pass(X, y, optimizer, loss_fn, net, train=False):
     return acc, loss
 
 
-def test_accuracy(torch_test_data, torch_test_labels, net):
-    net.eval()
-    o = net(torch_test_data)
-    print((o.argmax(axis=1) == torch_test_labels.argmax(axis=1)).sum() * 1.0 / torch_test_labels.shape[0])
-
-
 def test(X, y, optimizer, loss_fn, net, batch_size=500):
     avg_val_acc = 0
     avg_val_loss = 0
@@ -215,7 +269,7 @@ def test(X, y, optimizer, loss_fn, net, batch_size=500):
                                          optimizer, loss_fn, net)
             avg_val_acc += val_acc / avg_by
             avg_val_loss += val_loss / avg_by
-            print("val_acc {0} and val_loss {1}".format(val_acc, val_loss))
+            print("val/test_acc {0} and val/test_loss {1}".format(val_acc, val_loss))
     return avg_val_acc, avg_val_loss
 
 
@@ -248,7 +302,7 @@ def train(net, torch_train_data, torch_train_labels, torch_val_data, torch_val_l
                         'epoch': epoch,
                         'state_dict': net.state_dict()
                     }
-                torch.save(state, DEMO_PATH + "/" + MODEL_NAME)
+                    torch.save(state, DEMO_PATH + "/" + MODEL_NAME)
 
             print("Iteration: {0} | Loss: {1} | Training accuracy: {2}".format(epoch, train_loss, train_acc * 100))
 
@@ -326,30 +380,7 @@ def convert_to_gray_scale(im_as_arr):
     return grayscale_im
 
 
-# def plot_image(index, test=False):
-#     if (test):
-#         plt.imshow(testing_data[index].transpose(1, 2, 0))
-#         plt.title(labels[testing_labels[index].argmax()]);
-#     else:
-#         plt.imshow(training_data[index].transpose(1, 2, 0))
-#         plt.title(labels[training_labels[index].argmax()]);
-
-
 class Cifar10:
     def __init__(self, path, load_pretrained_model):
         self.path = path
-
-        if load_pretrained_model is "1":
-            print("load")
-            loaded_model = torch.load("../Pretrained Models/" + MODEL_NAME, map_location=device)
-            print(loaded_model['net'])
-            loss_fn = nn.CrossEntropyLoss()
-            VBP = VanillaBackprop(loaded_model['net'], loss_fn)
-            activation_maximization(VBP)
-            test_batch = unpickle(path + "/test_batch")
-            test_data = np.array(list(test_batch[b'data']))
-            testing_data = test_data.reshape(test_data.shape[0], N_CHANNELS, SIZE, SIZE)
-            torch_test_data = torch.tensor(testing_data, dtype=torch.float32)
-            fgst(loaded_model['net'], testing_data, torch_test_data, loss_fn)
-        else:
-            train_model(self.path)
+        train_model(path, load_pretrained_model)
