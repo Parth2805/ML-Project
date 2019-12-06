@@ -1,4 +1,23 @@
 Datasets
+Pretrained Models/CIFAR10.t7
+Pretrained Models/CIFAR10CPU.t7
+Results For Demo/activation_maximization.jpg
+Results For Demo/fgst.jpg
+Pretrained Models/RAJANCIFAR10.t7
+Results For Demo/CIFAR10.t7
+Datasets/1_DiabeticRetinopathy.arff
+Datasets/student-por.csv
+Datasets/5_GermanData.xlsx
+Datasets/default of credit card clients.xls
+Datasets/Faults.xlsx
+Datasets/seismic-bumps.csv
+Results/classification_10_class_balance.png
+Datasets/Concrete_Data.xls
+Datasets/ac2_cache.npz
+Datasets/ac4_cache.npz
+Results For Demo/merckResults.txt
+Results For Demo/cpu_acc_plot.jpg
+Results For Demo/cpu_loss_plot.jpg
 Pretrained Models
 Results For Demo
 Results

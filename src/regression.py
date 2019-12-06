@@ -96,7 +96,7 @@ class class_regression:
         # self.Facebook_metrics()
         self.Bike_Sharing(userResponse)
         # self.Student_Performance()
-        # self.Concrete_Compressive_Strength(userResponse)
+        self.Concrete_Compressive_Strength(userResponse)
         # self.SGEMM_GPU_kernel_performance()
         # self.Merck_Molecular_Activity_Challenge(userResponse)
 
@@ -584,34 +584,29 @@ class class_regression:
                                 params_grid, X_train_scaled, y_train, X_test_scaled, y_test, "ConcreteDTC")
         else:
             # SVM
-            self.load_pretrained_models("SVR_concrete_model", X_train_scaled, y_train, X_test_scaled, y_test, 5)
+            self.load_pretrained_models("ConcreteSVMModel", X_test_scaled, y_test)
 
             # DTC
-            self.load_pretrained_models("decsion_concrete_tree_model", X_train_scaled, y_train, X_test_scaled,
-                                        y_test,
-                                        5)
+            self.load_pretrained_models("ConcreteDTCModel", X_test_scaled, y_test)
 
             # RFC
-            self.load_pretrained_models("random_concrete_forest_model", X_train_scaled, y_train, X_test_scaled,
-                                        y_test,
-                                        5)
+            self.load_pretrained_models("ConcreteRFCModel", X_test_scaled, y_test)
 
             # LR
-            self.load_pretrained_models("Linear_regression_model", X_train_scaled, y_train, X_test_scaled, y_test,
-                                        5)
-
+            lr_model = pickle.load(open(PRETRAINED_MODEL + "ConcreteLRModel.sav", "rb"))
+            lr_pred = lr_model.predict(X_test_scaled)
+            print("Linear Regression Mean Squared Error: ",
+                  metrics.mean_squared_error(y_test, lr_pred))
+            print("Linear Regression R2 Score: ", metrics.r2_score(y_test, lr_pred))
             # Adaboost
-            self.load_pretrained_models("AdaBoost_concrete_model", X_train_scaled, y_train, X_test_scaled, y_test,
-                                        5)
+            self.load_pretrained_models("ConcreteAdaboostModel", X_test_scaled, y_test)
 
             # GNB
-            self.load_pretrained_models("gaussian_concrete_model", X_train_scaled, y_train, X_test_scaled, y_test,
-                                        5)
+            self.load_pretrained_models("ConcreteGaussianModel", X_test_scaled, y_test)
 
             # MLP
-            self.load_pretrained_models("neural_network_concrete_model", X_train_scaled, y_train, X_test_scaled,
-                                        y_test,
-                                        5)
+            self.load_pretrained_models("ConcreteMLPModel", X_test_scaled, y_test)
+
 
     def SGEMM_GPU_kernel_performance(self):
         print('Running Regression for 9.SGEMM_GPU_kernel_performance dataset')
@@ -686,31 +681,31 @@ class class_regression:
                              X_test_act4,
                              y_test_act4, "MLP")
         else:
-            act2 = pickle.load(open(PRETRAINED_MODEL + "Linear_act2_regression_model.sav", "rb"))
-            act4 = pickle.load(open(PRETRAINED_MODEL + "Linear_act4_regression_model.sav", "rb"))
+            act2 = pickle.load(open(PRETRAINED_MODEL + "LRBestModelACT2.sav", "rb"))
+            act4 = pickle.load(open(PRETRAINED_MODEL + "LRBestModelACT4.sav", "rb"))
             self.merck_model(act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "LR", pretrained=True)
 
-            act2 = pickle.load(open(PRETRAINED_MODEL + "svr_act2_model.sav", "rb"))
-            act4 = pickle.load(open(PRETRAINED_MODEL + "svr_act4_model.sav", "rb"))
+            act2 = pickle.load(open(PRETRAINED_MODEL + "SVRBestModelACT2.sav", "rb"))
+            act4 = pickle.load(open(PRETRAINED_MODEL + "SVRBestModelACT4.sav", "rb"))
             self.merck_model(act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "SVR", pretrained=True)
 
-            act2 = pickle.load(open(PRETRAINED_MODEL + "dct_act2_model.sav", "rb"))
-            act4 = pickle.load(open(PRETRAINED_MODEL + "dct_act4_model.sav", "rb"))
+            act2 = pickle.load(open(PRETRAINED_MODEL + "DTCBestModelACT2.sav", "rb"))
+            act4 = pickle.load(open(PRETRAINED_MODEL + "DTCBestModelACT4.sav", "rb"))
             self.merck_model(act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "DTC", pretrained=True)
 
-            act2 = pickle.load(open(PRETRAINED_MODEL + "rfr_act2_model.sav", "rb"))
-            act4 = pickle.load(open(PRETRAINED_MODEL + "rfr_act4_model.sav", "rb"))
+            act2 = pickle.load(open(PRETRAINED_MODEL + "RFCBestModelACT2.sav", "rb"))
+            act4 = pickle.load(open(PRETRAINED_MODEL + "RFCBestModelACT4.sav", "rb"))
             self.merck_model(act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "RFC", pretrained=True)
 
-            act2 = pickle.load(open(PRETRAINED_MODEL + "ada_act2_model.sav", "rb"))
-            act4 = pickle.load(open(PRETRAINED_MODEL + "ada_act4_model.sav", "rb"))
+            act2 = pickle.load(open(PRETRAINED_MODEL + "AdaboostBestModelACT2.sav", "rb"))
+            act4 = pickle.load(open(PRETRAINED_MODEL + "AdaboostBestModelACT4.sav", "rb"))
             self.merck_model(act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "Adaboost",
                              pretrained=True)
 
-            act2 = pickle.load(open(PRETRAINED_MODEL + "gau_act2_model.sav", "rb"))
-            act4 = pickle.load(open(PRETRAINED_MODEL + "gau_act4_model.sav", "rb"))
+            act2 = pickle.load(open(PRETRAINED_MODEL + "GPRBestModelACT2.sav", "rb"))
+            act4 = pickle.load(open(PRETRAINED_MODEL + "GPRBestModelACT4.sav", "rb"))
             self.merck_model(act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "GPR", pretrained=True)
 
-            act2 = pickle.load(open(PRETRAINED_MODEL + "mlp_act2_random_model.sav", "rb"))
-            act4 = pickle.load(open(PRETRAINED_MODEL + "mlp_act4_random_model.sav", "rb"))
+            act2 = pickle.load(open(PRETRAINED_MODEL + "MLPBestModelACT2.sav", "rb"))
+            act4 = pickle.load(open(PRETRAINED_MODEL + "MLPBestModelACT4.sav", "rb"))
             self.merck_model(act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "MLP", pretrained=True)
