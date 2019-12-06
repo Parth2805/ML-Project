@@ -94,15 +94,15 @@ class class_regression:
 
     def get_regressor(self, userResponse):
         print('Running regressors for the following datasets: \n')
-        self.WineQuality(userResponse)
+        # self.WineQuality(userResponse)
         # self.Communities_Crime()
         # self.QSAR_aquatic_toxicity()
         # self.Parkinson_Speech()
-        self.Facebook_metrics(userResponse)
+        # self.Facebook_metrics(userResponse)
         # self.Bike_Sharing()
         # self.Student_Performance()
         # self.Concrete_Compressive_Strength()
-        # self.SGEMM_GPU_kernel_performance()
+        self.SGEMM_GPU_kernel_performance(userResponse)
         # self.Merck_Molecular_Activity_Challenge()
 
     def WineQuality(self, userResponse):
@@ -298,7 +298,7 @@ class class_regression:
 
         df.fillna(0, axis=0, inplace=True)
         data = df.values
-        print(data)
+        # print(data)
         X_train, X_test, y_train, y_test = train_test_split(data[:, 0:18], data[:, 18], test_size=0.20, random_state=0)
 
         'Function for NAN'
@@ -563,7 +563,7 @@ class class_regression:
         '''
         ### **Preprocessing**
         '''
-        file = "/content/drive/My Drive/Regression/9_Sgemm_GPU/sgemm_product.csv"
+        file = "../Datasets/sgemm_product.csv"
         df = pd.read_csv(file, sep=',')
         data = df.values
         X_train, X_test, y_train, y_test = train_test_split(data[:, 0:14], data[:, 14:15], test_size=0.20,
