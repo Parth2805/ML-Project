@@ -90,21 +90,120 @@ class class_regression:
     def get_regressor(self, userResponse):
         print('Running regressors for the following datasets: \n')
         # self.WineQuality()
-        # self.Communities_Crime()
+        self.Communities_Crime(userResponse)
         # self.QSAR_aquatic_toxicity()
-        # self.Parkinson_Speech()
+        self.Parkinson_Speech(userResponse)
         # self.Facebook_metrics()
-        # self.Bike_Sharing()
+        self.Bike_Sharing(userResponse)
         # self.Student_Performance()
         self.Concrete_Compressive_Strength(userResponse)
         # self.SGEMM_GPU_kernel_performance()
-        self.Merck_Molecular_Activity_Challenge(userResponse)
+        # self.Merck_Molecular_Activity_Challenge(userResponse)
 
     def WineQuality(self):
         print('Running Regression for 1.WineQuality dataset')
 
-    def Communities_Crime(self):
+    def Communities_Crime(self, userResponse):
         print('Running Regression for 2.Communities_Crime dataset')
+
+        df = pd.read_csv(DATASETS + "communities.data", header=None,
+                         delimiter=',')
+        df = df.mask(df == '?').fillna(df.mean())
+
+        for column in df.columns:
+            if column != 3:
+                df[column] = df[column].astype(float)
+
+        df.fillna(0, inplace=True, axis=0);
+
+        df = df.iloc[:, 4:128]
+        df = df.T.reset_index(drop=True).T
+
+        X_train, X_test, y_train, y_test = train_test_split(df.iloc[:, 0:122], df.iloc[:, 122], test_size=0.2,
+                                                            random_state=0, shuffle=False)
+        if userResponse is "2":
+
+            # Linear Regression
+            lr_model = linear.LinearRegression().fit(X_train, y_train)
+            print(
+                "Linear Regression Mean Squared Error: ", metrics.mean_squared_error(y_test, lr_model.predict(X_test)))
+            print("Linear Regression R2 Score: ", metrics.r2_score(y_test, lr_model.predict(X_test)))
+
+            filename = "Communities&CrimeLRModel.sav"
+            pickle.dump(lr_model, open(RESULTS_FOR_DEMO + filename, 'wb'))
+
+            filename1 = "Communities&CrimeLRBestParams.sav"
+            pickle.dump(lr_model.get_params, open(RESULTS_FOR_DEMO + filename1, 'wb'))
+
+            # SVR
+            param = {'kernel': ['rbf'],
+                     'degree': [1, 2, 3, 4, 5, 6],
+                     'C': [1, 10, 100, 1000],
+                     'gamma': [1e-3, 1e-4]}
+
+            self.grid_search_cv(SVM.SVR(), param, X_train, y_train, X_test, y_test, "Communities&CrimeSVR", 5)
+
+            # DTR
+            param = {'max_depth': np.arange(1, 18, 1),
+                     'splitter': ['best', 'random'],
+                     'max_features': np.arange(1, 18, 1),
+                     'min_samples_split': np.arange(2, 20, 1)}
+            self.random_search_cv(Tree.DecisionTreeRegressor(random_state=0), param,
+                                  X_train, y_train, X_test, y_test, "Communities&CrimeDTR", 5)
+
+            # RFR
+            param = {'max_depth': np.arange(1, 20, 1),
+                     'max_features': np.array([1, 2, 5, 10, 15, 18]),
+                     'min_samples_split': np.array([2, 3, 5])}
+            self.random_search_cv(Ensemble.RandomForestRegressor(n_estimators=500, random_state=0),
+                                  param, X_train, y_train, X_test, y_test, "Communities&CrimeRFR", 5)
+
+            # NN
+            mlp = NN.MLPRegressor(activation='relu', n_iter_no_change=10, momentum=0.9, learning_rate='adaptive',
+                                  random_state=0, verbose=True, warm_start=True, early_stopping=True)
+            param_grid = {
+                "solver": ['adam'],
+                "learning_rate_init": Stats.reciprocal(0.001, 0.1),
+                "hidden_layer_sizes": [(128, 64, 32, 16), (32, 16, 8), (64, 32, 16)]
+            }
+            self.random_search_cv(mlp, param_grid, X_train, y_train, X_test, y_test, "Communities&CrimeNN", 5, 30)
+
+            # ADABOOST
+            param = {
+                "n_estimators": np.arange(50, 250, 10),
+                "loss": ['linear', 'square']
+            }
+            self.grid_search_cv(Ensemble.AdaBoostRegressor(random_state=0), param, X_train, y_train,
+                                X_test, y_test, "Communities&CrimeADA", 5)
+
+            # GPR
+            param = {
+                "alpha": [1e-10, 1e-9, 1e-8]
+            }
+            self.grid_search_cv(Gaussian.GaussianProcessRegressor(optimizer="fmin_l_bfgs_b", random_state=0),
+                                param, X_train, y_train, X_test, y_test, "Communities&CrimeGPR", 10)
+
+        else:
+            # SVR
+            self.load_pretrained_models("Communities&CrimeSVRModel", X_test, y_test)
+
+            # DTC
+            self.load_pretrained_models("Communities&CrimeDTRModel", X_test, y_test)
+
+            # RFC
+            self.load_pretrained_models("Communities&CrimeRFRModel", X_test, y_test)
+
+            # LR
+            self.load_pretrained_models("Communities&CrimeLRModel", X_test, y_test)
+
+            # Adaboost
+            self.load_pretrained_models("Communities&CrimeADAModel", X_test, y_test)
+
+            # GPR
+            self.load_pretrained_models("Communities&CrimeGPRModel", X_test, y_test)
+
+            # MLP
+            self.load_pretrained_models("Communities&CrimeNNModel", X_test, y_test)
 
     def QSAR_aquatic_toxicity(self):
         print('Running Regression for 3.QSAR_aquatic_toxicity dataset')
@@ -157,14 +256,199 @@ class class_regression:
             "hidden_layer_sizes": [(512,), (256, 128, 64, 32), (512, 256, 128, 64, 32)]
         }
 
-    def Parkinson_Speech(self):
+    def Parkinson_Speech(self, userResponse):
         print('Running Regression for 4.Parkinson_Speech dataset')
+
+        df = pd.read_csv(DATASETS + "train_data.txt", header=None, delimiter=',')
+
+        # Interchanging Last two columns
+        df_28 = df.iloc[:, 28]
+        df_27 = df.iloc[:, 27]
+        df = df.iloc[:, :27]
+        df = pd.concat([df, df_28, df_27], axis=1, ignore_index=True)
+
+        df = df.iloc[:, 1:29]
+        df = df.T.reset_index(drop=True).T
+
+        # Train Test Split
+        X_train, X_test, y_train, y_test = train_test_split(df.iloc[:, 0:27], df.iloc[:, 27], test_size=0.2,
+                                                            random_state=0, shuffle=False)
+        if userResponse is "2":
+
+            # LINEAR REGRESSION
+            lr_model = linear.LinearRegression().fit(X_train, y_train)
+            print(
+                "Linear Regression Mean Squared Error: ", metrics.mean_squared_error(y_test, lr_model.predict(X_test)))
+            print("Linear Regression R2 Score: ", metrics.r2_score(y_test, lr_model.predict(X_test)))
+            filename = "ParkinsonLRModel.sav"
+            pickle.dump(lr_model, open(RESULTS_FOR_DEMO + filename, 'wb'))
+            filename1 = "ParkinsonLRBestParams.sav"
+            pickle.dump(lr_model.get_params, open(RESULTS_FOR_DEMO + filename1, 'wb'))
+
+            # SVR
+            param = {'kernel': ['rbf'],
+                     'C': [1, 10, 100, 1000],
+                     'gamma': [1e-3, 1e-4, 1e-2, 1e-1, 1]}
+            self.grid_search_cv(SVM.SVR(), param, X_train, y_train, X_test, y_test, "ParkinsonSVR", cv=5)
+
+            # DTR
+            param = {'max_depth': np.arange(1, 18, 1),
+                     'splitter': ['best', 'random'],
+                     'max_features': np.arange(1, 18, 1),
+                     'min_samples_split': np.arange(2, 20, 1)}
+            self.random_search_cv(Tree.DecisionTreeRegressor(random_state=0), param, X_train, y_train, X_test, y_test,
+                                  "ParkinsonDTR", cv=5)
+
+            # RFR
+            param = {'max_depth': np.arange(1, 20, 1),
+                     'min_samples_split': np.array([2, 3, 5])}
+            self.grid_search_cv(Ensemble.RandomForestRegressor(n_estimators=100, random_state=0), param, X_train,
+                                y_train,
+                                X_test, y_test, "ParkinsonRFR", cv=5)
+
+            # NN
+            param = {
+                "solver": ['adam'],
+                "learning_rate_init": Stats.reciprocal(0.001, 0.1),
+                "hidden_layer_sizes": [(128, 64, 32, 16), (32, 16, 8), (64, 32, 16)]
+            }
+            self.random_search_cv(
+                NN.MLPRegressor(activation='relu', n_iter_no_change=10, momentum=0.9, learning_rate='adaptive',
+                                random_state=0, verbose=True, warm_start=True, early_stopping=True),
+                param, X_train, y_train, X_test, y_test, "ParkinsonNN", 5)
+
+            # ADABOOST
+            param = {
+                "n_estimators": np.arange(50, 250, 10),
+                "loss": ['linear', 'square']
+            }
+            self.grid_search_cv(Ensemble.AdaBoostRegressor(random_state=0), param, X_train, y_train, X_test, y_test,
+                                "ParkinsonADA", 5)
+
+            # GPR
+            param = {
+                "alpha": [1e-10, 1e-9, 1e-8]
+            }
+            self.grid_search_cv(Gaussian.GaussianProcessRegressor(optimizer="fmin_l_bfgs_b", random_state=0),
+                                param, X_train, y_train, X_test, y_test, "ParkinsonGPR", 10)
+
+        else:
+            # SVR
+            self.load_pretrained_models("ParkinsonSVRModel", X_test, y_test)
+
+            # DTR
+            self.load_pretrained_models("ParkinsonDTRModel", X_test, y_test)
+
+            # RFC
+            self.load_pretrained_models("ParkinsonRFRModel", X_test, y_test)
+
+            # LR
+            self.load_pretrained_models("ParkinsonLRModel", X_test, y_test)
+
+            # Adaboost
+            self.load_pretrained_models("ParkinsonADAModel", X_test, y_test)
+
+            # GPR
+            self.load_pretrained_models("ParkinsonGPRModel", X_test, y_test)
+
+            # MLP
+            self.load_pretrained_models("ParkinsonNNModel", X_test, y_test)
 
     def Facebook_metrics(self):
         print('Running Regression for 5.Facebook_metrics dataset')
 
-    def Bike_Sharing(self):
+    def Bike_Sharing(self, userResponse):
         print('Running Regression for 6.Bike_Sharing dataset')
+
+        df = pd.read_csv(DATASETS + "hour.csv", header=None, delimiter=',', skiprows=1)
+        encoder = Preprocessing.LabelEncoder()
+        encoder.fit(df.iloc[:, 1])
+        df.iloc[:, 1] = encoder.transform(df.iloc[:, 1])
+
+        X_train, X_test, y_train, y_test = train_test_split(df.iloc[:, 0:16], df.iloc[:, 16], test_size=0.2,
+                                                            random_state=0,
+                                                            shuffle=False)
+        if userResponse is "2":
+            # LINEAR REGRESSION
+            lr_model = linear.LinearRegression().fit(X_train, y_train)
+
+            print("Linear Regression Mean Squared Error: ",
+                  metrics.mean_squared_error(y_test, lr_model.predict(X_test)))
+            print("Linear Regression R2 Score: ", metrics.r2_score(y_test, lr_model.predict(X_test)))
+
+            filename = "BikeSharingLRModel.sav"
+            pickle.dump(lr_model, open(RESULTS_FOR_DEMO + filename, 'wb'))
+            filename1 = "BikeSharingLRBestParams.sav"
+            pickle.dump(lr_model.get_params, open(RESULTS_FOR_DEMO + filename1, 'wb'))
+
+            # SVR
+            param = {
+                "kernel": ["linear"],
+                "C": np.arange(0.01, 2)
+            }
+            self.random_search_cv(SVM.SVR(), param, X_train, y_train, X_test, y_test, "BikeSharingSVR", 5)
+
+            # DTR
+            param = {'max_depth': np.arange(1, 18, 1),
+                     'splitter': ['best', 'random'],
+                     'max_features': np.arange(1, 18, 1),
+                     'min_samples_split': np.arange(2, 20, 1)
+                     }
+            self.random_search_cv(Tree.DecisionTreeRegressor(random_state=0), param, X_train, y_train, X_test, y_test,
+                                  "BikeSharingDTR", 5)
+
+            # RFR
+            param = {'max_depth': np.arange(1, 20, 1),
+                     'min_samples_split': np.array([2, 3, 5])}
+
+            self.random_search_cv(Ensemble.RandomForestRegressor(n_estimators=100, random_state=0), param, X_train,
+                                  y_train, X_test, y_test, "BikeSharingRFR", 5)
+            # NN
+            mlp = NN.MLPRegressor(activation='relu', n_iter_no_change=10, momentum=0.9, learning_rate='adaptive',
+                                  random_state=0, verbose=True, warm_start=True, early_stopping=True)
+            param = {
+                "solver": ['adam'],
+                "learning_rate_init": Stats.reciprocal(0.001, 0.1),
+                "hidden_layer_sizes": [(128, 64, 32, 16), (32, 16, 8), (64, 32, 16)]
+            }
+            self.random_search_cv(mlp, param, X_train, y_train, X_test, y_test, "BikeSharingNN", 5, 30)
+
+            # ADABOOST
+            param = {
+                "n_estimators": np.arange(50, 250, 10),
+                "loss": ['linear', 'square']
+            }
+            self.grid_search_cv(Ensemble.AdaBoostRegressor(random_state=0), param, X_train, y_train, X_test, y_test,
+                                "BikeSharingADA", 5)
+
+            # GPR
+            param = {
+                "alpha": [1e-10, 1e-9, 1e-8]
+            }
+            self.random_search_cv(Gaussian.GaussianProcessRegressor(optimizer="fmin_l_bfgs_b", random_state=0),
+                                  param, X_train, y_train, X_test, y_test, "BikeSharingGPR", 3)
+
+        else:
+            # SVR
+            self.load_pretrained_models("BikeSharingSVRModel",X_test, y_test)
+
+            # DTR
+            self.load_pretrained_models("BikeSharingDTRModel",X_test, y_test)
+
+            # RFC
+            self.load_pretrained_models("BikeSharingRFRModel",X_test, y_test)
+
+            # LR
+            self.load_pretrained_models("BikeSharingLRModel",X_test, y_test)
+
+            # Adaboost
+            self.load_pretrained_models("BikeSharingADAModel",X_test, y_test)
+
+            # GPR
+            self.load_pretrained_models("BikeSharingGPRModel",X_test, y_test)
+
+            # MLP
+            self.load_pretrained_models("BikeSharingNNModel", X_test, y_test)
 
     def Student_Performance(self):
         print('Running Regression for 7.Student_Performance dataset')
@@ -174,8 +458,10 @@ class class_regression:
         X = df.loc[:, 'school':'G2']
         y = df.loc[:, 'G3']
         X = X.replace(
-            {'GP': 0, 'MS': 1, 'F': 1, 'M': 0, 'U': 0, 'R': 1, 'LE3': 0, 'GT3': 1, 'A': 0, 'T': 1, 'yes': 1, 'no': 0,
-             'father': 0, 'mother': 1, 'other': 2, 'teacher': 0, 'at_home': 1, 'health': 3, 'services': 4, 'home': 0,
+            {'GP': 0, 'MS': 1, 'F': 1, 'M': 0, 'U': 0, 'R': 1, 'LE3': 0, 'GT3': 1, 'A': 0, 'T': 1, 'yes': 1,
+             'no': 0,
+             'father': 0, 'mother': 1, 'other': 2, 'teacher': 0, 'at_home': 1, 'health': 3, 'services': 4,
+             'home': 0,
              'reputation': 1, 'course': 3}).astype(int)
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=0)
@@ -266,7 +552,8 @@ class class_regression:
                            'max_features': np.arange(1, 9),
                            'min_samples_split': np.arange(2, 10),
                            'n_estimators': [estimator for estimator in (2 ** i for i in range(0, 8))]}
-            self.random_search_cv(Ensemble.RandomForestRegressor(random_state=0), params_grid, X_train_scaled, y_train,
+            self.random_search_cv(Ensemble.RandomForestRegressor(random_state=0), params_grid, X_train_scaled,
+                                  y_train,
                                   X_test, y_test, "ConcreteRFC")
 
             # MLP
@@ -320,6 +607,7 @@ class class_regression:
             # MLP
             self.load_pretrained_models("ConcreteMLPModel", X_test_scaled, y_test)
 
+
     def SGEMM_GPU_kernel_performance(self):
         print('Running Regression for 9.SGEMM_GPU_kernel_performance dataset')
 
@@ -364,10 +652,12 @@ class class_regression:
             self.merck_model(ada_act2, ada_act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "Adaboost")
 
             # GPR
-            gau_act2 = Gaussian.GaussianProcessRegressor(optimizer="fmin_l_bfgs_b", random_state=0).fit(X_train_act2,
-                                                                                                        y_train_act2)
-            gau_act4 = Gaussian.GaussianProcessRegressor(optimizer="fmin_l_bfgs_b", random_state=0).fit(X_train_act4,
-                                                                                                        y_train_act4)
+            gau_act2 = Gaussian.GaussianProcessRegressor(optimizer="fmin_l_bfgs_b", random_state=0).fit(
+                X_train_act2,
+                y_train_act2)
+            gau_act4 = Gaussian.GaussianProcessRegressor(optimizer="fmin_l_bfgs_b", random_state=0).fit(
+                X_train_act4,
+                y_train_act4)
             self.merck_model(gau_act2, gau_act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, "GPR")
 
             # MLP
@@ -384,9 +674,11 @@ class class_regression:
             print("act2 done")
             mlp_act4 = NN.MLPRegressor(solver='adam', n_iter_no_change=10, momentum=0.9, learning_rate='adaptive',
                                        random_state=0, verbose=True, warm_start=True, early_stopping=True)
-            nn_act4 = RandomizedSearchCV(mlp_act4, param_grid, cv=5, scoring='r2', verbose=5, error_score='np.nan').fit(
+            nn_act4 = RandomizedSearchCV(mlp_act4, param_grid, cv=5, scoring='r2', verbose=5,
+                                         error_score='np.nan').fit(
                 X_train_act4, y_train_act4)
-            self.merck_model(nn_act2.best_estimator_, nn_act4.best_estimator_, X_test_act2, y_test_act2, X_test_act4,
+            self.merck_model(nn_act2.best_estimator_, nn_act4.best_estimator_, X_test_act2, y_test_act2,
+                             X_test_act4,
                              y_test_act4, "MLP")
         else:
             act2 = pickle.load(open(PRETRAINED_MODEL + "LRBestModelACT2.sav", "rb"))
