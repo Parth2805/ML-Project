@@ -97,9 +97,9 @@ class class_regression:
         # self.WineQuality(userResponse)
         # self.Communities_Crime()
         # self.QSAR_aquatic_toxicity()
-        self.Parkinson_Speech(userResponse)
+        # self.Parkinson_Speech(userResponse)
         # self.Facebook_metrics()
-        self.Bike_Sharing(userResponse)
+        # self.Bike_Sharing(userResponse)
         # self.Student_Performance()
         # self.Concrete_Compressive_Strength()
         self.SGEMM_GPU_kernel_performance(userResponse)
@@ -885,10 +885,9 @@ class class_regression:
 
             print("Mean Squared Error: ", metrics.mean_squared_error(y_test, lr.predict(X_test)))
             print("R2 Score: ", metrics.r2_score(y_test, lr.predict(X_test)))
-            name = "(SGEMM_Linear_Regression"
+            name = "SGEMM_Linear_Regression"
             pickle.dump(lr, open(RESULTS_FOR_DEMO + "%sModel.sav" % name, 'wb'))
             pickle.dump(lr.get_params, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
-            plot.plot_learning_curve(lr, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=5)
 
             '''
             ### **SVR**
@@ -956,7 +955,6 @@ class class_regression:
             name = "SGEMM_Neural_Network"
             pickle.dump(mlp, open(RESULTS_FOR_DEMO + "%sModel.sav" % name, 'wb'))
             pickle.dump(mlp.get_params, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
-            plot.plot_learning_curve(lr, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=5)
             '''
             ## **Gaussian Process**
             '''
@@ -967,7 +965,13 @@ class class_regression:
             # print(gp.score(X_train, y_train))
             # print(gp.score(X_test, y_test))
         else:
-            print("hello")
+            # self.load_pretrained_models("SGEMM_SVRModel", X_test, y_test)
+            self.load_pretrained_models("SGEMM_Linear_RegressionModel", X_test, y_test)
+            self.load_pretrained_models("SGEMM_Decision_TreeModel", X_test, y_test)
+            self.load_pretrained_models("SGEMM_Random_ForestModel", X_test, y_test)
+            self.load_pretrained_models("SGEMM_Ada_BoostModel", X_test, y_test)
+            self.load_pretrained_models("SGEMM_Neural_NetworkModel", X_test, y_test)
+            # self.load_pretrained_models("SGEMM_Gaussian_ProcessModel", X_test, y_test)
 
 
 
