@@ -94,16 +94,16 @@ class class_regression:
 
     def get_regressor(self, userResponse):
         print('Running regressors for the following datasets: \n')
-        # self.WineQuality(userResponse)
-        # self.Communities_Crime()
-        # self.QSAR_aquatic_toxicity()
+        self.WineQuality(userResponse)
+        # self.Communities_Crime(userResponse)
+        # self.QSAR_aquatic_toxicity(userResponse)
         # self.Parkinson_Speech(userResponse)
-        # self.Facebook_metrics()
+        self.Facebook_metrics(userResponse)
         # self.Bike_Sharing(userResponse)
-        # self.Student_Performance()
-        # self.Concrete_Compressive_Strength()
+        # self.Student_Performance(userResponse)
+        # self.Concrete_Compressive_Strength(userResponse)
         self.SGEMM_GPU_kernel_performance(userResponse)
-        # self.Merck_Molecular_Activity_Challenge()
+        # self.Merck_Molecular_Activity_Challenge(userResponse)
 
     def WineQuality(self, userResponse):
         print('Running Regression for 1.WineQuality dataset')
@@ -856,12 +856,6 @@ class class_regression:
         data = df.values
         X_train, X_test, y_train, y_test = train_test_split(data[:, 0:14], data[:, 14:15], test_size=0.20,
                                                             random_state=0)
-
-        # scaler=StandardScaler().fit(X_train)
-        # X_train=scaler.transform(X_train)
-        # X_test=scaler.transform(X_test)
-        # y_train=y_train.astype(int)
-        # y_test=y_test.astype(int)
         y_test = np.ravel(y_test)
         y_train = np.ravel(y_train)
 
