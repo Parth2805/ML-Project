@@ -54,12 +54,11 @@ class class_classification:
         pickle.dump(model.best_params_, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
         plot.plot_learning_curve(model.best_estimator_, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=cv)
 
-    def load_pretrained_models(self, name, X_train, y_train, X_test, y_test, cv):
+    def load_pretrained_models(self, name, X_train, y_train, X_test, y_test):
         print("Loading PreTrained model: ", name)
         model = pickle.load(open(PRETRAINED_MODEL + name + ".sav", 'rb'))
         print("Testing Accuracy: ", model.score(X_test, y_test))
         print("Training Accuracy: ", model.score(X_train, y_train))
-        plot.plot_learning_curve(model, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=cv)
 
     def run_classifier(self, userResponse):
         print('Running classifiers for the following datasets: \n')
