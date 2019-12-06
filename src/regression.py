@@ -557,8 +557,132 @@ class class_regression:
             self.load_pretrained_models("neural_network_concrete_model", X_train_scaled, y_train, X_test_scaled, y_test,
                                         5)
 
-    def SGEMM_GPU_kernel_performance(self):
+    def SGEMM_GPU_kernel_performance(self,userResponse):
         print('Running Regression for 9.SGEMM_GPU_kernel_performance dataset')
+
+        '''
+        ### **Preprocessing**
+        '''
+        file = "/content/drive/My Drive/Regression/9_Sgemm_GPU/sgemm_product.csv"
+        df = pd.read_csv(file, sep=',')
+        data = df.values
+        X_train, X_test, y_train, y_test = train_test_split(data[:, 0:14], data[:, 14:15], test_size=0.20,
+                                                            random_state=0)
+
+        # scaler=StandardScaler().fit(X_train)
+        # X_train=scaler.transform(X_train)
+        # X_test=scaler.transform(X_test)
+        # y_train=y_train.astype(int)
+        # y_test=y_test.astype(int)
+        y_test = np.ravel(y_test)
+        y_train = np.ravel(y_train)
+
+        # 'Function for NAN'
+        # # print(data.shape)
+        # list=[]
+        # for i in range(data.shape[0]):
+        #   for j in range(data.shape[1]):
+        #     if(np.isnan(data[i][j])):
+        #       print("There is a nan at:",i,j)
+        #     else:
+        #       list.append(data[i][j])
+        # print(len(list)/18)
+
+        if(userResponse=='2'):
+            # %%
+            '''
+            ### **Linear Regression**
+            '''
+            lr = sklearn.linear_model.LinearRegression().fit(X_train, y_train)
+
+            print("Mean Squared Error: ", metrics.mean_squared_error(y_test, lr.predict(X_test)))
+            print("R2 Score: ", metrics.r2_score(y_test, lr.predict(X_test)))
+            name = "(SGEMM_Linear_Regression"
+            pickle.dump(lr, open(RESULTS_FOR_DEMO + "%sModel.sav" % name, 'wb'))
+            pickle.dump(lr.get_params, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
+            plot.plot_learning_curve(lr, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=5)
+
+            '''
+            ### **SVR**
+            '''
+
+            # # %%
+            # svm = sklearn.svm.SVR(kernel="rbf").fit(X_train, y_train)
+            #
+            # print(svm.score(X_train, y_train))
+            # print(svm.score(X_test, y_test))
+
+
+            '''
+            ### **Decision Tree**
+            '''
+
+            dt = sklearn.tree.DecisionTreeRegressor(random_state=0)
+
+            param = {'max_depth': np.arange(1, 10, 1),
+                     'splitter': ['best', 'random'],
+                     'max_features': np.arange(1, 10, 1),
+                     'min_samples_split': np.arange(2, 13, 1)}
+
+            self.random_search_cv(dt,param,X_train,y_train,X_test,y_test,"SGEMM_Decision_Tree")
+
+
+            '''
+            ### **Random Forest**
+            '''
+
+            # %%
+            rf = sklearn.ensemble.RandomForestRegressor(n_estimators=100, random_state=0)
+
+            param = {'max_depth': np.arange(1, 20, 1),
+                     'max_features': np.array([1, 2, 3, 5, 7, 9]),
+                     'min_samples_split': np.array([2, 3, 5])}
+
+            self.random_search_cv(rf, param, X_train, y_train, X_test, y_test,"SGEMM_Random_Forest")
+            '''
+            ## **Ada Boost**
+            '''
+
+            # %%
+            ada = sklearn.ensemble.AdaBoostRegressor(random_state=0)
+
+            param = dict(n_estimators=np.arange(50, 250, 10),
+                         loss=['linear', 'square']
+                         )
+
+            self.grid_search_cv(ada, param, X_train, y_train, X_test, y_test,"SGEMM_Ada_Boost")
+
+            # %%
+            '''
+            ## **Neural Network**
+            '''
+
+            # %%
+            mlp = sklearn.neural_network.MLPRegressor(solver='adam', hidden_layer_sizes=(128, 64, 32, 16),
+                                                      activation='relu', n_iter_no_change=10, momentum=0.9,
+                                                      learning_rate='adaptive', random_state=0, verbose=True,
+                                                      warm_start=True, early_stopping=True, ).fit(X_train, y_train)
+
+            print("Mean Squared Error: ", metrics.mean_squared_error(y_test, mlp.predict(X_test)))
+            print("R2 Score: ", metrics.r2_score(y_test, mlp.predict(X_test)))
+            name = "SGEMM_Neural_Network"
+            pickle.dump(mlp, open(RESULTS_FOR_DEMO + "%sModel.sav" % name, 'wb'))
+            pickle.dump(mlp.get_params, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
+            plot.plot_learning_curve(lr, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=5)
+            '''
+            ## **Gaussian Process**
+            '''
+            #
+            # # %%
+            # gp = sklearn.gaussian_process.GaussianProcessRegressor(random_state=0, normalize_y=True, alpha=0.05).fit(
+            #     X_train, y_train)
+            # print(gp.score(X_train, y_train))
+            # print(gp.score(X_test, y_test))
+        else:
+            print("hello")
+
+
+
 
     def Merck_Molecular_Activity_Challenge(self, userResponse):
         print('Running Regression for 10.Merck_Molecular_Activity_Challenge dataset')
