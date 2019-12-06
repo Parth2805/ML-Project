@@ -61,15 +61,15 @@ class class_classification:
         print('Running classifiers for the following datasets: \n')
         # self.Diabetic_Retinopathy()
         # self.Default_of_credit_card_clients(userResponse)
-        # self.Breast_Cancer_Wisconsin(userResponse)
+        self.Breast_Cancer_Wisconsin(userResponse)
         # self.Statlog_Australian(userResponse)
         # self.Statlog_German()
         # self.Steel_Plates_Faults(userResponse)
-        # self.Adult(userResponse)
-        self.Yeast(userResponse)
+        self.Adult(userResponse)
+        #self.Yeast(userResponse)
         self.Thoracic_Surgery_Data(userResponse)
         # self.Breast_Cancer_Wisconsin()
-        self.Steel_Plates_Faults(userResponse)
+        #self.Steel_Plates_Faults(userResponse)
         # self.Seismic_Bumps(userResponse)
 
     def Diabetic_Retinopathy(self):
@@ -560,28 +560,28 @@ class class_classification:
             self.random_search_cv(mlp, param_grid, X_train, y_train, X_test, y_test, "Mlp_WBC_model", 5)
         else:
             # SVM
-            self.load_pretrained_models("Svm_WBC_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("Svm_WBC_model", X_train, y_train, X_test, y_test)
 
             # DTC
-            self.load_pretrained_models("DecisionTree_WBC_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("DecisionTree_WBC_model", X_train, y_train, X_test, y_test)
 
             # RFC
-            self.load_pretrained_models("RandomForest_WBC_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("RandomForest_WBC_model", X_train, y_train, X_test, y_test)
 
             # LR
-            self.load_pretrained_models("Logistic_WBC_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("Logistic_WBC_model", X_train, y_train, X_test, y_test)
 
             # Adaboost
-            self.load_pretrained_models("Adaboost_WBC_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("Adaboost_WBC_model", X_train, y_train, X_test, y_test)
 
             # KNN
-            self.load_pretrained_models("kNN_WBC_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("kNN_WBC_model", X_train, y_train, X_test, y_test)
 
             # GNB
-            self.load_pretrained_models("Gaussian_WBC_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("Gaussian_WBC_model", X_train, y_train, X_test, y_test)
 
             # MLP
-            self.load_pretrained_models("Mlp_WBC_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("Mlp_WBC_model", X_train, y_train, X_test, y_test)
 
         '''DATASET WDBC'''
         df = pd.read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/wdbc.data",
@@ -708,28 +708,28 @@ class class_classification:
             self.random_search_cv(mlp, param_grid, X_train, y_train, X_test, y_test, "mlp_WDBC_model")
         else:
             # SVM
-            self.load_pretrained_models("svm_WDBC_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("svm_WDBC_model", X_train, y_train, X_test, y_test)
 
             # DTC
-            self.load_pretrained_models("tree_WDBC_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("tree_WDBC_model", X_train, y_train, X_test, y_test)
 
             # RFC
-            self.load_pretrained_models("random_forest_WDBC_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("random_forest_WDBC_model", X_train, y_train, X_test, y_test)
 
             # LR
-            self.load_pretrained_models("logistic_WDBC_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("logistic_WDBC_model", X_train, y_train, X_test, y_test)
 
             # Adaboost
-            self.load_pretrained_models("adaboost_WDBC_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("adaboost_WDBC_model", X_train, y_train, X_test, y_test)
 
             # KNN
-            self.load_pretrained_models("knearest_WDBC_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("knearest_WDBC_model", X_train, y_train, X_test, y_test)
 
             # GNB
-            self.load_pretrained_models("gaussian_WDBC_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("gaussian_WDBC_model", X_train, y_train, X_test, y_test)
 
             # MLP
-            self.load_pretrained_models("mlp_WDBC_model", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("mlp_WDBC_model", X_train, y_train, X_test, y_test)
 
         '''DATASET WPBC'''
 
@@ -1582,28 +1582,28 @@ class class_classification:
             self.random_search_cv(mlp, param_grid, X_train, y_train, X_test, y_test, "mlp_Adult_model", cv=3)
         else:
             # SVM
-            self.load_pretrained_models("svm_Adult_model", X_train, y_train, X_test, y_test, 3)
+            self.load_pretrained_models("svm_Adult_model", X_train, y_train, X_test, y_test)
 
             # DTC
-            self.load_pretrained_models("tree_Adult_model", X_train, y_train, X_test, y_test, 3)
+            self.load_pretrained_models("tree_Adult_model", X_train, y_train, X_test, y_test)
 
             # RFC
-            self.load_pretrained_models("random_forest_Adult_model", X_train, y_train, X_test, y_test, 3)
+            self.load_pretrained_models("random_forest_Adult_model", X_train, y_train, X_test, y_test)
 
             # LR
-            self.load_pretrained_models("logistic_Adult_model", X_train, y_train, X_test, y_test, 3)
+            self.load_pretrained_models("logistic_Adult_model", X_train, y_train, X_test, y_test)
 
             # Adaboost
-            self.load_pretrained_models("adaboost_Adult_model", X_train, y_train, X_test, y_test, 3)
+            self.load_pretrained_models("adaboost_Adult_model", X_train, y_train, X_test, y_test)
 
             # KNN
-            self.load_pretrained_models("knearest_Adult_model", X_train, y_train, X_test, y_test, 3)
+            self.load_pretrained_models("knearest_Adult_model", X_train, y_train, X_test, y_test)
 
             # GNB
-            self.load_pretrained_models("gaussian_Adult_model", X_train, y_train, X_test, y_test, 3)
+            self.load_pretrained_models("gaussian_Adult_model", X_train, y_train, X_test, y_test)
 
             # MLP
-            self.load_pretrained_models("mlp_Adult_model", X_train, y_train, X_test, y_test, 3)
+            self.load_pretrained_models("mlp_Adult_model", X_train, y_train, X_test, y_test)
 
     def Yeast(self, userResponse):
         print('Running classification for 8.Yeast dataset')

@@ -15,7 +15,7 @@ class main:
         classifier.run_classifier(user_response)
         regressor = regression.class_regression()
         regressor.get_regressor(user_response)
-        cifar10.Cifar10(sys.argv[1], user_response)
+        #cifar10.Cifar10(sys.argv[1], user_response)
 
 
 start1 = main()
