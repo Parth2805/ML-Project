@@ -1,5 +1,4 @@
 Pretrained Models/CIFAR10.t7
-Results For Demo/CIFAR10.t7
 Pretrained Models/CIFAR10CPU.t7
 Results For Demo/activation_maximization.jpg
 Results For Demo/fgst.jpg
@@ -16,3 +15,8 @@ Datasets/Concrete_Data.xls
 Datasets/ac2_cache.npz
 Datasets/ac4_cache.npz
 Results For Demo/merckResults.txt
+Results For Demo/cpu_acc_plot.jpg
+Results For Demo/cpu_loss_plot.jpg
+Pretrained Models
+Results For Demo
+Results
