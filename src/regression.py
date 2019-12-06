@@ -58,13 +58,12 @@ class class_regression:
         pickle.dump(model.best_params_, open(RESULTS_FOR_DEMO + "%sBestParams.sav" % name, 'wb'))
         plot.plot_learning_curve(model.best_estimator_, name + " Learning Curve", X_train, y_train, (0.5, 1.01), cv=cv)
 
-    def load_pretrained_models(self, name, X_train, y_train, X_test, y_test, cv):
+    def load_pretrained_models(self, name, X_test, y_test):
         print("Loading PreTrained model: ", name)
         model = pickle.load(open(PRETRAINED_MODEL + name + ".sav", 'rb'))
         print("Mean Squared Error: ",
               metrics.mean_squared_error(y_test, model.predict(X_test)))
         print("R2 Score: ", metrics.r2_score(y_test, model.predict(X_test)))
-        plot.plot_learning_curve(model, name + " Learning Curve ", X_train, y_train, (0.5, 1.01), cv=cv)
 
     def merck_model(self, act2, act4, X_test_act2, y_test_act2, X_test_act4, y_test_act4, name, pretrained=False):
         print(name)
@@ -91,9 +90,9 @@ class class_regression:
     def get_regressor(self, userResponse):
         print('Running regressors for the following datasets: \n')
         # self.WineQuality()
-        # self.Communities_Crime(userResponse)
+        self.Communities_Crime(userResponse)
         # self.QSAR_aquatic_toxicity()
-        # self.Parkinson_Speech(userResponse)
+        self.Parkinson_Speech(userResponse)
         # self.Facebook_metrics()
         self.Bike_Sharing(userResponse)
         # self.Student_Performance()
@@ -186,25 +185,25 @@ class class_regression:
 
         else:
             # SVR
-            self.load_pretrained_models("Communities&CrimeSVRModel", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("Communities&CrimeSVRModel", X_test, y_test)
 
             # DTC
-            self.load_pretrained_models("Communities&CrimeDTRModel", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("Communities&CrimeDTRModel", X_test, y_test)
 
             # RFC
-            self.load_pretrained_models("Communities&CrimeRFRModel", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("Communities&CrimeRFRModel", X_test, y_test)
 
             # LR
-            self.load_pretrained_models("Communities&CrimeLRModel", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("Communities&CrimeLRModel", X_test, y_test)
 
             # Adaboost
-            self.load_pretrained_models("Communities&CrimeADAModel", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("Communities&CrimeADAModel", X_test, y_test)
 
             # GPR
-            self.load_pretrained_models("Communities&CrimeGPRModel", X_train, y_train, X_test, y_test, 10)
+            self.load_pretrained_models("Communities&CrimeGPRModel", X_test, y_test)
 
             # MLP
-            self.load_pretrained_models("Communities&CrimeNNModel", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("Communities&CrimeNNModel", X_test, y_test)
 
     def QSAR_aquatic_toxicity(self):
         print('Running Regression for 3.QSAR_aquatic_toxicity dataset')
@@ -335,25 +334,25 @@ class class_regression:
 
         else:
             # SVR
-            self.load_pretrained_models("ParkinsonSVRModel", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("ParkinsonSVRModel", X_test, y_test)
 
             # DTR
-            self.load_pretrained_models("ParkinsonDTRModel", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("ParkinsonDTRModel", X_test, y_test)
 
             # RFC
-            self.load_pretrained_models("ParkinsonRFRModel", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("ParkinsonRFRModel", X_test, y_test)
 
             # LR
-            self.load_pretrained_models("ParkinsonLRModel", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("ParkinsonLRModel", X_test, y_test)
 
             # Adaboost
-            self.load_pretrained_models("ParkinsonADAModel", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("ParkinsonADAModel", X_test, y_test)
 
             # GPR
-            self.load_pretrained_models("ParkinsonGPRModel", X_train, y_train, X_test, y_test, 10)
+            self.load_pretrained_models("ParkinsonGPRModel", X_test, y_test)
 
             # MLP
-            self.load_pretrained_models("ParkinsonNNModel", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("ParkinsonNNModel", X_test, y_test)
 
     def Facebook_metrics(self):
         print('Running Regression for 5.Facebook_metrics dataset')
@@ -431,25 +430,25 @@ class class_regression:
 
         else:
             # SVR
-            self.load_pretrained_models("BikeSharingSVRModel", X_train, y_train, X_test, y_test, 3)
+            self.load_pretrained_models("BikeSharingSVRModel",X_test, y_test)
 
             # DTR
-            self.load_pretrained_models("BikeSharingDTRModel", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("BikeSharingDTRModel",X_test, y_test)
 
             # RFC
-            self.load_pretrained_models("BikeSharingRFRModel", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("BikeSharingRFRModel",X_test, y_test)
 
             # LR
-            self.load_pretrained_models("BikeSharingLRModel", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("BikeSharingLRModel",X_test, y_test)
 
             # Adaboost
-            self.load_pretrained_models("BikeSharingADAModel", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("BikeSharingADAModel",X_test, y_test)
 
             # GPR
-            self.load_pretrained_models("BikeSharingGPRModel", X_train, y_train, X_test, y_test, 3)
+            self.load_pretrained_models("BikeSharingGPRModel",X_test, y_test)
 
             # MLP
-            self.load_pretrained_models("BikeSharingNNModel", X_train, y_train, X_test, y_test, 5)
+            self.load_pretrained_models("BikeSharingNNModel", X_test, y_test)
 
     def Student_Performance(self):
         print('Running Regression for 7.Student_Performance dataset')
