@@ -3,7 +3,7 @@ import numpy as np
 import os
 import pickle
 import plot
-import pydotplus as pdp
+# import pydotplus as pdp
 import sklearn.model_selection as model_select
 import sklearn.tree as Tree
 import torch
