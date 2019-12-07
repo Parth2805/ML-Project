@@ -67,7 +67,7 @@ class class_classification:
         # self.Statlog_Australian()
         self.Statlog_German(userResponse)
         # self.Steel_Plates_Faults(userResponse)
-        self.Adult(userResponse)
+        # self.Adult(userResponse)
         # self.Yeast(userResponse)
         self.Thoracic_Surgery_Data(userResponse)
         # self.Seismic_Bumps(userResponse)
@@ -1454,7 +1454,6 @@ class class_classification:
             self.load_pretrained_models("YeastDCTModel", X_train, y_train, X_test, y_test)
 
     def Thoracic_Surgery_Data(self, userResponse):
-        def Thoracic_Surgery_Data(self, userResponse):
             print('Running classification for 9.Thoracic Surgery Data dataset')
             df = pd.read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/00277/ThoraricSurgery.arff",
                              delimiter=",", header=None, skiprows=21)
@@ -1573,30 +1572,29 @@ class class_classification:
                                       "mlp_Thoracic_Surgery_Data_model", cv=3)
             else:
                 # SVM
-                self.load_pretrained_models("svm_Thoracic_Surgery_Data_model", X_train, y_train, X_test, y_test, 3)
+                self.load_pretrained_models("svm_Thoracic_Surgery_Data_modelModel", X_train, y_train, X_test, y_test)
 
                 # DTC
-                self.load_pretrained_models("tree_Thoracic_Surgery_Data_model", X_train, y_train, X_test, y_test, 3)
+                self.load_pretrained_models("tree_Thoracic_Surgery_Data_modelModel", X_train, y_train, X_test, y_test)
 
                 # RFC
-                self.load_pretrained_models("random_forest_Thoracic_Surgery_Data_model", X_train, y_train, X_test,
-                                            y_test,
-                                            3)
+                self.load_pretrained_models("random_forest_Thoracic_Surgery_Data_modelModel", X_train, y_train, X_test,
+                                            y_test)
 
                 # LR
-                self.load_pretrained_models("logistic_Thoracic_Surgery_Data_model", X_train, y_train, X_test, y_test, 3)
+                self.load_pretrained_models("logistic_Thoracic_Surgery_Data_modelModel", X_train, y_train, X_test, y_test)
 
                 # Adaboost
-                self.load_pretrained_models("adaboost_Thoracic_Surgery_Data_model", X_train, y_train, X_test, y_test, 3)
+                self.load_pretrained_models("adaboost_Thoracic_Surgery_Data_modelModel", X_train, y_train, X_test, y_test)
 
                 # KNN
-                self.load_pretrained_models("knearest_Thoracic_Surgery_Data_model", X_train, y_train, X_test, y_test, 3)
+                self.load_pretrained_models("knearest_Thoracic_Surgery_Data_modelModel", X_train, y_train, X_test, y_test)
 
                 # GNB
-                self.load_pretrained_models("gaussian_Thoracic_Surgery_Data_model", X_train, y_train, X_test, y_test, 3)
+                self.load_pretrained_models("gaussian_Thoracic_Surgery_Data_modelModel", X_train, y_train, X_test, y_test)
 
                 # MLP
-                self.load_pretrained_models("mlp_Thoracic_Surgery_Data_model", X_train, y_train, X_test, y_test, 3)
+                self.load_pretrained_models("mlp_Thoracic_Surgery_Data_modelModel", X_train, y_train, X_test, y_test)
 
     def Seismic_Bumps(self, userResponse):
         print('Running classification for 10.Seismic Bumps dataset')
