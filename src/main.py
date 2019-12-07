@@ -1,9 +1,9 @@
 import sys
 
-import cifar10 as cifar10
+# import cifar10 as cifar10
 import classification
 import regression
-from cifar10 import CNN
+# from cifar10 import CNN
 from pip._vendor.distlib.compat import raw_input
 
 
@@ -15,7 +15,7 @@ class main:
         classifier.run_classifier(user_response)
         regressor = regression.class_regression()
         regressor.get_regressor(user_response)
-        cifar10.Cifar10(sys.argv[1], user_response)
+        # cifar10.Cifar10(sys.argv[1], user_response)
 
 
 start1 = main()

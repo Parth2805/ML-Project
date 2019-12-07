@@ -63,13 +63,13 @@ class class_classification:
         print('Running classifiers for the following datasets: \n')
         self.Diabetic_Retinopathy(userResponse)
         # self.Default_of_credit_card_clients(userResponse)
-        # self.Breast_Cancer_Wisconsin()
+        self.Breast_Cancer_Wisconsin(userResponse)
         # self.Statlog_Australian()
         self.Statlog_German(userResponse)
         # self.Steel_Plates_Faults(userResponse)
-        # self.Adult()
+        self.Adult(userResponse)
         # self.Yeast(userResponse)
-        # self.Thoracic_Surgery_Data()
+        self.Thoracic_Surgery_Data(userResponse)
         # self.Seismic_Bumps(userResponse)
 
     def Diabetic_Retinopathy(self,userResponse):
@@ -198,7 +198,6 @@ class class_classification:
             self.load_pretrained_models("Diabetic_Neural_NetworkModel", X_train, y_train, X_test, y_test)
             self.load_pretrained_models("Diabetic_Gaussian_Naive_BayesModel", X_train, y_train, X_test, y_test)
             self.load_pretrained_models("Diabetic_K_NeighborsModel", X_train, y_train, X_test, y_test)
-
 
     def Default_of_credit_card_clients(self, userResponse):
         df = pd.read_excel(DATASETS + "default of credit card clients.xls", skiprows=1)
@@ -446,28 +445,28 @@ class class_classification:
             self.random_search_cv(mlp, param_grid, X_train, y_train, X_test, y_test, "Mlp_WBC_model", 5)
         else:
             # SVM
-            self.load_pretrained_models("Svm_WBC_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Svm_WBC_modelModel", X_train, y_train, X_test, y_test)
 
             # DTC
-            self.load_pretrained_models("DecisionTree_WBC_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("DecisionTree_WBC_modelModel", X_train, y_train, X_test, y_test)
 
             # RFC
-            self.load_pretrained_models("RandomForest_WBC_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("RandomForest_WBC_modelModel", X_train, y_train, X_test, y_test)
 
             # LR
-            self.load_pretrained_models("Logistic_WBC_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Logistic_WBC_modelModel", X_train, y_train, X_test, y_test)
 
             # Adaboost
-            self.load_pretrained_models("Adaboost_WBC_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Adaboost_WBC_modelModel", X_train, y_train, X_test, y_test)
 
             # KNN
-            self.load_pretrained_models("kNN_WBC_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("kNN_WBC_modelModel", X_train, y_train, X_test, y_test)
 
             # GNB
-            self.load_pretrained_models("Gaussian_WBC_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Gaussian_WBC_modelModel", X_train, y_train, X_test, y_test)
 
             # MLP
-            self.load_pretrained_models("Mlp_WBC_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("Mlp_WBC_modelModel", X_train, y_train, X_test, y_test)
 
         '''DATASET WDBC'''
         df = pd.read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/wdbc.data",
@@ -594,28 +593,28 @@ class class_classification:
             self.random_search_cv(mlp, param_grid, X_train, y_train, X_test, y_test, "mlp_WDBC_model")
         else:
             # SVM
-            self.load_pretrained_models("svm_WDBC_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("svm_WDBC_modelModel", X_train, y_train, X_test, y_test)
 
             # DTC
-            self.load_pretrained_models("tree_WDBC_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("tree_WDBC_modelModel", X_train, y_train, X_test, y_test)
 
             # RFC
-            self.load_pretrained_models("random_forest_WDBC_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("random_forest_WDBC_modelModel", X_train, y_train, X_test, y_test)
 
             # LR
-            self.load_pretrained_models("logistic_WDBC_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("logistic_WDBC_modelModel", X_train, y_train, X_test, y_test)
 
             # Adaboost
-            self.load_pretrained_models("adaboost_WDBC_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("adaboost_WDBC_modelModel", X_train, y_train, X_test, y_test)
 
             # KNN
-            self.load_pretrained_models("knearest_WDBC_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("knearest_WDBC_modelModel", X_train, y_train, X_test, y_test)
 
             # GNB
-            self.load_pretrained_models("gaussian_WDBC_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("gaussian_WDBC_modelModel", X_train, y_train, X_test, y_test)
 
             # MLP
-            self.load_pretrained_models("mlp_WDBC_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("mlp_WDBC_modelModel", X_train, y_train, X_test, y_test)
 
         '''DATASET WPBC'''
 
@@ -756,28 +755,28 @@ class class_classification:
             self.random_search_cv(mlp, param_grid, X_train, y_train, X_test, y_test, "mlp_WPBC_model")
         else:
             # SVM
-            self.load_pretrained_models("svm_WPBC_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("svm_WPBC_modelModel", X_train, y_train, X_test, y_test)
 
             # DTC
-            self.load_pretrained_models("tree_WPBC_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("tree_WPBC_modelModel", X_train, y_train, X_test, y_test)
 
             # RFC
-            self.load_pretrained_models("random_forest_WPBC_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("random_forest_WPBC_modelModel", X_train, y_train, X_test, y_test)
 
             # LR
-            self.load_pretrained_models("logistic_WPBC_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("logistic_WPBC_modelModel", X_train, y_train, X_test, y_test)
 
             # Adaboost
-            self.load_pretrained_models("adaboost_WPBC_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("adaboost_WPBC_modelModel", X_train, y_train, X_test, y_test)
 
             # KNN
-            self.load_pretrained_models("knearest_WPBC_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("knearest_WPBC_modelModel", X_train, y_train, X_test, y_test)
 
             # GNB
-            self.load_pretrained_models("gaussian_WPBC_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("gaussian_WPBC_modelModel", X_train, y_train, X_test, y_test)
 
             # MLP
-            self.load_pretrained_models("mlp_WPBC_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("mlp_WPBC_modelModel", X_train, y_train, X_test, y_test)
 
     def Statlog_Australian(self, userResponse):
         print('Running classification for 4.Statlog Australian dataset')
@@ -1009,7 +1008,6 @@ class class_classification:
             self.load_pretrained_models("StatlOgGerman_Neural_NetworkModel", X_train, y_train, X_test, y_test)
             self.load_pretrained_models("StatlOgGerman_Gaussian_Naive_BayesModel", X_train, y_train, X_test, y_test)
             self.load_pretrained_models("StatlOgGerman_K_NeigborsModel", X_train, y_train, X_test, y_test)
-
 
     def Steel_Plates_Faults(self, userResponse):
         print('Running classification for 6.Steel Plates Faults dataset')
@@ -1324,28 +1322,28 @@ class class_classification:
             self.random_search_cv(mlp, param_grid, X_train, y_train, X_test, y_test, "mlp_Adult_model", cv=3)
         else:
             # SVM
-            self.load_pretrained_models("svm_Adult_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("svm_Adult_modelModel", X_train, y_train, X_test, y_test)
 
             # DTC
-            self.load_pretrained_models("tree_Adult_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("tree_Adult_modelModel", X_train, y_train, X_test, y_test)
 
             # RFC
-            self.load_pretrained_models("random_forest_Adult_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("random_forest_Adult_modelModel", X_train, y_train, X_test, y_test)
 
             # LR
-            self.load_pretrained_models("logistic_Adult_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("logistic_Adult_modelModel", X_train, y_train, X_test, y_test)
 
             # Adaboost
-            self.load_pretrained_models("adaboost_Adult_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("adaboost_Adult_modelModel", X_train, y_train, X_test, y_test)
 
             # KNN
-            self.load_pretrained_models("knearest_Adult_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("knearest_Adult_modelModel", X_train, y_train, X_test, y_test)
 
             # GNB
-            self.load_pretrained_models("gaussian_Adult_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("gaussian_Adult_modelModel", X_train, y_train, X_test, y_test)
 
             # MLP
-            self.load_pretrained_models("mlp_Adult_model", X_train, y_train, X_test, y_test)
+            self.load_pretrained_models("mlp_Adult_modelModel", X_train, y_train, X_test, y_test)
 
     def Yeast(self, userResponse):
         print('Running classification for 8.Yeast dataset')
@@ -1456,110 +1454,149 @@ class class_classification:
             self.load_pretrained_models("YeastDCTModel", X_train, y_train, X_test, y_test)
 
     def Thoracic_Surgery_Data(self, userResponse):
-        df = pd.read_csv("../Datasets/yeast.data", header=None, delim_whitespace=True)
-        encoder = Preprocessing.LabelEncoder()
-        encoder.fit(df.iloc[:, 0])
-        df.iloc[:, 0] = encoder.transform(df.iloc[:, 0])
-        encoder.fit(df.iloc[:, 9])
-        df.iloc[:, 9] = encoder.transform(df.iloc[:, 9])
-        X_train, X_test, y_train, y_test = train_test_split(df.iloc[:, 0:9], df.iloc[:, 9], test_size=0.2,
-                                                            random_state=0, shuffle=False)
-        scaler = Preprocessing.StandardScaler().fit(X_train.iloc[:, [0]])
-        X_train.iloc[:, [0]] = scaler.fit_transform(X_train.iloc[:, [0]])
-        X_test.iloc[:, [0]] = scaler.fit_transform(X_test.iloc[:, [0]])
+        def Thoracic_Surgery_Data(self, userResponse):
+            print('Running classification for 9.Thoracic Surgery Data dataset')
+            df = pd.read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/00277/ThoraricSurgery.arff",
+                             delimiter=",", header=None, skiprows=21)
 
-        if userResponse is "2":
+            X = df.loc[:, :15]
+            X = X.replace({'F': 0, 'T': 1})
+            X = X.replace({'OC11': 0, 'OC12': 1, 'OC13': 2, 'OC14': 3})
+            X = X.replace({'PRZ0': 0, 'PRZ1': 1, 'PRZ2': 2})
+            X = X.replace({'DGN1': 0, 'DGN2': 1, 'DGN3': 2, 'DGN4': 3, 'DGN5': 4, 'DGN6': 5, 'DGN8': 6})
+            y = df.loc[:, 16]
+            y = y.replace({'F': 0, 'T': 1})
 
-            # LOGISTIC REGRESSION
-            param = {'solver': ["lbfgs"],
-                     'C': Stats.reciprocal(0.001, 1000),
-                     }
-            lr = Linear.LogisticRegression(random_state=0, multi_class='ovr', max_iter=10000)
-            self.random_search_cv(lr, param, X_train, y_train, X_test, y_test, "YeastLR", 5)
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=0)
 
-            # K NEAREST NEIGHBOURS
-            param = {
-                "n_neighbors": [10, 50, 100],
-                "weights": ['uniform', 'distance'],
-                "leaf_size": [15, 30, 50, 100]
-            }
-            self.grid_search_cv(Neighbors.KNeighborsClassifier(),
-                                param, X_train, y_train, X_test, y_test, "YeastKNN", 5)
+            if userResponse is "2":
 
-            # SVM
-            param = {'kernel': ['rbf', 'linear'],
-                     'degree': [1, 2, 3, 4, 5, 6],
-                     'C': [1, 10, 100, 1000],
-                     'gamma': [1e-3, 1e-4]}
-            self.grid_search_cv(sklearn.svm.SVC(random_state=0, class_weight="balanced"), param, X_train, y_train,
-                                X_test, y_test, "YeastSVM", 5)
+                ''' KNN CLASSIFICATION'''
 
-            # DECISION TREE CLASSIFIER
-            dt = Tree.DecisionTreeClassifier(random_state=0, class_weight="balanced")
-            param = {'max_depth': np.arange(3, 10),
-                     'criterion': ['gini'],
-                     'max_leaf_nodes': [5, 10, 20, 100],
-                     'min_samples_split': [2, 5, 10, 20]}
-            self.grid_search_cv(dt, param, X_train, y_train, X_test, y_test, "YeastDCT", 5)
+                print('Running KNN Classifier\n')
+                param_grid = {
+                    "n_neighbors": np.arange(5, 50),
+                    "weights": ['uniform', 'distance'],
+                    "leaf_size": np.arange(5, 100, 5)
+                }
+                knn = Neighbors.KNeighborsClassifier()
+                self.grid_search_cv(knn, param_grid, X_train, y_train, X_test,
+                                    y_test, "knearest_Thoracic_Surgery_Data_model", cv=3)
 
-            # RANDOM FOREST
-            param_grid = {'max_depth': np.arange(3, 10),
-                          'max_features': np.arange(1, 9, 1),
-                          'max_leaf_nodes': [5, 10, 15, 50, 100],
-                          'min_samples_split': [2, 5],
-                          }
-            self.random_search_cv(Ensemble.RandomForestClassifier(n_estimators=500, random_state=0),
-                                  param_grid, X_train, y_train, X_test, y_test, "YeastRF", 5)
+                ''' Decision Tree CLASSIFICATION'''
 
-            # ADABOOST CLASSIFIER
-            param_grid = {
-                "n_estimators": [30, 50, 70, 100],
-                "learning_rate": [0.5, 0.7, 1, 2],
-                "algorithm": ["SAMME", "SAMME.R"]
-            }
-            self.grid_search_cv(Ensemble.AdaBoostClassifier(random_state=0), param_grid, X_train,
-                                y_train, X_test, y_test, "YeastAda", 3)
+                print('Running Decision Tree Classifier\n')
+                param_grid = {
+                    'max_depth': np.arange(5, 30, 5),
+                    'max_leaf_nodes': np.arange(5, 30, 5),
+                    'criterion': ['gini', 'entropy']
+                }
+                dtc = Tree.DecisionTreeClassifier(random_state=0)
 
-            # NEURAL NETWORK
-            param_grid = {
-                "solver": ['adam', 'sgd'],
-                "learning_rate_init": [0.001, 0.01, 0.1],
-                "hidden_layer_sizes": [(1024,), (128, 64, 32), (512,), (256, 128, 64, 32), (512, 256, 128, 64, 32)]
-            }
-            self.grid_search_cv(
-                NN.MLPClassifier(activation='relu', tol=1e-4, n_iter_no_change=10, momentum=0.9, \
-                                 learning_rate='adaptive', verbose=True, warm_start=True, \
-                                 early_stopping=True), param_grid, X_train, y_train, X_test, y_test, "YeastNN", 3)
+                self.grid_search_cv(dtc, param_grid, X_train, y_train, X_test,
+                                    y_test, "tree_Thoracic_Surgery_Data_model", cv=3)
 
-            # GAUSSIAN NAIVE BAY
-            param_grid = {
-                "var_smoothing": [1e-07, 1e-08, 1e-09]
-            }
-            self.grid_search_cv(GaussianNB(), param_grid, X_train, y_train, X_test, y_test, "YeastGNN", 5)
-        else:
-            # ADABOOST
-            self.load_pretrained_models("YeastAdaModel", X_train, y_train, X_test, y_test)
+                ''' SVM CLASSIFICATION'''
 
-            # DTC
-            self.load_pretrained_models("YeastGNNModel", X_train, y_train, X_test, y_test)
+                print('Running SVM Classifier\n')
+                param_grid = {
+                    'kernel': ['rbf'],
+                    'C': np.logspace(0, 3, 4),
+                    'gamma': np.logspace(-2, 1, 4)
+                }
+                svm = sklearn.svm.SVC(random_state=0)
+                self.random_search_cv(svm, param_grid, X_train, y_train, X_test, y_test,
+                                      "svm_Thoracic_Surgery_Data_model", cv=3)
 
-            # KNN
-            self.load_pretrained_models("YeastKNNModel", X_train, y_train, X_test, y_test)
+                '''RANDOM FOREST CLASSIFIER'''
 
-            # LR
-            self.load_pretrained_models("YeastLRModel", X_train, y_train, X_test, y_test)
+                print('Running Random Forest Classifier\n')
+                param_grid = {'n_estimators': np.arange(5, 20, 3),
+                              'max_depth': np.arange(5, 50, 3),
+                              'max_leaf_nodes': np.arange(5, 50, 5),
+                              'criterion': ['gini', 'entropy']
+                              }
 
-            # NN
-            self.load_pretrained_models("YeastNNModel", X_train, y_train, X_test, y_test)
+                rfc = Ensemble.RandomForestClassifier(random_state=0)
 
-            # RF
-            self.load_pretrained_models("YeastRFModel", X_train, y_train, X_test, y_test)
+                self.grid_search_cv(rfc, param_grid, X_train,
+                                    y_train, X_test, y_test, "random_forest_Thoracic_Surgery_Data_model", cv=3)
 
-            # SVM
-            self.load_pretrained_models("YeastSVMModel", X_train, y_train, X_test, y_test)
+                '''ADABOOST CLASSIFIER'''
 
-            # DCT
-            self.load_pretrained_models("YeastDCTModel", X_train, y_train, X_test, y_test)
+                print('Running Adaboost Classifier\n')
+                param_grid = {'n_estimators': np.arange(25, 75, 5),
+                              'learning_rate': np.arange(0.1, 1.1, 0.1),
+                              'algorithm': ['SAMME', 'SAMME.R']
+                              }
+
+                adaboost = Ensemble.AdaBoostClassifier(random_state=0)
+
+                self.random_search_cv(adaboost, param_grid, X_train,
+                                      y_train, X_test, y_test, "adaboost_Thoracic_Surgery_Data_model", cv=3)
+
+                '''LOGISTIC REGRESSION CLASSIFIER'''
+
+                print('Running Logistic Regression Classifier\n')
+                param_grid = {
+                    'C': np.logspace(0, 3, 4),
+                    'fit_intercept': [True, False],
+                    'max_iter': [50, 100, 150],
+                    'solver': ['liblinear', 'sag', 'saga']
+                }
+                lr = Linear.LogisticRegression(multi_class='auto', random_state=0)
+                self.random_search_cv(lr, param_grid, X_train,
+                                      y_train, X_test, y_test, "logistic_Thoracic_Surgery_Data_model", cv=3)
+
+                '''GAUSSIAN NAIVE BAYES CLASSIFIER'''
+
+                print('Running Gaussian Naive Bayes Classifier\n')
+                param_grid = {
+                    "var_smoothing": [1e-05, 1e-07, 1e-09, 1e-11]}
+                self.grid_search_cv(GaussianNB(), param_grid, X_train, y_train, X_test, y_test,
+                                    "gaussian_Thoracic_Surgery_Data_model", cv=3)
+
+                '''Neural Network Classifier'''
+
+                mlp = sklearn.neural_network.MLPClassifier(activation='relu', tol=1e-4, n_iter_no_change=10,
+                                                           momentum=0.9,
+                                                           learning_rate='adaptive', random_state=0, verbose=True,
+                                                           warm_start=True, early_stopping=True)
+
+                param_grid = {
+                    "solver": ['adam'],
+                    "learning_rate_init": np.arange(0.1, 1.1, 0.1),
+                    "hidden_layer_sizes": [(512,), (256, 128, 64, 32, 2), (512, 256, 128, 64, 32, 2)]
+                }
+
+                self.random_search_cv(mlp, param_grid, X_train, y_train, X_test, y_test,
+                                      "mlp_Thoracic_Surgery_Data_model", cv=3)
+            else:
+                # SVM
+                self.load_pretrained_models("svm_Thoracic_Surgery_Data_model", X_train, y_train, X_test, y_test, 3)
+
+                # DTC
+                self.load_pretrained_models("tree_Thoracic_Surgery_Data_model", X_train, y_train, X_test, y_test, 3)
+
+                # RFC
+                self.load_pretrained_models("random_forest_Thoracic_Surgery_Data_model", X_train, y_train, X_test,
+                                            y_test,
+                                            3)
+
+                # LR
+                self.load_pretrained_models("logistic_Thoracic_Surgery_Data_model", X_train, y_train, X_test, y_test, 3)
+
+                # Adaboost
+                self.load_pretrained_models("adaboost_Thoracic_Surgery_Data_model", X_train, y_train, X_test, y_test, 3)
+
+                # KNN
+                self.load_pretrained_models("knearest_Thoracic_Surgery_Data_model", X_train, y_train, X_test, y_test, 3)
+
+                # GNB
+                self.load_pretrained_models("gaussian_Thoracic_Surgery_Data_model", X_train, y_train, X_test, y_test, 3)
+
+                # MLP
+                self.load_pretrained_models("mlp_Thoracic_Surgery_Data_model", X_train, y_train, X_test, y_test, 3)
 
     def Seismic_Bumps(self, userResponse):
         print('Running classification for 10.Seismic Bumps dataset')
